@@ -108,3 +108,22 @@ body {
     columns: 1 100%;
   }
 }
+
+/* Diagonal split background for hero section */
+.hero-diagonal-bg {
+  clip-path: polygon(0 0, 100% 0, 100% 58%, 0 70%);
+}
+
+.hero-diagonal-wrapper {
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
+}
+
+@media (min-width: 1024px) {
+  .hero-diagonal-bg {
+    clip-path: polygon(0 0, 62% 0, 42% 100%, 0 100%);
+  }
+  .hero-diagonal-wrapper {
+    filter: drop-shadow(10px 0 20px rgba(0, 0, 0, 0.45));
+  }
+}
+

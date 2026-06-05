@@ -22,6 +22,7 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [isTestimonialHovered, setIsTestimonialHovered] = useState(false);
   const [activeAdmissionsStep, setActiveAdmissionsStep] = useState(1);
   const [formStatus, setFormStatus] = useState({ loading: false, submitted: false });
   const [activeNavSection, setActiveNavSection] = useState('home');
@@ -100,54 +101,80 @@ export default function App() {
   // GSAP Animations once loader is gone
   useEffect(() => {
     if (!isLoading) {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      
       // 1. Hero Load Animations
       const heroTl = gsap.timeline();
-      heroTl.from('.hero-badge', { y: 30, opacity: 0, duration: 0.8, ease: 'power3.out' })
-            .from('.hero-heading', { y: 40, opacity: 0, duration: 1, ease: 'power3.out' }, '-=0.6')
-            .from('.hero-desc', { y: 30, opacity: 0, duration: 0.8, ease: 'power3.out' }, '-=0.6')
-            .from('.hero-btn', { y: 20, opacity: 0, duration: 0.6, stagger: 0.2, ease: 'power3.out' }, '-=0.6')
-            .from('.hero-img-box', { scale: 0.95, opacity: 0, duration: 1.2, ease: 'power3.out' }, '-=1.2')
-            .from('.hero-logo-badge', { scale: 0, opacity: 0, duration: 0.8, ease: 'back.out(1.7)' }, '-=0.4');
+      
+      if (prefersReducedMotion) {
+        heroTl.from('.hero-badge', { opacity: 0, duration: 0.5, ease: 'power1.inOut' })
+              .from('.hero-heading', { opacity: 0, duration: 0.5, ease: 'power1.inOut' }, '-=0.35')
+              .from('.hero-desc', { opacity: 0, duration: 0.5, ease: 'power1.inOut' }, '-=0.35')
+              .from('.hero-btn', { opacity: 0, duration: 0.5, stagger: 0.1, ease: 'power1.inOut' }, '-=0.35')
+              .from('.hero-img-box', { opacity: 0, duration: 0.6, ease: 'power1.inOut' }, '-=0.45')
+              .from('.hero-logo-badge', { opacity: 0, duration: 0.5, ease: 'power1.inOut' }, '-=0.35');
+      } else {
+        heroTl.from('.hero-badge', { y: 15, opacity: 0, duration: 0.6, ease: 'power1.inOut' })
+              .from('.hero-heading', { opacity: 0, duration: 0.6, ease: 'power1.inOut' }, '-=0.4')
+              .from('.hero-desc', { y: 10, opacity: 0, duration: 0.6, ease: 'power1.inOut' }, '-=0.4')
+              .from('.hero-btn', { y: 5, opacity: 0, duration: 0.5, stagger: 0.15, ease: 'power1.inOut' }, '-=0.4')
+              .from('.hero-img-box', { scale: 0.98, opacity: 0, duration: 0.8, ease: 'power1.inOut' }, '-=0.8')
+              .from('.hero-logo-badge', { scale: 0.95, opacity: 0, duration: 0.6, ease: 'power1.inOut' }, '-=0.4');
+              
+        // Subtle background zoom
+        gsap.to('.hero-bg-img', { scale: 1.02, duration: 6, ease: 'power1.inOut' });
+      }
 
       // 2. Features entrance
-      gsap.from('.feature-card-el', {
-        scrollTrigger: {
-          trigger: '.features-grid-el',
-          start: 'top 80%',
-        },
-        y: 50,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: 'power3.out'
-      });
+      if (prefersReducedMotion) {
+        gsap.from('.feature-card-el', {
+          scrollTrigger: { trigger: '.features-grid-el', start: 'top 85%' },
+          opacity: 0,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: 'power1.inOut'
+        });
+      } else {
+        gsap.from('.feature-card-el', {
+          scrollTrigger: { trigger: '.features-grid-el', start: 'top 85%' },
+          y: 20,
+          opacity: 0,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: 'power1.inOut'
+        });
+      }
 
       // 3. About animations
-      gsap.from('.about-img-box-el', {
-        scrollTrigger: { trigger: '.about-grid-el', start: 'top 75%' },
-        x: -50,
-        opacity: 0,
-        duration: 1.2,
-        ease: 'power3.out'
-      });
-
-      gsap.from('.about-glass-card-el', {
-        scrollTrigger: { trigger: '.about-grid-el', start: 'top 70%' },
-        scale: 0.9,
-        opacity: 0,
-        duration: 1,
-        delay: 0.3,
-        ease: 'back.out(1.2)'
-      });
-
-      gsap.from('.about-text-el > *', {
-        scrollTrigger: { trigger: '.about-text-el', start: 'top 75%' },
-        y: 30,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: 'power3.out'
-      });
+      if (prefersReducedMotion) {
+        gsap.from('.about-img-box-el', {
+          scrollTrigger: { trigger: '.about-grid-el', start: 'top 80%', once: true },
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power1.inOut'
+        });
+        gsap.from('.about-text-el', {
+          scrollTrigger: { trigger: '.about-grid-el', start: 'top 80%', once: true },
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power1.inOut'
+        });
+      } else {
+        gsap.from('.about-img-box-el', {
+          scrollTrigger: { trigger: '.about-grid-el', start: 'top 80%', once: true },
+          x: -30,
+          opacity: 0,
+          duration: 0.6,
+          ease: 'power1.inOut'
+        });
+        gsap.from('.about-text-el', {
+          scrollTrigger: { trigger: '.about-grid-el', start: 'top 80%', once: true },
+          x: 30,
+          opacity: 0,
+          duration: 0.6,
+          ease: 'power1.inOut'
+        });
+      }
 
       // 4. Statistics Counters
       const statsSection = document.querySelector('.stats-grid-el');
@@ -171,8 +198,8 @@ export default function App() {
               start: 'top 80%',
             },
             val: data.target,
-            duration: 2.2,
-            ease: 'power1.out',
+            duration: 2.0, // Exactly 2 seconds
+            ease: 'power1.inOut',
             onUpdate: function() {
               el.innerText = Math.floor(obj.val) + data.suffix;
             }
@@ -181,14 +208,24 @@ export default function App() {
       }
 
       // 5. Programs Cards Stagger
-      gsap.from('.program-card-el', {
-        scrollTrigger: { trigger: '.programs-grid-el', start: 'top 80%' },
-        y: 50,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.12,
-        ease: 'power3.out'
-      });
+      if (prefersReducedMotion) {
+        gsap.from('.program-card-el', {
+          scrollTrigger: { trigger: '.programs-grid-el', start: 'top 85%' },
+          opacity: 0,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: 'power1.inOut'
+        });
+      } else {
+        gsap.from('.program-card-el', {
+          scrollTrigger: { trigger: '.programs-grid-el', start: 'top 85%' },
+          y: 20,
+          opacity: 0,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: 'power1.inOut'
+        });
+      }
 
       // 6. Admissions timeline progress triggers
       const timelineSteps = document.querySelectorAll('.timeline-step-el');
@@ -202,23 +239,45 @@ export default function App() {
         });
       });
 
-      // 8. Blog posts stagger
-      gsap.from('.blog-card-el', {
-        scrollTrigger: { trigger: '.blog-grid-el', start: 'top 85%' },
-        y: 40,
+      // 7. Blog posts stagger
+      if (prefersReducedMotion) {
+        gsap.from('.blog-card-el', {
+          scrollTrigger: { trigger: '.blog-grid-el', start: 'top 85%' },
+          opacity: 0,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: 'power1.inOut'
+        });
+      } else {
+        gsap.from('.blog-card-el', {
+          scrollTrigger: { trigger: '.blog-grid-el', start: 'top 85%' },
+          y: 20,
+          opacity: 0,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: 'power1.inOut'
+        });
+      }
+
+      // 8. Footer fade-in
+      gsap.from('footer', {
+        scrollTrigger: { trigger: 'footer', start: 'top 95%' },
         opacity: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: 'power3.out'
+        duration: 0.6,
+        ease: 'power1.inOut'
       });
     }
   }, [isLoading]);
 
   // Testimonials slide autoplay loops
   useEffect(() => {
-    startAutoplay();
+    if (!isTestimonialHovered) {
+      startAutoplay();
+    } else {
+      clearInterval(autoplayRef.current);
+    }
     return () => clearInterval(autoplayRef.current);
-  }, [currentTestimonial]);
+  }, [currentTestimonial, isTestimonialHovered]);
 
   const startAutoplay = () => {
     clearInterval(autoplayRef.current);
@@ -229,7 +288,6 @@ export default function App() {
 
   const handleTestimonialNav = (dir) => {
     setCurrentTestimonial(prev => (prev + dir + testimonials.length) % testimonials.length);
-    startAutoplay();
   };
 
   // Form submission handler
@@ -274,13 +332,13 @@ export default function App() {
       {/* ==========================================
          STICKY HEADER NAVBAR
          ========================================== */}
-      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-4 navbar-glass shadow-md' : 'py-6 bg-transparent'}`}>
-        <div className="max-w-[1300px] mx-auto px-8 flex justify-between items-center">
+      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-4 bg-burgundy border-b border-burgundy-dark shadow-md' : 'py-6 bg-white border-b-2 border-burgundy shadow-sm'}`}>
+        <div className="max-w-[1300px] mx-auto px-6 sm:px-8 flex justify-between items-center">
           <a href="#home" className="flex items-center gap-3">
             {/* Logo used here */}
-            <img src={logo} alt="Beever Academy Logo" className="w-[64px] h-auto drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]" />
-            <span className="font-serif text-white text-xl md:text-2xl font-semibold tracking-wider">
-              BEEVER <span className="text-gold">ACADEMY</span>
+            <img src={logo} alt="Beever Academy Logo" className="w-[50px] sm:w-[64px] h-auto drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]" />
+            <span className={`font-serif text-lg sm:text-xl md:text-2xl font-semibold tracking-wider transition-colors duration-300 ${isScrolled ? 'text-white' : 'text-burgundy'}`}>
+              BEEVER <span className={isScrolled ? 'text-gold' : 'text-gold-dark'}>ACADEMY</span>
             </span>
           </a>
 
@@ -290,7 +348,11 @@ export default function App() {
               <li key={sec}>
                 <a 
                   href={`#${sec}`} 
-                  className={`font-sans text-xs uppercase tracking-wider font-semibold transition-all duration-200 relative py-2 ${activeNavSection === sec ? 'text-gold-light after:w-full' : 'text-white/80 hover:text-gold-light after:w-0'} after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1px] after:bg-gold-gradient hover:after:w-full after:transition-all after:duration-300`}
+                  className={`font-sans text-xs uppercase tracking-wider font-semibold transition-all duration-200 relative py-2 ${
+                    activeNavSection === sec 
+                      ? (isScrolled ? 'text-gold-light after:w-full' : 'text-gold-dark after:w-full') 
+                      : (isScrolled ? 'text-white/80 hover:text-gold-light after:w-0' : 'text-burgundy/80 hover:text-gold-dark after:w-0')
+                  } after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1px] ${isScrolled ? 'after:bg-gold' : 'after:bg-burgundy'} hover:after:w-full after:transition-all after:duration-300`}
                 >
                   {sec.replace('-', ' ')}
                 </a>
@@ -299,12 +361,19 @@ export default function App() {
           </ul>
 
           <div className="flex items-center gap-6">
-            <a href="#admissions" className="hidden sm:inline-flex btn btn-gold text-xs px-6 py-3 font-semibold shadow-gold gold-gradient-bg text-burgundy-dark hover:shadow-[0_15px_30px_rgba(212,175,55,0.5)] hover:-translate-y-[2px] transition-all duration-300 uppercase tracking-widest">
+            <a 
+              href="#admissions" 
+              className={`hidden sm:inline-flex btn text-xs px-6 py-3 font-semibold shadow-sm transition-all duration-300 uppercase tracking-widest ${
+                isScrolled 
+                  ? 'gold-gradient-bg text-burgundy-dark hover:shadow-md hover:-translate-y-[2px]' 
+                  : 'bg-burgundy text-white hover:bg-burgundy-light hover:-translate-y-[2px]'
+              }`}
+            >
               Enroll Now
             </a>
             {/* Mobile Hamburger toggle */}
             <button 
-              className="lg:hidden text-white flex flex-col gap-[6px] cursor-pointer z-[1100]" 
+              className={`lg:hidden flex flex-col gap-[6px] cursor-pointer z-[1100] ${mobileMenuOpen ? 'text-white' : (isScrolled ? 'text-white' : 'text-burgundy')}`}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle Menu"
             >
@@ -312,9 +381,9 @@ export default function App() {
                 <X className="w-6 h-6 text-white" />
               ) : (
                 <>
-                  <span className="w-6 h-[2px] bg-white block"></span>
-                  <span className="w-6 h-[2px] bg-white block"></span>
-                  <span className="w-6 h-[2px] bg-white block"></span>
+                  <span className={`w-6 h-[2px] block transition-colors duration-300 ${isScrolled ? 'bg-white' : 'bg-burgundy'}`}></span>
+                  <span className={`w-6 h-[2px] block transition-colors duration-300 ${isScrolled ? 'bg-white' : 'bg-burgundy'}`}></span>
+                  <span className={`w-6 h-[2px] block transition-colors duration-300 ${isScrolled ? 'bg-white' : 'bg-burgundy'}`}></span>
                 </>
               )}
             </button>
@@ -345,10 +414,23 @@ export default function App() {
       {/* ==========================================
          HERO SECTION
          ========================================== */}
-      <section id="home" className="relative min-h-screen bg-burgundy-dark flex items-center overflow-hidden pt-32">
-        <div className="absolute inset-0 bg-gradient-to-r from-burgundy-dark/95 to-burgundy-dark/70 z-10"></div>
+      <section id="home" className="relative min-h-screen bg-white flex items-center overflow-hidden pt-32 pb-20 lg:pb-24">
+        {/* Diagonal Background Split */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          {/* Burgundy side with drop shadow */}
+          <div className="absolute inset-0 hero-diagonal-wrapper">
+            <div className="absolute inset-0 bg-burgundy-dark hero-diagonal-bg">
+              {/* Subtle background image zoom inside the burgundy side */}
+              <div 
+                className="hero-bg-img absolute inset-0 bg-cover bg-center opacity-15 z-0"
+                style={{ backgroundImage: "url('/hero_building.png')" }}
+              ></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-burgundy-dark/95 to-burgundy-dark/70 z-10"></div>
+            </div>
+          </div>
+        </div>
         
-        <div className="relative max-w-[1300px] w-full mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 items-center gap-16 z-20">
+        <div className="relative max-w-[1300px] w-full mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 items-center gap-6 lg:gap-16 z-20">
           {/* Hero Left Content */}
           <div className="lg:col-span-7 text-white text-left">
             <div className="hero-badge mb-6 inline-block">
@@ -360,27 +442,27 @@ export default function App() {
               LEARN TODAY,<br/>
               <span className="gold-gradient-text font-bold">LEAD TOMORROW</span>
             </h1>
-            <p className="hero-desc text-base md:text-lg font-light text-text-light mb-12 max-w-[580px] leading-relaxed">
+            <p className="hero-desc text-base md:text-lg font-light text-text-light mb-6 md:mb-12 max-w-[580px] leading-relaxed">
               Empowering minds. Building character. Shaping future leaders. Experience the highest standard of academic excellence and luxury campus life.
             </p>
             <div className="flex flex-wrap gap-5">
-              <a href="#programs" className="hero-btn btn btn-gold gold-gradient-bg text-burgundy-dark px-9 py-4 font-semibold uppercase tracking-widest shadow-gold hover:shadow-[0_15px_30px_rgba(212,175,55,0.5)] hover:-translate-y-[3px] transition-all duration-300">
+              <a href="#programs" className="hero-btn btn btn-gold gold-gradient-bg text-burgundy-dark px-9 py-4 font-semibold uppercase tracking-widest shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-colors duration-300">
                 Explore Programs
               </a>
-              <a href="#contact" className="hero-btn btn border border-white/30 text-white hover:bg-white hover:text-burgundy hover:border-white px-9 py-4 font-semibold uppercase tracking-widest hover:-translate-y-[3px] transition-all duration-300">
+              <a href="#contact" className="hero-btn btn border border-white/30 text-white hover:bg-white hover:text-burgundy hover:border-white px-9 py-4 font-semibold uppercase tracking-widest hover:-translate-y-[2px] transition-colors duration-300">
                 Schedule Campus Visit
               </a>
             </div>
           </div>
-
+ 
           {/* Hero Right Visual */}
           <div className="lg:col-span-5 flex justify-center relative">
-            <div className="hero-img-box relative w-full max-w-[450px] border border-gold/20 p-3 bg-white/5 shadow-2xl">
-              <img src="/hero_building.png" alt="Grand Academy Building" className="w-full h-[520px] object-cover transition-transform duration-500 hover:scale-105" />
+            <div className="hero-img-box relative w-full max-w-[450px] border-2 border-burgundy p-3 bg-burgundy/5 shadow-2xl">
+              <img src="/hero_building.png" alt="Grand Academy Building" className="w-full h-[320px] sm:h-[420px] lg:h-[520px] object-cover transition-transform duration-500 hover:scale-105" />
               
               {/* Emblem Overlay - Logo used here */}
-              <div className="hero-logo-badge absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[160px] h-[160px] bg-burgundy-dark/85 border border-gold rounded-full flex justify-center items-center shadow-[0_10px_40px_rgba(0,0,0,0.5),_0_0_20px_rgba(212,175,55,0.3)] backdrop-blur-[8px]">
-                <img src={logo} alt="Beever Academy Shield" className="w-[96px] h-auto drop-shadow-md animate-[spin_20s_linear_infinite]" />
+              <div className="hero-logo-badge absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110px] h-[110px] sm:w-[130px] sm:h-[130px] lg:w-[160px] lg:h-[160px] bg-burgundy-dark/85 border border-gold rounded-full flex justify-center items-center shadow-[0_10px_40px_rgba(0,0,0,0.5),_0_0_20px_rgba(212,175,55,0.3)] backdrop-blur-[8px]">
+                <img src={logo} alt="Beever Academy Shield" className="w-[64px] sm:w-[76px] lg:w-[96px] h-auto drop-shadow-md" />
               </div>
               
               {/* Parallax Light Flares */}
@@ -415,9 +497,9 @@ export default function App() {
 
           <div className="features-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
             {/* Feature 1 */}
-            <div className="feature-card-el bg-white p-10 border border-black/5 shadow-sm hover:-translate-y-2 hover:shadow-lg hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
+            <div className="feature-card-el bg-white p-10 border border-black/5 shadow-sm hover:-translate-y-[5px] hover:shadow-lg hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
               <div className="w-[65px] h-[65px] bg-ivory border border-burgundy/8 flex justify-center items-center mb-8 mx-auto group-hover:bg-burgundy group-hover:border-burgundy transition-all duration-300">
-                <Award className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-110 transition-all duration-300" />
+                <Award className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />
               </div>
               <h3 className="text-xl font-serif text-burgundy mb-4">Academic Excellence</h3>
               <p className="text-sm text-text-secondary leading-relaxed">Rigorous curriculum, state-of-the-art resources, and exceptional academic standards recognized globally.</p>
@@ -425,9 +507,9 @@ export default function App() {
             </div>
 
             {/* Feature 2 */}
-            <div className="feature-card-el bg-white p-10 border border-black/5 shadow-sm hover:-translate-y-2 hover:shadow-lg hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
+            <div className="feature-card-el bg-white p-10 border border-black/5 shadow-sm hover:-translate-y-[5px] hover:shadow-lg hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
               <div className="w-[65px] h-[65px] bg-ivory border border-burgundy/8 flex justify-center items-center mb-8 mx-auto group-hover:bg-burgundy group-hover:border-burgundy transition-all duration-300">
-                <Users className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-110 transition-all duration-300" />
+                <Users className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />
               </div>
               <h3 className="text-xl font-serif text-burgundy mb-4">Experienced Faculty</h3>
               <p className="text-sm text-text-secondary leading-relaxed">Learn from distinguished scholars, industry pioneers, and internationally acclaimed Ivy League educators.</p>
@@ -435,9 +517,9 @@ export default function App() {
             </div>
 
             {/* Feature 3 */}
-            <div className="feature-card-el bg-white p-10 border border-black/5 shadow-sm hover:-translate-y-2 hover:shadow-lg hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
+            <div className="feature-card-el bg-white p-10 border border-black/5 shadow-sm hover:-translate-y-[5px] hover:shadow-lg hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
               <div className="w-[65px] h-[65px] bg-ivory border border-burgundy/8 flex justify-center items-center mb-8 mx-auto group-hover:bg-burgundy group-hover:border-burgundy transition-all duration-300">
-                <Shield className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-110 transition-all duration-300" />
+                <Shield className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />
               </div>
               <h3 className="text-xl font-serif text-burgundy mb-4">Character Building</h3>
               <p className="text-sm text-text-secondary leading-relaxed">Fostering integrity, resilience, ethical leadership, and a deep commitment to positive societal impact.</p>
@@ -445,9 +527,9 @@ export default function App() {
             </div>
 
             {/* Feature 4 */}
-            <div className="feature-card-el bg-white p-10 border border-black/5 shadow-sm hover:-translate-y-2 hover:shadow-lg hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
+            <div className="feature-card-el bg-white p-10 border border-black/5 shadow-sm hover:-translate-y-[5px] hover:shadow-lg hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
               <div className="w-[65px] h-[65px] bg-ivory border border-burgundy/8 flex justify-center items-center mb-8 mx-auto group-hover:bg-burgundy group-hover:border-burgundy transition-all duration-300">
-                <Globe className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-110 transition-all duration-300" />
+                <Globe className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />
               </div>
               <h3 className="text-xl font-serif text-burgundy mb-4">Global Perspective</h3>
               <p className="text-sm text-text-secondary leading-relaxed">International study opportunities, global networking events, and an inclusive, diverse student body.</p>
@@ -465,10 +547,10 @@ export default function App() {
           <div className="about-grid-el grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             {/* Visual Column */}
             <div className="about-img-box-el relative border border-burgundy/10 p-[15px] bg-white shadow-md">
-              <img src="/library_students.png" alt="Students in Library" className="w-full h-[480px] object-cover" />
+              <img src="/library_students.png" alt="Students in Library" className="w-full h-[280px] sm:h-[380px] lg:h-[480px] object-cover" />
               
               {/* Overlay Glass Card */}
-              <div className="about-glass-card-el absolute -bottom-10 -right-10 w-[280px] bg-burgundy/90 backdrop-blur-[12px] border border-gold/30 p-8 shadow-2xl text-white hidden sm:block">
+              <div className="about-glass-card-el absolute -bottom-10 right-4 lg:-right-10 w-[280px] bg-burgundy/90 backdrop-blur-[12px] border border-gold/30 p-8 shadow-2xl text-white hidden sm:block">
                 <div className="relative">
                   <h4 className="font-serif text-2xl text-gold mb-3">Education For Life</h4>
                   <p className="text-xs text-text-light leading-relaxed">Enriching minds, nurturing spirits, and preparing global citizens since 1918.</p>
@@ -507,7 +589,7 @@ export default function App() {
                 ))}
               </ul>
               
-              <a href="#contact" className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white px-9 py-4 font-semibold uppercase tracking-widest shadow-burgundy hover:-translate-y-[3px] transition-all duration-300">
+              <a href="#contact" className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white px-9 py-4 font-semibold uppercase tracking-widest shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-all duration-300">
                 Learn More About Us
               </a>
             </div>
@@ -576,7 +658,7 @@ export default function App() {
               { title: "Online Learning", icon: <Monitor className="w-full h-full" />, desc: "Flexible digital instruction leveraging cutting-edge technology, accessible from anywhere in the world." },
               { title: "Executive Education", icon: <Briefcase className="w-full h-full" />, desc: "Bespoke management masterclasses designed exclusively for elite senior business directors and C-suite leaders." }
             ].map((program, i) => (
-              <div key={i} className="program-card-el bg-white p-10 border border-black/5 shadow-sm relative z-10 hover:-translate-y-2 hover:shadow-2xl hover:border-transparent transition-all duration-300 flex flex-col justify-between group min-h-[300px]">
+              <div key={i} className="program-card-el bg-white p-10 border border-black/5 shadow-sm relative z-10 hover:-translate-y-[2px] hover:shadow-md hover:border-gold/30 transition-all duration-300 flex flex-col justify-between group min-h-[300px]">
                 <div>
                   <div className="w-[60px] h-[60px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300 mb-8">
                     {program.icon}
@@ -615,11 +697,15 @@ export default function App() {
           </div>
 
           <div className="max-w-[850px] mx-auto relative px-8 sm:px-16">
-            <div className="relative h-[420px] sm:h-[350px] overflow-hidden">
+            <div 
+              className="relative h-[420px] sm:h-[350px] overflow-hidden"
+              onMouseEnter={() => setIsTestimonialHovered(true)}
+              onMouseLeave={() => setIsTestimonialHovered(false)}
+            >
               {testimonials.map((test, index) => (
                 <div 
                   key={index} 
-                  className={`absolute inset-0 flex flex-col justify-center items-center text-center transition-all duration-600 ${index === currentTestimonial ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-5'}`}
+                  className={`absolute inset-0 flex flex-col justify-center items-center text-center transition-all duration-500 ease-in-out ${index === currentTestimonial ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-5'}`}
                 >
                   <div className="relative pt-14 mb-8">
                     <Quote className="absolute top-0 left-1/2 -translate-x-1/2 w-[50px] h-[50px] text-gold-light/45" />
@@ -665,7 +751,7 @@ export default function App() {
               {testimonials.map((_, index) => (
                 <button 
                   key={index} 
-                  onClick={() => { setCurrentTestimonial(index); startAutoplay(); }} 
+                  onClick={() => setCurrentTestimonial(index)} 
                   className={`border-none h-2 cursor-pointer transition-all duration-300 rounded-full ${index === currentTestimonial ? 'bg-gold-dark w-6' : 'bg-burgundy/15 w-2'}`}
                   aria-label={`Slide ${index + 1}`}
                 />
@@ -801,10 +887,10 @@ export default function App() {
             Admissions for the upcoming academic year are now open. Secure your legacy at Beever Academy.
           </p>
           <div className="flex flex-wrap justify-center gap-5">
-            <a href="#admissions" className="btn btn-gold gold-gradient-bg text-burgundy-dark px-10 py-4 font-semibold uppercase tracking-widest shadow-gold hover:shadow-[0_15px_30px_rgba(212,175,55,0.5)] hover:-translate-y-1 transition-all duration-300">
+            <a href="#admissions" className="btn btn-gold gold-gradient-bg text-burgundy-dark px-10 py-4 font-semibold uppercase tracking-widest shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-all duration-300">
               Apply Now
             </a>
-            <a href="#contact" className="btn border border-white/30 text-white hover:bg-white hover:text-burgundy hover:border-white px-10 py-4 font-semibold uppercase tracking-widest hover:-translate-y-1 transition-all duration-300">
+            <a href="#contact" className="btn border border-white/30 text-white hover:bg-white hover:text-burgundy hover:border-white px-10 py-4 font-semibold uppercase tracking-widest hover:-translate-y-[2px] transition-all duration-300">
               Request Information
             </a>
           </div>
@@ -865,7 +951,7 @@ export default function App() {
                 <button 
                   type="submit" 
                   disabled={formStatus.loading}
-                  className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white font-semibold uppercase tracking-widest py-4 w-full cursor-pointer disabled:opacity-75 transition-all"
+                  className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white font-semibold uppercase tracking-widest py-4 w-full cursor-pointer disabled:opacity-75 hover:-translate-y-[2px] shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   {formStatus.loading ? 'PROCESSING INQUIRY...' : 'SUBMIT INQUIRY'}
                 </button>
@@ -930,7 +1016,7 @@ export default function App() {
                 { icon: <Linkedin className="w-4 h-4" />, label: "LinkedIn" },
                 { icon: <Youtube className="w-4 h-4" />, label: "YouTube" }
               ].map((soc, i) => (
-                <a key={i} href="#" className="w-[38px] h-[38px] bg-white/5 border border-white/10 rounded-none flex justify-center items-center text-white hover:bg-gold-gradient hover:text-burgundy-dark hover:border-transparent hover:-translate-y-1 transition-all duration-300" aria-label={soc.label}>
+                <a key={i} href="#" className="w-[38px] h-[38px] bg-white/5 border border-white/10 rounded-none flex justify-center items-center text-white hover:bg-gold-gradient hover:text-burgundy-dark hover:border-transparent hover:scale-105 transition-all duration-300" aria-label={soc.label}>
                   {soc.icon}
                 </a>
               ))}
