@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  --color-burgundy: #5A0000;
-  --color-burgundy-dark: #350000;
-  --color-burgundy-light: #7E0000;
-  --color-gold: #D4AF37;
-  --color-gold-dark: #B38F1E;
-  --color-gold-light: #F3E5AB;
+  --color-burgundy: #5A0F1D;
+  --color-burgundy-dark: #37060F;
+  --color-burgundy-light: #7E1C2C;
+  --color-gold: #C9A24D;
+  --color-gold-dark: #A67E2D;
+  --color-gold-light: #F2DFA2;
   --color-ivory: #FAF9F6;
   --color-charcoal: #1C1C1C;
   --color-charcoal-light: #2D2D2D;
@@ -25,8 +25,8 @@
   --animate-grid-fade: grid-fade-in 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
   
   @keyframes logo-pulse {
-    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3)); }
-    50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(212, 175, 55, 0.6)); }
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(201, 162, 77, 0.3)); }
+    50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(201, 162, 77, 0.6)); }
   }
   @keyframes bar-fill {
     0% { width: 0; }
@@ -65,26 +65,26 @@ body {
 
 /* Custom Gradients and Borders */
 .gold-gradient-bg {
-  background: linear-gradient(135deg, #F3E5AB 0%, #D4AF37 50%, #B38F1E 100%);
+  background: linear-gradient(135deg, #F2DFA2 0%, #C9A24D 50%, #A67E2D 100%);
 }
 
 .gold-gradient-text {
-  background: linear-gradient(135deg, #F3E5AB 0%, #D4AF37 50%, #B38F1E 100%);
+  background: linear-gradient(135deg, #F2DFA2 0%, #C9A24D 50%, #A67E2D 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
 }
 
 .burgundy-glass {
-  background: rgba(90, 0, 0, 0.9);
+  background: rgba(90, 15, 29, 0.9);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(201, 162, 77, 0.3);
 }
 
 .navbar-glass {
-  background-color: rgba(53, 0, 0, 0.95);
+  background-color: rgba(55, 6, 15, 0.95);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  border-bottom: 1px solid rgba(201, 162, 77, 0.15);
 }
 
 .timeline-progress-line {

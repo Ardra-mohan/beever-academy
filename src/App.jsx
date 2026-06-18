@@ -5,7 +5,8 @@ import {
   Award, Users, Shield, Globe, BookOpen, GraduationCap, 
   Monitor, Briefcase, ChevronLeft, ChevronRight, 
   MapPin, Phone, Mail, Facebook, Instagram, Linkedin, Youtube, 
-  Quote, Sparkles, Menu, X, ArrowRight, CheckCircle2
+  Quote, Sparkles, Menu, X, ArrowRight, CheckCircle2,
+  Star, TrendingUp, Trophy, Clock, Compass
 } from 'lucide-react';
 
 // Import local logo from assets
@@ -19,13 +20,15 @@ export default function App() {
   // STATE MANAGEMENT
   // ==========================================
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState('home');
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isTestimonialHovered, setIsTestimonialHovered] = useState(false);
-  const [activeAdmissionsStep, setActiveAdmissionsStep] = useState(1);
   const [formStatus, setFormStatus] = useState({ loading: false, submitted: false });
   const [activeNavSection, setActiveNavSection] = useState('home');
+  const [allowScrollHome, setAllowScrollHome] = useState(false);
+  const [activeJourneyStep, setActiveJourneyStep] = useState(0);
 
   // Testimonial Autoplay Ref
   const autoplayRef = useRef(null);
@@ -33,22 +36,28 @@ export default function App() {
   // Testimonials data
   const testimonials = [
     {
-      text: "My time at Beever Academy redefined my career. The holistic focus on leadership and ethics gave me the confidence to head global teams at Fortune 500 companies.",
-      name: "Charles Harrison",
-      meta: "Class of 2021 • Executive MBA",
-      initials: "CH"
-    },
-    {
-      text: "The faculty at Beever do not just lecture; they inspire. The hands-on innovation labs allowed me to patent a fintech model while finishing my undergraduate thesis.",
+      heading: "Career Transformation",
+      text: "My time at Beever Academy redefined my career path. The industry-focused training and hands-on projects allowed me to transition into high-end finance seamlessly.",
       name: "Victoria Kincaid",
-      meta: "Class of 2023 • BS Computer Science",
-      initials: "VK"
+      meta: "Investment Banking Associate",
+      rating: 5,
+      img: "/student_avatar_woman.png"
     },
     {
-      text: "A truly elite and global environment. The connections I formed here with fellow students and visiting scholars are my single most valuable professional assets.",
+      heading: "Professional Growth",
+      text: "The mentorship and expert guidance here helped me build both technical depth and leadership confidence. The network of industry leaders is unmatched.",
+      name: "Charles Harrison",
+      meta: "Senior Tech Consultant",
+      rating: 5,
+      img: "/student_avatar_man.png"
+    },
+    {
+      heading: "Industry Success",
+      text: "Thanks to the real-world insights shared by specialists, I was able to solve critical challenges at my startup from day one. Truly career-ready skills.",
       name: "Aravind Sharma",
-      meta: "Class of 2020 • PhD Economics",
-      initials: "AS"
+      meta: "Co-Founder, Fintech Solutions",
+      rating: 5,
+      img: "/student_avatar_young.png"
     }
   ];
 
@@ -72,11 +81,44 @@ export default function App() {
     }
   }, []);
 
+  // Hash Change SPA Routing
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === '#about') {
+        setCurrentPage('about');
+        window.scrollTo(0, 0);
+      } else if (hash === '#home' || hash === '' || hash === '#/') {
+        setCurrentPage('home');
+        window.scrollTo(0, 0);
+      } else if (hash === '#contact') {
+        setCurrentPage('home');
+        setTimeout(() => {
+          const el = document.getElementById('contact');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      } else {
+        // For existing hash hashes (#programs, #admissions, #blog, #testimonials) that exist on both pages:
+        // Keep current page state, let browser naturally scroll.
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    handleHashChange(); // Run once initially
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   // Navbar Scroll Trigger
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
       
+      if (currentPage === 'about' && window.scrollY < 300) {
+        setActiveNavSection('about');
+        return;
+      }
+
       // Track active section for navbar highlighting
       const sections = ['home', 'about', 'programs', 'admissions', 'blog', 'contact'];
       const scrollY = window.pageYOffset;
@@ -96,178 +138,151 @@ export default function App() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [currentPage]);
 
-  // GSAP Animations once loader is gone
+  // GSAP Animations once loader is gone or page changes
   useEffect(() => {
     if (!isLoading) {
+      // Clear previous ScrollTriggers to prevent duplicates/errors on page changes
+      ScrollTrigger.getAll().forEach(t => t.kill());
+
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       
-      // 1. Hero Load Animations
-      const heroTl = gsap.timeline();
-      
-      if (prefersReducedMotion) {
-        heroTl.from('.hero-badge', { opacity: 0, duration: 0.5, ease: 'power1.inOut' })
-              .from('.hero-heading', { opacity: 0, duration: 0.5, ease: 'power1.inOut' }, '-=0.35')
-              .from('.hero-desc', { opacity: 0, duration: 0.5, ease: 'power1.inOut' }, '-=0.35')
-              .from('.hero-btn', { opacity: 0, duration: 0.5, stagger: 0.1, ease: 'power1.inOut' }, '-=0.35')
-              .from('.hero-img-box', { opacity: 0, duration: 0.6, ease: 'power1.inOut' }, '-=0.45')
-              .from('.hero-logo-badge', { opacity: 0, duration: 0.5, ease: 'power1.inOut' }, '-=0.35');
-      } else {
-        heroTl.from('.hero-badge', { y: 15, opacity: 0, duration: 0.6, ease: 'power1.inOut' })
-              .from('.hero-heading', { opacity: 0, duration: 0.6, ease: 'power1.inOut' }, '-=0.4')
-              .from('.hero-desc', { y: 10, opacity: 0, duration: 0.6, ease: 'power1.inOut' }, '-=0.4')
-              .from('.hero-btn', { y: 5, opacity: 0, duration: 0.5, stagger: 0.15, ease: 'power1.inOut' }, '-=0.4')
-              .from('.hero-img-box', { scale: 0.98, opacity: 0, duration: 0.8, ease: 'power1.inOut' }, '-=0.8')
-              .from('.hero-logo-badge', { scale: 0.95, opacity: 0, duration: 0.6, ease: 'power1.inOut' }, '-=0.4');
-              
-        // Subtle background zoom
-        gsap.to('.hero-bg-img', { scale: 1.02, duration: 6, ease: 'power1.inOut' });
+      // 1. Hero Load Animations (Only if on Home page)
+      if (currentPage === 'home') {
+        const heroTl = gsap.timeline();
+        if (prefersReducedMotion) {
+          heroTl.fromTo('.hero-badge', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut', overwrite: 'auto' })
+                .fromTo('.hero-heading', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35')
+                .fromTo('.hero-desc', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35')
+                .fromTo('.hero-btn', { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35')
+                .fromTo('.hero-img-box', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.45')
+                .fromTo('.hero-logo-badge', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35');
+        } else {
+          heroTl.fromTo('.hero-badge', { y: 15, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' })
+                .fromTo('.hero-heading', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.4')
+                .fromTo('.hero-desc', { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.4')
+                .fromTo('.hero-btn', { y: 5, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.15, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.4')
+                .fromTo('.hero-img-box', { scale: 0.98, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.8')
+                .fromTo('.hero-logo-badge', { scale: 0.95, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.4');
+                
+          // Subtle background zoom
+          gsap.to('.hero-bg-img', { scale: 1.02, duration: 6, ease: 'power1.inOut' });
+        }
       }
 
       // 2. Features entrance
-      if (prefersReducedMotion) {
-        gsap.from('.feature-card-el', {
-          scrollTrigger: { trigger: '.features-grid-el', start: 'top 85%' },
-          opacity: 0,
-          duration: 0.5,
-          stagger: 0.1,
-          ease: 'power1.inOut'
-        });
-      } else {
-        gsap.from('.feature-card-el', {
-          scrollTrigger: { trigger: '.features-grid-el', start: 'top 85%' },
-          y: 20,
-          opacity: 0,
-          duration: 0.5,
-          stagger: 0.1,
-          ease: 'power1.inOut'
-        });
-      }
-
-      // 3. About animations
-      if (prefersReducedMotion) {
-        gsap.from('.about-img-box-el', {
-          scrollTrigger: { trigger: '.about-grid-el', start: 'top 80%', once: true },
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power1.inOut'
-        });
-        gsap.from('.about-text-el', {
-          scrollTrigger: { trigger: '.about-grid-el', start: 'top 80%', once: true },
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power1.inOut'
-        });
-      } else {
-        gsap.from('.about-img-box-el', {
-          scrollTrigger: { trigger: '.about-grid-el', start: 'top 80%', once: true },
-          x: -30,
-          opacity: 0,
-          duration: 0.6,
-          ease: 'power1.inOut'
-        });
-        gsap.from('.about-text-el', {
-          scrollTrigger: { trigger: '.about-grid-el', start: 'top 80%', once: true },
-          x: 30,
-          opacity: 0,
-          duration: 0.6,
-          ease: 'power1.inOut'
-        });
-      }
-
-      // 4. Statistics Counters
-      const statsSection = document.querySelector('.stats-grid-el');
-      if (statsSection) {
-        const statsData = [
-          { target: 1000, suffix: '+' },
-          { target: 50, suffix: '+' },
-          { target: 25, suffix: '+' },
-          { target: 98, suffix: '%' }
-        ];
-        
-        const statNumbers = document.querySelectorAll('.stat-number-el');
-        statNumbers.forEach((el, index) => {
-          const data = statsData[index];
-          if (!data) return;
-          
-          const obj = { val: 0 };
-          gsap.to(obj, {
-            scrollTrigger: {
-              trigger: statsSection,
-              start: 'top 80%',
-            },
-            val: data.target,
-            duration: 2.0, // Exactly 2 seconds
+      if (document.querySelector('.features-grid-el')) {
+        gsap.fromTo('.feature-card-el', 
+          { y: prefersReducedMotion ? 0 : 20, opacity: 0 },
+          {
+            scrollTrigger: { trigger: '.features-grid-el', start: 'top 85%' },
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.1,
             ease: 'power1.inOut',
-            onUpdate: function() {
-              el.innerText = Math.floor(obj.val) + data.suffix;
-            }
-          });
-        });
+            overwrite: 'auto'
+          }
+        );
       }
 
-      // 5. Programs Cards Stagger
-      if (prefersReducedMotion) {
-        gsap.from('.program-card-el', {
-          scrollTrigger: { trigger: '.programs-grid-el', start: 'top 85%' },
-          opacity: 0,
-          duration: 0.5,
-          stagger: 0.1,
-          ease: 'power1.inOut'
-        });
-      } else {
-        gsap.from('.program-card-el', {
-          scrollTrigger: { trigger: '.programs-grid-el', start: 'top 85%' },
-          y: 20,
-          opacity: 0,
-          duration: 0.5,
-          stagger: 0.1,
-          ease: 'power1.inOut'
-        });
+      // 3. Strengths Cards Stagger
+      if (document.querySelector('.strengths-grid-el')) {
+        gsap.fromTo('.strength-card-el', 
+          { y: prefersReducedMotion ? 0 : 25, opacity: 0 },
+          {
+            scrollTrigger: { trigger: '.strengths-grid-el', start: 'top 85%' },
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.1,
+            ease: 'power1.inOut',
+            overwrite: 'auto'
+          }
+        );
       }
 
-      // 6. Admissions timeline progress triggers
-      const timelineSteps = document.querySelectorAll('.timeline-step-el');
-      timelineSteps.forEach((step, index) => {
-        ScrollTrigger.create({
-          trigger: step,
-          start: 'top 65%',
-          end: 'bottom 65%',
-          onEnter: () => setActiveAdmissionsStep(index + 1),
-          onLeaveBack: () => setActiveAdmissionsStep(index)
-        });
-      });
-
-      // 7. Blog posts stagger
-      if (prefersReducedMotion) {
-        gsap.from('.blog-card-el', {
-          scrollTrigger: { trigger: '.blog-grid-el', start: 'top 85%' },
-          opacity: 0,
-          duration: 0.5,
-          stagger: 0.1,
-          ease: 'power1.inOut'
-        });
-      } else {
-        gsap.from('.blog-card-el', {
-          scrollTrigger: { trigger: '.blog-grid-el', start: 'top 85%' },
-          y: 20,
-          opacity: 0,
-          duration: 0.5,
-          stagger: 0.1,
-          ease: 'power1.inOut'
-        });
+      // 4. Learning Journey Timeline steps stagger
+      if (document.querySelector('.journey-timeline-el')) {
+        gsap.fromTo('.journey-step-el', 
+          { scale: prefersReducedMotion ? 1 : 0.9, opacity: 0 },
+          {
+            scrollTrigger: { trigger: '.journey-timeline-el', start: 'top 85%' },
+            scale: 1,
+            opacity: 1,
+            duration: 0.6,
+            stagger: 0.15,
+            ease: 'power1.inOut',
+            overwrite: 'auto'
+          }
+        );
       }
 
-      // 8. Footer fade-in
-      gsap.from('footer', {
-        scrollTrigger: { trigger: 'footer', start: 'top 95%' },
-        opacity: 0,
-        duration: 0.6,
-        ease: 'power1.inOut'
-      });
+      // 5. Inside Gallery Cards
+      if (document.querySelector('.inside-grid-el')) {
+        gsap.fromTo('.inside-card-el', 
+          { y: prefersReducedMotion ? 0 : 20, opacity: 0 },
+          {
+            scrollTrigger: { trigger: '.inside-grid-el', start: 'top 85%' },
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.1,
+            ease: 'power1.inOut',
+            overwrite: 'auto'
+          }
+        );
+      }
+
+      // 6. About animations
+      if (document.querySelector('.about-grid-el')) {
+        gsap.fromTo('.about-img-box-el', 
+          { x: prefersReducedMotion ? 0 : -30, opacity: 0 },
+          {
+            scrollTrigger: { trigger: '.about-grid-el', start: 'top 80%', once: true },
+            x: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: 'power1.inOut',
+            overwrite: 'auto'
+          }
+        );
+        gsap.fromTo('.about-text-el', 
+          { x: prefersReducedMotion ? 0 : 30, opacity: 0 },
+          {
+            scrollTrigger: { trigger: '.about-grid-el', start: 'top 80%', once: true },
+            x: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: 'power1.inOut',
+            overwrite: 'auto'
+          }
+        );
+      }
+
+      // 7. Footer fade-in
+      gsap.fromTo('footer', 
+        { opacity: 0 },
+        {
+          scrollTrigger: { trigger: 'footer', start: 'top 95%' },
+          opacity: 1,
+          duration: 0.6,
+          ease: 'power1.inOut',
+          overwrite: 'auto'
+        }
+      );
+
+      // Refresh ScrollTrigger after a short delay to ensure correct calculations
+      const timer = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 500);
+
+      return () => {
+        clearTimeout(timer);
+      };
     }
-  }, [isLoading]);
+  }, [isLoading, currentPage]);
 
   // Testimonials slide autoplay loops
   useEffect(() => {
@@ -278,6 +293,71 @@ export default function App() {
     }
     return () => clearInterval(autoplayRef.current);
   }, [currentTestimonial, isTestimonialHovered]);
+
+  // Scroll up on About page cooldown to prevent instant scroll back
+  useEffect(() => {
+    if (currentPage === 'about') {
+      setAllowScrollHome(false);
+      const timer = setTimeout(() => {
+        setAllowScrollHome(true);
+      }, 800); // 800ms cooldown after page navigation
+      return () => clearTimeout(timer);
+    } else {
+      setAllowScrollHome(false);
+    }
+  }, [currentPage]);
+
+  // Scroll up on About page to lead back to Home page
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let touchStartY = 0;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentPage === 'about' && allowScrollHome) {
+        // Scroll up to reach absolute top (scrollY === 0)
+        if (currentScrollY === 0 && lastScrollY > 0) {
+          window.location.hash = '#home';
+        }
+      }
+      lastScrollY = currentScrollY;
+    };
+
+    const handleWheel = (e) => {
+      if (currentPage === 'about' && allowScrollHome && window.scrollY <= 5) {
+        // e.deltaY < 0 means scroll up attempt at the top
+        if (e.deltaY < 0) {
+          window.location.hash = '#home';
+        }
+      }
+    };
+
+    const handleTouchStart = (e) => {
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e) => {
+      if (currentPage === 'about' && allowScrollHome && window.scrollY <= 5) {
+        const touchEndY = e.touches[0].clientY;
+        // swiping down (touchEndY > touchStartY) at top scrolls up
+        if (touchEndY - touchStartY > 60) {
+          window.location.hash = '#home';
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [currentPage, allowScrollHome]);
 
   const startAutoplay = () => {
     clearInterval(autoplayRef.current);
@@ -297,17 +377,932 @@ export default function App() {
     
     setTimeout(() => {
       setFormStatus({ loading: false, submitted: true });
-      alert('Thank you for your interest in Beever Academy. A senior admissions ambassador will review your profile and contact you within 24 business hours.');
+      alert('Thank you for your interest in Beever Academy. A senior admissions advisor will contact you within 24 business hours.');
       e.target.reset();
     }, 1500);
   };
 
-  // Timeline Progress percentage
-  const getTimelineProgressHeight = () => {
-    const totalSteps = 5;
-    const activeIndex = activeAdmissionsStep - 1;
-    return `${(activeIndex / (totalSteps - 1)) * 100}%`;
+  // ==========================================
+  // SECTION RENDER FUNCTIONS
+  // ==========================================
+  
+  const renderHero = () => (
+    <section id="home" className="relative min-h-screen bg-white flex items-center overflow-hidden pt-32 pb-20 lg:pb-24">
+      {/* Diagonal Background Split */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        {/* Burgundy side with drop shadow */}
+        <div className="absolute inset-0 hero-diagonal-wrapper">
+          <div className="absolute inset-0 bg-burgundy-dark hero-diagonal-bg">
+            {/* Subtle background image zoom inside the burgundy side */}
+            <div 
+              className="hero-bg-img absolute inset-0 bg-cover bg-center opacity-15 z-0"
+              style={{ backgroundImage: "url('/hero_building.png')" }}
+            ></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-burgundy-dark/95 to-burgundy-dark/70 z-10"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="relative max-w-[1300px] w-full mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 items-center gap-6 lg:gap-16 z-20">
+        {/* Hero Left Content */}
+        <div className="lg:col-span-7 text-white text-left">
+          <div className="hero-badge mb-6 inline-block">
+            <span className="font-sans text-[11px] font-semibold tracking-[0.15em] uppercase text-gold border border-gold/30 px-4 py-2 bg-gold/5 backdrop-blur-[5px]">
+              Est. 2016 &bull; Institution of Excellence
+            </span>
+          </div>
+          <h1 className="hero-heading text-5xl md:text-7xl font-serif leading-[1.15] mb-8 font-medium">
+            Learn Today.<br/>
+            <span className="gold-gradient-text font-bold">Lead Tomorrow.</span>
+          </h1>
+          <p className="hero-desc text-base md:text-lg font-light text-text-light mb-6 md:mb-12 max-w-[580px] leading-relaxed">
+            Transforming Knowledge Into Success Through Practical, Industry-Focused Learning.
+          </p>
+          <div className="flex flex-wrap gap-5">
+            <a href="#programs" className="hero-btn btn btn-gold gold-gradient-bg text-burgundy-dark px-9 py-4 font-semibold uppercase tracking-widest shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-colors duration-300">
+              Explore Programs
+            </a>
+            <a href="#contact" className="hero-btn btn border border-white/30 text-white hover:bg-white hover:text-burgundy hover:border-white px-9 py-4 font-semibold uppercase tracking-widest hover:-translate-y-[2px] transition-colors duration-300">
+              Schedule Campus Visit
+            </a>
+          </div>
+        </div>
+
+        {/* Hero Right Visual */}
+        <div className="lg:col-span-5 flex justify-center relative">
+          <div className="hero-img-box relative w-full max-w-[450px] border-2 border-burgundy p-3 bg-burgundy/5 shadow-2xl rounded-2xl">
+            <img src="/hero_building.png" alt="Grand Academy Building" className="w-full h-[320px] sm:h-[420px] lg:h-[520px] object-cover transition-transform duration-500 hover:scale-105 rounded-xl" />
+            
+            {/* Emblem Overlay - Logo used here */}
+            <div className="hero-logo-badge absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110px] h-[110px] sm:w-[130px] sm:h-[130px] lg:w-[160px] lg:h-[160px] bg-burgundy-dark/85 border border-gold rounded-full flex justify-center items-center shadow-[0_10px_40px_rgba(0,0,0,0.5),_0_0_20px_rgba(201,162,77,0.3)] backdrop-blur-[8px]">
+              <img src={logo} alt="Beever Academy Shield" className="w-[64px] sm:w-[76px] lg:w-[96px] h-auto drop-shadow-md" />
+            </div>
+            
+            {/* Parallax Light Flares */}
+            <div className="absolute w-[300px] h-[300px] -top-[50px] -right-[50px] bg-radial from-gold/20 to-transparent z-[-1] animate-glow-float-1"></div>
+            <div className="absolute w-[250px] h-[250px] -bottom-[30px] -left-[60px] bg-radial from-gold/20 to-transparent z-[-1] animate-glow-float-2"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mouse scroll down indicator */}
+      <a href="#why-choose-us" className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex justify-center" aria-label="Scroll Down">
+        <span className="w-[26px] h-[44px] border-2 border-white/40 rounded-[12px] relative block">
+          <span className="w-[4px] h-[8px] bg-gold rounded-[2px] absolute top-2 left-1/2 -translate-x-1/2 animate-mouse-scroll"></span>
+        </span>
+      </a>
+    </section>
+  );
+
+  const renderWhyChooseUs = () => (
+    <section id="why-choose-us" className="py-32 bg-white text-center">
+      <div className="max-w-[1200px] mx-auto px-8">
+        <div className="mb-20">
+          <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
+            Heritage of Distinction
+          </span>
+          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
+            Why Choose Beever Academy?
+          </h2>
+          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
+        </div>
+
+        <div className="features-grid-el grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+          {[
+            {
+              icon: <BookOpen className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
+              title: "Industry-Focused Training",
+              desc: "Learn practical skills through real-world projects, case studies, and hands-on learning experiences."
+            },
+            {
+              icon: <Award className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
+              title: "10+ Years of Combined Experience",
+              desc: "Gain knowledge from professionals with over a decade of industry expertise."
+            },
+            {
+              icon: <Users className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
+              title: "Expert-Led Learning",
+              desc: "Learn directly from specialists from diverse industry backgrounds and domains."
+            },
+            {
+              icon: <Briefcase className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
+              title: "Career-Oriented Approach",
+              desc: "Bridge the gap between theory and application with training designed for professional success."
+            }
+          ].map((feat, i) => (
+            <div key={i} className="feature-card-el bg-white p-10 border border-black/5 rounded-2xl shadow-sm hover:-translate-y-[5px] hover:shadow-xl hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
+              <div className="w-[65px] h-[65px] bg-ivory rounded-full border border-burgundy/8 flex justify-center items-center mb-8 mx-auto group-hover:bg-burgundy group-hover:border-burgundy transition-all duration-300">
+                {feat.icon}
+              </div>
+              <h3 className="text-xl font-serif text-burgundy mb-4">{feat.title}</h3>
+              <p className="text-sm text-text-secondary leading-relaxed">{feat.desc}</p>
+              <div className="absolute inset-0 border border-gold opacity-0 group-hover:opacity-40 rounded-2xl shadow-[inset_0_0_15px_rgba(201,162,77,0.1)] transition-all duration-300 z-[-1]"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+
+  const renderAbout = () => (
+    <section id="about" className="py-32 bg-ivory">
+      <div className="max-w-[1200px] mx-auto px-8">
+        <div className="about-grid-el grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+          {/* Visual Column */}
+          <div className="about-img-box-el relative border border-burgundy/10 p-[15px] bg-white shadow-md rounded-2xl">
+            <img src="/hero_building.png" alt="Grand Academy Facade" className="w-full h-[280px] sm:h-[380px] lg:h-[480px] object-cover rounded-xl" />
+            
+            {/* Overlay Glass Card */}
+            <div className="about-glass-card-el absolute -bottom-10 right-4 lg:-right-10 w-[280px] bg-burgundy/90 backdrop-blur-[12px] border border-gold/30 p-8 shadow-2xl text-white rounded-2xl hidden sm:block">
+              <div className="relative">
+                <h4 className="font-serif text-2xl text-gold mb-3">Education For Life</h4>
+                <p className="text-xs text-text-light leading-relaxed">Transforming knowledge into success through practical, industry-focused programs.</p>
+                <Sparkles className="absolute -top-[10px] -right-[10px] w-[35px] h-[35px] text-gold/20" />
+              </div>
+            </div>
+          </div>
+
+          {/* Content Column */}
+          <div className="about-text-el">
+            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
+              Since 2016
+            </span>
+            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6 font-medium">
+              About Beever Academy
+            </h2>
+            <div className="w-[80px] h-[2px] bg-gold-gradient mb-8"></div>
+            
+            <div className="text-sm text-text-secondary leading-relaxed flex flex-col gap-6 mb-10 text-justify">
+              <p>
+                At Beever Academy, we are committed to transforming knowledge into success. Backed by a team of professionals with over 10 years of combined industry experience, we deliver practical, industry-focused training designed to equip individuals with the skills needed to thrive in a rapidly evolving world.
+              </p>
+              <p>
+                Our team consists of specialists from different areas of the industry, bringing diverse expertise, real-world experience, and valuable insights into every training program we offer.
+              </p>
+              <p>
+                We focus on bridging the gap between learning and application, ensuring that our students gain not only knowledge but also the confidence to apply it effectively.
+              </p>
+              <p>
+                Whether you are starting your journey or advancing your professional career, Beever Academy provides the guidance, expertise, and learning environment needed to help you achieve your goals.
+              </p>
+            </div>
+
+            {/* Stats Highlights Grid */}
+            <div className="grid grid-cols-2 gap-6 border-t border-burgundy/10 pt-8">
+              <div>
+                <div className="font-serif text-4xl font-bold text-burgundy mb-1">10+ Years</div>
+                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Combined Experience</div>
+              </div>
+              <div>
+                <div className="font-serif text-4xl font-bold text-burgundy mb-1">100%</div>
+                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Industry Experts</div>
+              </div>
+              <div>
+                <div className="font-serif text-4xl font-bold text-burgundy mb-1">Hands-On</div>
+                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Practical Training</div>
+              </div>
+              <div>
+                <div className="font-serif text-4xl font-bold text-burgundy mb-1">Success</div>
+                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Career-Focused Learning</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+
+  const renderStrengths = () => (
+    <section id="programs" className="py-32 bg-white text-center">
+      <div className="max-w-[1300px] mx-auto px-8">
+        <div className="mb-20">
+          <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
+            Elite Competencies
+          </span>
+          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
+            Our Strengths
+          </h2>
+          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
+        </div>
+
+        <div className="strengths-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-16">
+          {[
+            {
+              title: "Practical Learning",
+              desc: "Industry-relevant knowledge that can be applied immediately.",
+              img: "/campus_classroom.png"
+            },
+            {
+              title: "Diverse Expertise",
+              desc: "Training delivered by specialists from multiple sectors and disciplines.",
+              img: "/library_students.png"
+            },
+            {
+              title: "Real-World Insights",
+              desc: "Learn from actual industry experiences, challenges, and solutions.",
+              img: "/campus_innovation.png"
+            },
+            {
+              title: "Professional Growth",
+              desc: "Develop confidence, leadership, and career-ready skills.",
+              img: "/campus_sports.png"
+            },
+            {
+              title: "Future-Ready Skills",
+              desc: "Stay ahead in a rapidly evolving professional landscape.",
+              img: "/campus_events.png"
+            }
+          ].map((strength, i) => (
+            <div key={i} className="strength-card-el bg-white border border-black/5 rounded-2xl overflow-hidden shadow-sm hover:-translate-y-2 hover:shadow-xl hover:border-gold/30 transition-all duration-300 flex flex-col justify-between group">
+              <div className="relative overflow-hidden h-[180px]">
+                <img src={strength.img} alt={strength.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <div className="p-6 text-left flex-grow flex flex-col justify-between">
+                <div>
+                  <h3 className="text-lg font-serif text-burgundy mb-2 font-semibold">{strength.title}</h3>
+                  <p className="text-xs text-text-secondary leading-relaxed mb-6">{strength.desc}</p>
+                </div>
+                <a href="#contact" className="inline-flex items-center gap-2 font-sans text-[11px] uppercase tracking-wider font-semibold text-burgundy hover:text-gold-dark transition-colors duration-200 mt-auto">
+                  <span>Explore More</span>
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-center">
+          <a href="#contact" className="btn btn-gold gold-gradient-bg text-burgundy-dark px-12 py-4 font-semibold uppercase tracking-widest shadow-md hover:shadow-lg hover:-translate-y-[2px] transition-all duration-300">
+            View All Programs
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+
+  const renderJourney = () => {
+    const journeySteps = [
+      {
+        step: "01",
+        label: "Market Analysis",
+        phase: "Learn",
+        desc: "Master the fundamentals of market mechanics, order books, and price action dynamics.",
+        icon: <BookOpen className="w-5 h-5" />,
+        value: "$1,000",
+        x: 100,
+        y: 280,
+        candle: { open: 290, close: 270, high: 260, low: 300 }
+      },
+      {
+        step: "02",
+        label: "Risk & Probability",
+        phase: "Understand",
+        desc: "Formulate quantitative models, risk-management rules, and risk-reward strategies.",
+        icon: <Shield className="w-5 h-5" />,
+        value: "$2,500",
+        x: 300,
+        y: 230,
+        candle: { open: 245, close: 215, high: 200, low: 260 }
+      },
+      {
+        step: "03",
+        label: "Live Simulation",
+        phase: "Apply",
+        desc: "Execute trades in real-time simulated environments to test discipline and emotional control.",
+        icon: <Monitor className="w-5 h-5" />,
+        value: "$5,000",
+        x: 500,
+        y: 170,
+        candle: { open: 190, close: 150, high: 130, low: 210 }
+      },
+      {
+        step: "04",
+        label: "Capital Allocation",
+        phase: "Grow",
+        desc: "Scale position sizes safely, manage leverage, and diversify multi-asset portfolios.",
+        icon: <TrendingUp className="w-5 h-5" />,
+        value: "$12,000",
+        x: 700,
+        y: 100,
+        candle: { open: 120, close: 80, high: 60, low: 140 }
+      },
+      {
+        step: "05",
+        label: "Fund Management",
+        phase: "Lead",
+        desc: "Direct trading desks, manage proprietary firm capital, and build professional market operations.",
+        icon: <Trophy className="w-5 h-5" />,
+        value: "$50,000",
+        x: 900,
+        y: 40,
+        candle: { open: 55, close: 25, high: 10, low: 70 }
+      }
+    ];
+
+    const activeStepData = journeySteps[activeJourneyStep];
+
+    return (
+      <section id="admissions" className="py-32 bg-ivory text-center relative overflow-hidden">
+        {/* Decorative background grid subtle effect */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(90,15,29,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(90,15,29,0.015)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none"></div>
+
+        <div className="max-w-[1200px] mx-auto px-8 relative z-10">
+          <div className="mb-16">
+            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3 animate-pulse">
+              Strategic Progression
+            </span>
+            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6 font-bold">
+              Your Learning Journey
+            </h2>
+            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-4"></div>
+            <p className="text-sm text-text-secondary max-w-[600px] mx-auto leading-relaxed">
+              Track your development from foundations to prop-firm management on our proprietary academy chart.
+            </p>
+          </div>
+
+          {/* Desktop/Tablet Trading Terminal Layout */}
+          <div className="journey-timeline-el hidden md:block mb-12">
+            <div className="bg-white border border-burgundy/10 rounded-2xl shadow-xl overflow-hidden transition-all duration-500 hover:shadow-2xl">
+              
+              {/* Terminal Header Bar */}
+              <div className="bg-burgundy-dark text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4 font-sans text-xs border-b border-white/10 shadow-inner select-none">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
+                  <span className="font-bold tracking-wider text-[10px] text-white/90">BEEVER TERMINAL v4.2</span>
+                </div>
+                <div className="flex items-center gap-6 overflow-x-auto py-1 whitespace-nowrap scrollbar-none text-[11px]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-white/40 font-medium">PAIR:</span>
+                    <span className="font-semibold text-gold font-mono">BEEV/USD</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-white/40 font-medium">GROWTH:</span>
+                    <span className="font-semibold text-emerald-400 font-mono">+5,000%</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-white/40 font-medium">STATUS:</span>
+                    <span className="font-semibold text-emerald-400 font-mono tracking-wider">UPTREND CONFIRMED</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-white/40 font-medium">SHARPE RATIO:</span>
+                    <span className="font-semibold text-gold font-mono">3.82</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-white/40 font-medium">RSI(14):</span>
+                    <span className="font-semibold text-white/90 font-mono">68.2 (BULLISH)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Legend Indicator */}
+              <div className="flex items-center gap-5 text-[10px] text-burgundy/60 border-b border-burgundy/5 px-6 py-2.5 bg-ivory/30 select-none">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-1.5 rounded-sm bg-emerald-500"></span>
+                  <span>Bullish Candlestick</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-4 h-0.5 bg-gradient-to-r from-burgundy to-gold"></span>
+                  <span>Skill Growth Trendline</span>
+                </div>
+                <div className="flex items-center gap-1.5 font-semibold text-burgundy">
+                  <span className="w-2.5 h-2.5 rounded-full border border-gold bg-white flex items-center justify-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-burgundy"></span>
+                  </span>
+                  <span>Active Phase (Step ${activeStepData.step})</span>
+                </div>
+              </div>
+
+              {/* Chart Screen (SVG) */}
+              <div className="p-6 md:p-8 bg-white relative overflow-hidden select-none">
+                <svg viewBox="0 0 1000 350" className="w-full h-auto overflow-visible">
+                  {/* Defs for gradients and filters */}
+                  <defs>
+                    <filter id="chartGlow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="4" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                    <linearGradient id="curveGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#5A0F1D" />
+                      <stop offset="100%" stopColor="#C9A24D" />
+                    </linearGradient>
+                    <linearGradient id="areaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#C9A24D" stopOpacity="0.12" />
+                      <stop offset="100%" stopColor="#C9A24D" stopOpacity="0.0" />
+                    </linearGradient>
+                    <linearGradient id="activeCandleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#C9A24D" />
+                      <stop offset="100%" stopColor="#A88135" />
+                    </linearGradient>
+                    <linearGradient id="normalCandleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#34D399" />
+                      <stop offset="100%" stopColor="#059669" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Horizontal grid lines */}
+                  {[40, 110, 180, 250, 320].map((yVal, index) => (
+                    <g key={`grid-h-${index}`}>
+                      <line x1={50} y1={yVal} x2={950} y2={yVal} stroke="#5A0F1D" strokeOpacity="0.04" strokeWidth="1" />
+                      <text x={960} y={yVal + 3} fill="#5A0F1D" fillOpacity="0.4" fontSize={9} fontFamily="monospace" textAnchor="start">
+                        {index === 0 && "$50,000"}
+                        {index === 1 && "$12,000"}
+                        {index === 2 && "$5,000"}
+                        {index === 3 && "$2,500"}
+                        {index === 4 && "$1,000"}
+                      </text>
+                    </g>
+                  ))}
+
+                  {/* Vertical grid lines */}
+                  {[100, 300, 500, 700, 900].map((xVal, index) => (
+                    <line key={`grid-v-${index}`} x1={xVal} y1={20} x2={xVal} y2={320} stroke="#5A0F1D" strokeOpacity="0.04" strokeWidth="1" />
+                  ))}
+
+                  {/* Shaded Area Under the Curve */}
+                  <path 
+                    d="M 100,280 C 200,260 200,230 300,230 C 400,230 400,170 500,170 C 600,170 600,100 700,100 C 800,100 800,40 900,40 L 900,320 L 100,320 Z" 
+                    fill="url(#areaGrad)" 
+                  />
+
+                  {/* Glowing Trendline Curve */}
+                  <path 
+                    d="M 100,280 C 200,260 200,230 300,230 C 400,230 400,170 500,170 C 600,170 600,100 700,100 C 800,100 800,40 900,40" 
+                    fill="none" 
+                    stroke="url(#curveGrad)" 
+                    strokeWidth="3" 
+                    filter="url(#chartGlow)"
+                  />
+
+                  {/* Active Step Crosshairs */}
+                  <line 
+                    x1={activeStepData.x} 
+                    y1={20} 
+                    x2={activeStepData.x} 
+                    y2={320} 
+                    stroke="#5A0F1D" 
+                    strokeOpacity="0.12" 
+                    strokeDasharray="4 4" 
+                    className="transition-all duration-300"
+                  />
+                  <line 
+                    x1={50} 
+                    y1={activeStepData.y} 
+                    x2={950} 
+                    y2={activeStepData.y} 
+                    stroke="#5A0F1D" 
+                    strokeOpacity="0.12" 
+                    strokeDasharray="4 4" 
+                    className="transition-all duration-300"
+                  />
+
+                  {/* Y-axis Active Price Coordinate Badge */}
+                  <g className="transition-all duration-300" style={{ transform: `translateY(${activeStepData.y}px)` }}>
+                    <rect x={954} y={-8} width={42} height={16} rx={3} fill="#5A0F1D" />
+                    <text x={975} y={3} fill="#C9A24D" fontSize={8} fontWeight="bold" textAnchor="middle" fontFamily="monospace">
+                      {activeStepData.value}
+                    </text>
+                  </g>
+
+                  {/* X-axis Active Step Coordinate Badge */}
+                  <g className="transition-all duration-300" style={{ transform: `translateX(${activeStepData.x}px)` }}>
+                    <rect x={-25} y={322} width={50} height={15} rx={3} fill="#5A0F1D" />
+                    <text x={0} y={332} fill="#C9A24D" fontSize={8} fontWeight="bold" textAnchor="middle" fontFamily="monospace">
+                      STEP {activeStepData.step}
+                    </text>
+                  </g>
+
+                  {/* Candlesticks Layer */}
+                  {journeySteps.map((item, i) => {
+                    const isActive = activeJourneyStep === i;
+                    const { high, low, open, close } = item.candle;
+                    const x = item.x;
+                    return (
+                      <g 
+                        key={`candle-${i}`} 
+                        className="cursor-pointer group"
+                        onMouseEnter={() => setActiveJourneyStep(i)}
+                      >
+                        {/* Transparent click/hover helper rect */}
+                        <rect x={x - 20} y={20} width={40} height={300} fill="transparent" />
+                        
+                        {/* Candlestick Wick (Shadow & Line) */}
+                        <line 
+                          x1={x} 
+                          y1={high} 
+                          x2={x} 
+                          y2={low} 
+                          stroke={isActive ? "#C9A24D" : "#10B981"} 
+                          strokeWidth={isActive ? 2 : 1.25} 
+                          strokeOpacity={isActive ? 1.0 : 0.7}
+                          className="transition-all duration-300"
+                        />
+                        {/* Candlestick Body */}
+                        <rect 
+                          x={isActive ? x - 8 : x - 5} 
+                          y={close} 
+                          width={isActive ? 16 : 10} 
+                          height={Math.max(4, Math.abs(open - close))} 
+                          fill={isActive ? "url(#activeCandleGrad)" : "url(#normalCandleGrad)"} 
+                          stroke={isActive ? "#C9A24D" : "none"}
+                          strokeWidth={isActive ? 1 : 0}
+                          rx={2}
+                          className="transition-all duration-300 shadow-sm"
+                        />
+                      </g>
+                    );
+                  })}
+
+                  {/* Line Node Points Layer */}
+                  {journeySteps.map((item, i) => {
+                    const isActive = activeJourneyStep === i;
+                    return (
+                      <circle 
+                        key={`node-${i}`}
+                        cx={item.x}
+                        cy={item.y}
+                        r={isActive ? 7 : 4.5}
+                        fill={isActive ? "#C9A24D" : "#5A0F1D"}
+                        stroke="#FFFFFF"
+                        strokeWidth={isActive ? 2 : 1.5}
+                        className="transition-all duration-300 cursor-pointer shadow-md"
+                        onMouseEnter={() => setActiveJourneyStep(i)}
+                      />
+                    );
+                  })}
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Responsive Details Cards Grid (Desktop/Tablet) */}
+          <div className="hidden md:grid grid-cols-5 gap-4">
+            {journeySteps.map((item, i) => {
+              const isActive = activeJourneyStep === i;
+              return (
+                <div 
+                  key={i}
+                  onMouseEnter={() => setActiveJourneyStep(i)}
+                  className={`journey-step-el p-6 text-left rounded-2xl border transition-all duration-300 cursor-pointer ${
+                    isActive 
+                      ? 'bg-white border-gold shadow-lg -translate-y-1' 
+                      : 'bg-white/60 border-burgundy/10 hover:border-gold/40 hover:bg-white hover:-translate-y-0.5'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`w-10 h-10 rounded-full flex justify-center items-center transition-all duration-300 ${
+                      isActive ? 'bg-burgundy text-gold shadow-md' : 'bg-ivory text-burgundy'
+                    }`}>
+                      {item.icon}
+                    </div>
+                    <span className={`font-mono text-xs font-bold transition-colors duration-300 ${isActive ? 'text-gold-dark' : 'text-gold-dark/60'}`}>
+                      {item.step}
+                    </span>
+                  </div>
+                  <div className="font-sans text-[10px] font-bold uppercase tracking-wider text-gold-dark mb-1">
+                    {item.phase}
+                  </div>
+                  <h3 className="font-serif text-lg text-burgundy font-semibold mb-2 leading-tight">
+                    {item.label}
+                  </h3>
+                  <p className="text-[11px] text-text-secondary leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Mobile Vertical Candlestick Timeline Layout */}
+          <div className="journey-timeline-el md:hidden space-y-4 text-left">
+            {journeySteps.map((item, i) => {
+              const isActive = activeJourneyStep === i;
+              return (
+                <div 
+                  key={i} 
+                  className={`flex items-stretch gap-4 p-4 rounded-xl border transition-all duration-300 cursor-pointer ${
+                    isActive 
+                      ? 'bg-white border-gold shadow-md' 
+                      : 'bg-white/60 border-burgundy/10'
+                  }`}
+                  onClick={() => setActiveJourneyStep(i)}
+                >
+                  {/* Left Side Candlestick Column */}
+                  <div className="flex flex-col items-center w-10 flex-shrink-0 select-none relative">
+                    {/* Dashed background connector */}
+                    {i < 4 && (
+                      <div className="absolute top-[45px] bottom-[-25px] left-1/2 -translate-x-1/2 w-[1.5px] border-l border-dashed border-burgundy/20 z-0"></div>
+                    )}
+                    
+                    <svg width="30" height="90" viewBox="0 0 30 90" className="overflow-visible relative z-10">
+                      <defs>
+                        <linearGradient id={`mobActCandle-${i}`} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#C9A24D" />
+                          <stop offset="100%" stopColor="#8A6E32" />
+                        </linearGradient>
+                        <linearGradient id={`mobNormCandle-${i}`} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#34D399" />
+                          <stop offset="100%" stopColor="#059669" />
+                        </linearGradient>
+                      </defs>
+                      {/* Wick */}
+                      <line x1="15" y1="8" x2="15" y2="82" stroke={isActive ? "#C9A24D" : "#10B981"} strokeWidth="1.5" />
+                      {/* Candle Body */}
+                      <rect 
+                        x="10" 
+                        y="22" 
+                        width="10" 
+                        height="46" 
+                        fill={isActive ? `url(#mobActCandle-${i})` : `url(#mobNormCandle-${i})`} 
+                        rx="1.5"
+                      />
+                      {/* Marker Circle */}
+                      <circle 
+                        cx="15" 
+                        cy="45" 
+                        r={isActive ? 6 : 4} 
+                        fill={isActive ? "#C9A24D" : "#5A0F1D"} 
+                        stroke="#FFFFFF"
+                        strokeWidth={isActive ? 2 : 1.5}
+                      />
+                      {/* Price Label Badge */}
+                      <text x="15" y="6" fill={isActive ? "#C9A24D" : "#5A0F1D"} fillOpacity="0.7" fontSize="7" fontWeight="bold" fontFamily="monospace" textAnchor="middle">
+                        {item.value}
+                      </text>
+                    </svg>
+                  </div>
+
+                  {/* Right Side Card Details */}
+                  <div className="flex-grow flex flex-col justify-center">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`font-mono text-[10px] font-bold ${isActive ? 'text-gold-dark' : 'text-gold-dark/60'}`}>
+                        STEP {item.step}
+                      </span>
+                      <span className="font-sans text-[9px] font-bold uppercase tracking-wider text-burgundy/60">
+                        {item.phase}
+                      </span>
+                    </div>
+                    <h3 className="font-serif text-base text-burgundy font-semibold mb-1 leading-snug">
+                      {item.label}
+                    </h3>
+                    <p className="text-[11px] text-text-secondary leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    );
   };
+
+  const renderInsideGallery = () => (
+    <section id="blog" className="py-32 bg-white text-center">
+      <div className="max-w-[1200px] mx-auto px-8">
+        <div className="mb-20">
+          <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
+            Campus Life & Environment
+          </span>
+          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
+            Inside Beever Academy
+          </h2>
+          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
+        </div>
+
+        <div className="inside-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
+          {[
+            {
+              title: "Interactive Learning Sessions",
+              img: "/campus_classroom.png",
+              desc: "Engage in collaborative workshops using modern educational technology and collaborative teaching setups."
+            },
+            {
+              title: "Expert-Led Workshops",
+              img: "/campus_innovation.png",
+              desc: "Gain hands-on problem solving insights led directly by top industry practitioners."
+            },
+            {
+              title: "Collaborative Learning Environment",
+              img: "/library_students.png",
+              desc: "Modern study environments built to nurture teamwork, cooperation, and group study projects."
+            },
+            {
+              title: "Professional Mentorship",
+              img: "/campus_events.png",
+              desc: "One-on-one professional counseling guidance to layout clear long-term career growth plans."
+            },
+            {
+              title: "Career Development Programs",
+              img: "/campus_sports.png",
+              desc: "Rigorous physical and strategic preparation designed to cultivate confidence and leadership."
+            }
+          ].map((card, i) => (
+            <div 
+              key={i} 
+              className={`inside-card-el bg-white border border-black/5 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-gold/30 transition-all duration-300 flex flex-col justify-between group ${i === 3 || i === 4 ? 'lg:col-span-1 lg:max-w-md mx-auto w-full' : ''}`}
+            >
+              <div className="relative overflow-hidden h-[240px]">
+                <img src={card.img} alt={card.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-burgundy-dark/75 via-transparent to-transparent opacity-90"></div>
+                <div className="absolute bottom-4 left-6 right-6">
+                  <h3 className="font-serif text-xl text-white font-medium drop-shadow-sm">{card.title}</h3>
+                </div>
+              </div>
+              <div className="p-6">
+                <p className="text-xs text-text-secondary leading-relaxed">{card.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+
+  const renderTestimonials = () => (
+    <section id="testimonials" className="py-32 bg-ivory">
+      <div className="max-w-[1200px] mx-auto px-8">
+        <div className="text-center mb-16">
+          <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
+            Alumni Testimonials
+          </span>
+          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
+            Student Success Stories
+          </h2>
+          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
+        </div>
+
+        <div className="max-w-[850px] mx-auto relative px-4 sm:px-16">
+          <div 
+            className="relative h-[480px] sm:h-[380px] overflow-hidden"
+            onMouseEnter={() => setIsTestimonialHovered(true)}
+            onMouseLeave={() => setIsTestimonialHovered(false)}
+          >
+            {testimonials.map((test, index) => (
+              <div 
+                key={index} 
+                className={`absolute inset-0 flex flex-col justify-center items-center text-center transition-all duration-500 ease-in-out ${index === currentTestimonial ? 'opacity-100 visible translate-y-0 scale-100' : 'opacity-0 invisible translate-y-5 scale-95'}`}
+              >
+                <div className="bg-white border border-black/5 rounded-2xl p-8 sm:p-10 shadow-md relative max-w-[750px] mx-auto">
+                  {/* Heading tag */}
+                  <span className="font-sans text-[10px] font-bold text-gold-dark uppercase tracking-widest block mb-4">
+                    {test.heading}
+                  </span>
+
+                  {/* Stars Rating */}
+                  <div className="flex gap-1 justify-center mb-6">
+                    {Array(test.rating).fill().map((_, starIdx) => (
+                      <Star key={starIdx} className="w-4 h-4 fill-gold text-gold" />
+                    ))}
+                  </div>
+
+                  <div className="relative pt-6 mb-8">
+                    <Quote className="absolute -top-4 left-1/2 -translate-x-1/2 w-[36px] h-[36px] text-gold-light/45" />
+                    <p className="font-serif text-xl sm:text-2xl text-burgundy-dark italic leading-relaxed">
+                      "{test.text}"
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-4 border-t border-burgundy/10 pt-6 mt-4">
+                    <img 
+                      src={test.img} 
+                      alt={test.name} 
+                      className="w-14 h-14 rounded-full object-cover border-2 border-gold shadow-sm"
+                    />
+                    <div className="text-left">
+                      <h4 className="text-base text-burgundy font-serif font-bold">{test.name}</h4>
+                      <span className="font-sans text-[10px] uppercase tracking-wider text-text-secondary block mt-0.5">
+                        {test.meta}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Slider Arrow Buttons */}
+          <button 
+            onClick={() => handleTestimonialNav(-1)} 
+            className="absolute left-0 top-1/2 -translate-y-1/2 border border-burgundy/15 rounded-full w-12 h-12 flex justify-center items-center bg-white text-burgundy hover:bg-burgundy hover:text-white hover:border-burgundy hover:shadow-lg transition-all duration-300 cursor-pointer hidden md:flex z-20"
+            aria-label="Previous Testimonial"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button 
+            onClick={() => handleTestimonialNav(1)} 
+            className="absolute right-0 top-1/2 -translate-y-1/2 border border-burgundy/15 rounded-full w-12 h-12 flex justify-center items-center bg-white text-burgundy hover:bg-burgundy hover:text-white hover:border-burgundy hover:shadow-lg transition-all duration-300 cursor-pointer hidden md:flex z-20"
+            aria-label="Next Testimonial"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+
+          {/* Dots */}
+          <div className="flex justify-center gap-3 mt-8">
+            {testimonials.map((_, index) => (
+              <button 
+                key={index} 
+                onClick={() => setCurrentTestimonial(index)} 
+                className={`border-none h-2 cursor-pointer transition-all duration-300 rounded-full ${index === currentTestimonial ? 'bg-gold-dark w-6' : 'bg-burgundy/15 w-2'}`}
+                aria-label={`Slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+
+  const renderContact = () => (
+    <section id="contact" className="py-32 bg-white">
+      <div className="max-w-[1200px] mx-auto px-8">
+        <div className="text-center mb-20">
+          <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
+            Reach Out
+          </span>
+          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
+            Schedule A Visit & Inquiry
+          </h2>
+          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+          {/* Form Wrap */}
+          <div className="lg:col-span-7 bg-ivory p-10 sm:p-14 border border-black/5 rounded-2xl shadow-sm text-left">
+            <form onSubmit={handleInquirySubmit} className="flex flex-col gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="name" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Full Name</label>
+                  <input type="text" id="name" placeholder="John Doe" required className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="email" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Email Address</label>
+                  <input type="email" id="email" placeholder="john@example.com" required className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="program" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Program of Interest</label>
+                  <select id="program" className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200">
+                    <option value="undergraduate">Undergraduate Studies</option>
+                    <option value="postgraduate">Postgraduate Programs</option>
+                    <option value="executive">Executive Education</option>
+                    <option value="other">Other / General Inquiry</option>
+                  </select>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="date" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Preferred Visit Date</label>
+                  <input type="date" id="date" className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="msg" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Your Message</label>
+                <textarea id="msg" rows="5" placeholder="Tell us about your academic goals..." required className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200"></textarea>
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={formStatus.loading}
+                className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white font-semibold uppercase tracking-widest py-4 w-full cursor-pointer rounded-xl disabled:opacity-75 hover:-translate-y-[2px] shadow-sm hover:shadow-md transition-all duration-300"
+              >
+                {formStatus.loading ? 'PROCESSING INQUIRY...' : 'SUBMIT INQUIRY'}
+              </button>
+            </form>
+          </div>
+
+          {/* Info Cards Wrap */}
+          <div className="lg:col-span-5 flex flex-col gap-8 text-left">
+            {[
+              { icon: <MapPin className="w-5.5 h-5.5" />, title: "Academy Campus", desc: "100 Academic Circle, Royal Estates, NY 10021" },
+              { icon: <Phone className="w-5.5 h-5.5" />, title: "Admissions Office", desc: "+1 (800) 555-BEEV • +1 (212) 555-0198" },
+              { icon: <Mail className="w-5.5 h-5.5" />, title: "Electronic Mail", desc: "admissions@beeveracademy.edu • info@beeveracademy.edu" }
+            ].map((card, i) => (
+              <div key={i} className="flex gap-6 items-start bg-white p-8 border border-black/3 rounded-2xl shadow-sm">
+                <div className="w-[48px] h-[48px] bg-ivory border border-burgundy/5 rounded-full flex justify-center items-center text-burgundy flex-shrink-0">
+                  {card.icon}
+                </div>
+                <div>
+                  <h4 className="text-lg font-serif text-burgundy font-bold mb-1">{card.title}</h4>
+                  <p className="text-sm text-text-secondary leading-relaxed">{card.desc}</p>
+                </div>
+              </div>
+            ))}
+
+            <div className="h-[220px] bg-cover bg-center border border-black/5 rounded-2xl shadow-sm relative overflow-hidden" style={{ backgroundImage: "url('/hero_building.png')" }}>
+              <div className="absolute inset-0 bg-burgundy/30 flex justify-center items-center">
+                <a href="https://maps.google.com" target="_blank" rel="noreferrer" className="btn btn-gold text-[10px] font-semibold tracking-wider gold-gradient-bg text-burgundy-dark px-5 py-3 rounded-xl uppercase flex items-center gap-2">
+                  <Globe className="w-4 h-4" /> View Map
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 
   return (
     <div className="min-h-screen text-charcoal font-sans bg-white relative">
@@ -411,582 +1406,27 @@ export default function App() {
         </div>
       )}
 
-      {/* ==========================================
-         HERO SECTION
-         ========================================== */}
-      <section id="home" className="relative min-h-screen bg-white flex items-center overflow-hidden pt-32 pb-20 lg:pb-24">
-        {/* Diagonal Background Split */}
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-          {/* Burgundy side with drop shadow */}
-          <div className="absolute inset-0 hero-diagonal-wrapper">
-            <div className="absolute inset-0 bg-burgundy-dark hero-diagonal-bg">
-              {/* Subtle background image zoom inside the burgundy side */}
-              <div 
-                className="hero-bg-img absolute inset-0 bg-cover bg-center opacity-15 z-0"
-                style={{ backgroundImage: "url('/hero_building.png')" }}
-              ></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-burgundy-dark/95 to-burgundy-dark/70 z-10"></div>
-            </div>
-          </div>
+      {currentPage === 'home' ? (
+        <>
+          {renderHero()}
+          {renderWhyChooseUs()}
+          {renderAbout()}
+          {renderStrengths()}
+          {renderJourney()}
+          {renderInsideGallery()}
+          {renderTestimonials()}
+          {renderContact()}
+        </>
+      ) : (
+        <div className="pt-24">
+          {renderWhyChooseUs()}
+          {renderStrengths()}
+          {renderJourney()}
+          {renderInsideGallery()}
+          {renderAbout()}
+          {renderTestimonials()}
         </div>
-        
-        <div className="relative max-w-[1300px] w-full mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 items-center gap-6 lg:gap-16 z-20">
-          {/* Hero Left Content */}
-          <div className="lg:col-span-7 text-white text-left">
-            <div className="hero-badge mb-6 inline-block">
-              <span className="font-sans text-[11px] font-semibold tracking-[0.15em] uppercase text-gold border border-gold/30 px-4 py-2 bg-gold/5 backdrop-blur-[5px]">
-                Est. 1918 &bull; Institution of Excellence
-              </span>
-            </div>
-            <h1 className="hero-heading text-5xl md:text-7xl font-serif leading-[1.1] mb-8">
-              LEARN TODAY,<br/>
-              <span className="gold-gradient-text font-bold">LEAD TOMORROW</span>
-            </h1>
-            <p className="hero-desc text-base md:text-lg font-light text-text-light mb-6 md:mb-12 max-w-[580px] leading-relaxed">
-              Empowering minds. Building character. Shaping future leaders. Experience the highest standard of academic excellence and luxury campus life.
-            </p>
-            <div className="flex flex-wrap gap-5">
-              <a href="#programs" className="hero-btn btn btn-gold gold-gradient-bg text-burgundy-dark px-9 py-4 font-semibold uppercase tracking-widest shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-colors duration-300">
-                Explore Programs
-              </a>
-              <a href="#contact" className="hero-btn btn border border-white/30 text-white hover:bg-white hover:text-burgundy hover:border-white px-9 py-4 font-semibold uppercase tracking-widest hover:-translate-y-[2px] transition-colors duration-300">
-                Schedule Campus Visit
-              </a>
-            </div>
-          </div>
- 
-          {/* Hero Right Visual */}
-          <div className="lg:col-span-5 flex justify-center relative">
-            <div className="hero-img-box relative w-full max-w-[450px] border-2 border-burgundy p-3 bg-burgundy/5 shadow-2xl">
-              <img src="/hero_building.png" alt="Grand Academy Building" className="w-full h-[320px] sm:h-[420px] lg:h-[520px] object-cover transition-transform duration-500 hover:scale-105" />
-              
-              {/* Emblem Overlay - Logo used here */}
-              <div className="hero-logo-badge absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110px] h-[110px] sm:w-[130px] sm:h-[130px] lg:w-[160px] lg:h-[160px] bg-burgundy-dark/85 border border-gold rounded-full flex justify-center items-center shadow-[0_10px_40px_rgba(0,0,0,0.5),_0_0_20px_rgba(212,175,55,0.3)] backdrop-blur-[8px]">
-                <img src={logo} alt="Beever Academy Shield" className="w-[64px] sm:w-[76px] lg:w-[96px] h-auto drop-shadow-md" />
-              </div>
-              
-              {/* Parallax Light Flares */}
-              <div className="absolute w-[300px] h-[300px] -top-[50px] -right-[50px] bg-radial from-gold/20 to-transparent z-[-1] animate-glow-float-1"></div>
-              <div className="absolute w-[250px] h-[250px] -bottom-[30px] -left-[60px] bg-radial from-gold/20 to-transparent z-[-1] animate-glow-float-2"></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Mouse scroll down indicator */}
-        <a href="#why-choose-us" className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex justify-center" aria-label="Scroll Down">
-          <span className="w-[26px] h-[44px] border-2 border-white/40 rounded-[12px] relative block">
-            <span className="w-[4px] h-[8px] bg-gold rounded-[2px] absolute top-2 left-1/2 -translate-x-1/2 animate-mouse-scroll"></span>
-          </span>
-        </a>
-      </section>
-
-      {/* ==========================================
-         WHY CHOOSE US SECTION
-         ========================================== */}
-      <section id="why-choose-us" className="py-32 bg-white text-center">
-        <div className="max-w-[1200px] mx-auto px-8">
-          <div className="mb-20">
-            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-              Heritage of Distinction
-            </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
-              Why Choose Beever Academy
-            </h2>
-            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
-          </div>
-
-          <div className="features-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-            {/* Feature 1 */}
-            <div className="feature-card-el bg-white p-10 border border-black/5 shadow-sm hover:-translate-y-[5px] hover:shadow-lg hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
-              <div className="w-[65px] h-[65px] bg-ivory border border-burgundy/8 flex justify-center items-center mb-8 mx-auto group-hover:bg-burgundy group-hover:border-burgundy transition-all duration-300">
-                <Award className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />
-              </div>
-              <h3 className="text-xl font-serif text-burgundy mb-4">Academic Excellence</h3>
-              <p className="text-sm text-text-secondary leading-relaxed">Rigorous curriculum, state-of-the-art resources, and exceptional academic standards recognized globally.</p>
-              <div className="absolute inset-0 border border-gold opacity-0 group-hover:opacity-40 shadow-[inset_0_0_15px_rgba(212,175,55,0.1)] transition-all duration-300 z-[-1]"></div>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="feature-card-el bg-white p-10 border border-black/5 shadow-sm hover:-translate-y-[5px] hover:shadow-lg hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
-              <div className="w-[65px] h-[65px] bg-ivory border border-burgundy/8 flex justify-center items-center mb-8 mx-auto group-hover:bg-burgundy group-hover:border-burgundy transition-all duration-300">
-                <Users className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />
-              </div>
-              <h3 className="text-xl font-serif text-burgundy mb-4">Experienced Faculty</h3>
-              <p className="text-sm text-text-secondary leading-relaxed">Learn from distinguished scholars, industry pioneers, and internationally acclaimed Ivy League educators.</p>
-              <div className="absolute inset-0 border border-gold opacity-0 group-hover:opacity-40 shadow-[inset_0_0_15px_rgba(212,175,55,0.1)] transition-all duration-300 z-[-1]"></div>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="feature-card-el bg-white p-10 border border-black/5 shadow-sm hover:-translate-y-[5px] hover:shadow-lg hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
-              <div className="w-[65px] h-[65px] bg-ivory border border-burgundy/8 flex justify-center items-center mb-8 mx-auto group-hover:bg-burgundy group-hover:border-burgundy transition-all duration-300">
-                <Shield className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />
-              </div>
-              <h3 className="text-xl font-serif text-burgundy mb-4">Character Building</h3>
-              <p className="text-sm text-text-secondary leading-relaxed">Fostering integrity, resilience, ethical leadership, and a deep commitment to positive societal impact.</p>
-              <div className="absolute inset-0 border border-gold opacity-0 group-hover:opacity-40 shadow-[inset_0_0_15px_rgba(212,175,55,0.1)] transition-all duration-300 z-[-1]"></div>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="feature-card-el bg-white p-10 border border-black/5 shadow-sm hover:-translate-y-[5px] hover:shadow-lg hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
-              <div className="w-[65px] h-[65px] bg-ivory border border-burgundy/8 flex justify-center items-center mb-8 mx-auto group-hover:bg-burgundy group-hover:border-burgundy transition-all duration-300">
-                <Globe className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />
-              </div>
-              <h3 className="text-xl font-serif text-burgundy mb-4">Global Perspective</h3>
-              <p className="text-sm text-text-secondary leading-relaxed">International study opportunities, global networking events, and an inclusive, diverse student body.</p>
-              <div className="absolute inset-0 border border-gold opacity-0 group-hover:opacity-40 shadow-[inset_0_0_15px_rgba(212,175,55,0.1)] transition-all duration-300 z-[-1]"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ==========================================
-         ABOUT SECTION
-         ========================================== */}
-      <section id="about" className="py-32 bg-ivory">
-        <div className="max-w-[1200px] mx-auto px-8">
-          <div className="about-grid-el grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            {/* Visual Column */}
-            <div className="about-img-box-el relative border border-burgundy/10 p-[15px] bg-white shadow-md">
-              <img src="/library_students.png" alt="Students in Library" className="w-full h-[280px] sm:h-[380px] lg:h-[480px] object-cover" />
-              
-              {/* Overlay Glass Card */}
-              <div className="about-glass-card-el absolute -bottom-10 right-4 lg:-right-10 w-[280px] bg-burgundy/90 backdrop-blur-[12px] border border-gold/30 p-8 shadow-2xl text-white hidden sm:block">
-                <div className="relative">
-                  <h4 className="font-serif text-2xl text-gold mb-3">Education For Life</h4>
-                  <p className="text-xs text-text-light leading-relaxed">Enriching minds, nurturing spirits, and preparing global citizens since 1918.</p>
-                  <Sparkles className="absolute -top-[10px] -right-[10px] w-[35px] h-[35px] text-gold/20" />
-                </div>
-              </div>
-            </div>
-
-            {/* Content Column */}
-            <div className="about-text-el">
-              <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-                Since 1918
-              </span>
-              <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
-                About Beever Academy
-              </h2>
-              <div className="w-[80px] h-[2px] bg-gold-gradient mb-8"></div>
-              
-              <p className="font-serif text-2xl text-burgundy italic mb-8 leading-relaxed">
-                Beever Academy stands as a beacon of luxury educational excellence. We believe in providing an environment that is as inspiring as it is intellectually challenging.
-              </p>
-              
-              <ul className="flex flex-col gap-6 mb-12">
-                {[
-                  { title: "Holistic Education", desc: "Cultivating intellectual, emotional, and social development." },
-                  { title: "Leadership Development", desc: "Programs built specifically to shape tomorrow's chief executives and statesmen." },
-                  { title: "Academic Excellence", desc: "Consistently ranked among the top elite academic institutions worldwide." },
-                  { title: "Personal Growth", desc: "Dedicated mentorship, individualized feedback, and wellness coaching." }
-                ].map((item, i) => (
-                  <li key={i} className="flex gap-4 items-start">
-                    <CheckCircle2 className="w-5 h-5 text-gold-dark mt-[3px] flex-shrink-0" />
-                    <span className="text-sm text-text-secondary">
-                      <strong className="text-charcoal font-semibold">{item.title}</strong> - {item.desc}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              
-              <a href="#contact" className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white px-9 py-4 font-semibold uppercase tracking-widest shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-all duration-300">
-                Learn More About Us
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ==========================================
-         STATISTICS COUNTERS
-         ========================================== */}
-      <section className="relative py-32 bg-burgundy-dark text-white overflow-hidden">
-        {/* Background Decorative Rings */}
-        <div className="absolute inset-0 pointer-events-none z-10">
-          <div className="absolute w-[500px] h-[500px] -top-[200px] -left-[200px] rounded-full bg-radial from-gold/5 to-transparent"></div>
-          <div className="absolute w-[400px] h-[400px] -bottom-[150px] -right-[100px] rounded-full bg-radial from-gold/5 to-transparent"></div>
-        </div>
-
-        <div className="max-w-[1200px] mx-auto px-8 relative z-20">
-          <div className="stats-grid-el grid grid-cols-2 lg:grid-cols-4 gap-12 text-center">
-            {[
-              { icon: <Users className="w-full h-full" />, target: 1000, label: "Students Enrolled", display: "1000+" },
-              { icon: <GraduationCap className="w-full h-full" />, target: 50, label: "Expert Faculty", display: "50+" },
-              { icon: <BookOpen className="w-full h-full" />, target: 25, label: "Programs Offered", display: "25+" },
-              { icon: <Award className="w-full h-full" />, target: 98, label: "Success Rate", display: "98%" }
-            ].map((stat, i) => (
-              <div key={i} className="flex flex-col items-center">
-                <div className="w-[50px] h-[50px] text-gold mb-6 opacity-85">
-                  {stat.icon}
-                </div>
-                <div className="stat-number-el font-serif text-5xl md:text-6xl font-bold text-gold-light mb-3" data-target={stat.target}>
-                  {stat.display}
-                </div>
-                <div className="font-sans text-xs uppercase tracking-widest text-text-light">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ==========================================
-         PROGRAMS SECTION
-         ========================================== */}
-      <section id="programs" className="py-32 bg-white">
-        <div className="max-w-[1200px] mx-auto px-8">
-          <div className="text-center mb-20">
-            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-              Academic Pathways
-            </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
-              Programs of Distinction
-            </h2>
-            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
-            <p className="text-lg text-text-secondary italic font-serif max-w-[650px] mx-auto mt-6">
-              Explore our diverse selection of rigorous, world-class curricula tailored for global leaders.
-            </p>
-          </div>
-
-          <div className="programs-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {[
-              { title: "Undergraduate Studies", icon: <BookOpen className="w-full h-full" />, desc: "A foundational journey offering robust core knowledge, flexible majors, and comprehensive liberal arts components." },
-              { title: "Postgraduate Programs", icon: <GraduationCap className="w-full h-full" />, desc: "Advanced master's and doctoral degrees focusing on deep research, critical inquiry, and industrial application." },
-              { title: "Professional Certifications", icon: <Award className="w-full h-full" />, desc: "Targeted, high-impact training designed to keep working professionals at the peak of their industries." },
-              { title: "Leadership Development", icon: <Users className="w-full h-full" />, desc: "Signature courses focusing on strategic decision-making, team synergy, and systemic global change." },
-              { title: "Online Learning", icon: <Monitor className="w-full h-full" />, desc: "Flexible digital instruction leveraging cutting-edge technology, accessible from anywhere in the world." },
-              { title: "Executive Education", icon: <Briefcase className="w-full h-full" />, desc: "Bespoke management masterclasses designed exclusively for elite senior business directors and C-suite leaders." }
-            ].map((program, i) => (
-              <div key={i} className="program-card-el bg-white p-10 border border-black/5 shadow-sm relative z-10 hover:-translate-y-[2px] hover:shadow-md hover:border-gold/30 transition-all duration-300 flex flex-col justify-between group min-h-[300px]">
-                <div>
-                  <div className="w-[60px] h-[60px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300 mb-8">
-                    {program.icon}
-                  </div>
-                  <h3 className="text-2xl font-serif text-burgundy mb-4">{program.title}</h3>
-                  <p className="text-sm text-text-secondary leading-relaxed mb-8">{program.desc}</p>
-                </div>
-                <a href="#contact" className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-wider font-semibold text-burgundy hover:text-gold-dark transition-colors duration-200">
-                  <span>Learn More</span>
-                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </a>
-                
-                {/* Custom glowing background on hover */}
-                <div className="absolute inset-0 bg-gradient-to-b from-burgundy/1 to-burgundy/5 border border-gold opacity-0 group-hover:opacity-100 transition-all duration-300 z-[-1]"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* ==========================================
-         TESTIMONIALS SECTION
-         ========================================== */}
-      <section className="py-32 bg-white">
-        <div className="max-w-[1200px] mx-auto px-8">
-          <div className="text-center mb-16">
-            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-              Alumni Testimonials
-            </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
-              Voices of Excellence
-            </h2>
-            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
-          </div>
-
-          <div className="max-w-[850px] mx-auto relative px-8 sm:px-16">
-            <div 
-              className="relative h-[420px] sm:h-[350px] overflow-hidden"
-              onMouseEnter={() => setIsTestimonialHovered(true)}
-              onMouseLeave={() => setIsTestimonialHovered(false)}
-            >
-              {testimonials.map((test, index) => (
-                <div 
-                  key={index} 
-                  className={`absolute inset-0 flex flex-col justify-center items-center text-center transition-all duration-500 ease-in-out ${index === currentTestimonial ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-5'}`}
-                >
-                  <div className="relative pt-14 mb-8">
-                    <Quote className="absolute top-0 left-1/2 -translate-x-1/2 w-[50px] h-[50px] text-gold-light/45" />
-                    <p className="font-serif text-2xl md:text-3xl text-burgundy-dark italic leading-relaxed">
-                      "{test.text}"
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-[60px] h-[60px] bg-radial from-gold to-gold-dark rounded-full flex justify-center items-center shadow-md">
-                      <span className="font-sans text-burgundy-dark font-bold text-sm tracking-wide">
-                        {test.initials}
-                      </span>
-                    </div>
-                    <div>
-                      <h4 className="text-lg text-burgundy font-serif font-medium">{test.name}</h4>
-                      <span className="font-sans text-[11px] uppercase tracking-wider text-text-secondary block">
-                        {test.meta}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Slider Arrow Buttons */}
-            <button 
-              onClick={() => handleTestimonialNav(-1)} 
-              className="absolute left-0 top-1/2 -translate-y-1/2 border border-burgundy/15 rounded-full w-12 h-12 flex justify-center items-center text-burgundy hover:bg-burgundy hover:text-white hover:border-burgundy hover:shadow-burgundy transition-all duration-300 cursor-pointer hidden md:flex"
-              aria-label="Previous Testimonial"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => handleTestimonialNav(1)} 
-              className="absolute right-0 top-1/2 -translate-y-1/2 border border-burgundy/15 rounded-full w-12 h-12 flex justify-center items-center text-burgundy hover:bg-burgundy hover:text-white hover:border-burgundy hover:shadow-burgundy transition-all duration-300 cursor-pointer hidden md:flex"
-              aria-label="Next Testimonial"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-
-            {/* Dots */}
-            <div className="flex justify-center gap-3 mt-8">
-              {testimonials.map((_, index) => (
-                <button 
-                  key={index} 
-                  onClick={() => setCurrentTestimonial(index)} 
-                  className={`border-none h-2 cursor-pointer transition-all duration-300 rounded-full ${index === currentTestimonial ? 'bg-gold-dark w-6' : 'bg-burgundy/15 w-2'}`}
-                  aria-label={`Slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* ==========================================
-         ADMISSIONS TIMELINE
-         ========================================== */}
-      <section id="admissions" className="py-32 bg-white">
-        <div className="max-w-[1200px] mx-auto px-8">
-          <div className="text-center mb-20">
-            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-              Enrollment Gateway
-            </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
-              Admissions Process
-            </h2>
-            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
-            <p className="text-lg text-text-secondary italic font-serif max-w-[650px] mx-auto mt-6">
-              Our steps to guide elite candidates toward successful matriculation.
-            </p>
-          </div>
-
-          {/* Timeline Wrapper */}
-          <div className="relative max-w-[900px] mx-auto py-16">
-            
-            {/* Center connector line */}
-            <div className="timeline-line absolute top-0 left-8 lg:left-1/2 -translate-x-1/2 w-[2px] h-full bg-burgundy/10 z-10">
-              <div 
-                className="timeline-progress-line absolute top-0 left-0 w-full bg-gold-gradient" 
-                style={{ height: getTimelineProgressHeight() }}
-              ></div>
-            </div>
-
-            {[
-              { step: 1, title: "Submit Application", desc: "Complete the digital profile and submit academic transcripts, references, and your personal statement statement." },
-              { step: 2, title: "Review Process", desc: "Our admissions board conducts a comprehensive, holistic review of every candidate's profiles." },
-              { step: 3, title: "Interview", desc: "Shortlisted candidates are invited for a panel interview, either in-person on campus or online." },
-              { step: 4, title: "Admission Decision", desc: "Formal decisions are sent out via email, providing comprehensive feedback and financial aid outlines." },
-              { step: 5, title: "Enrollment", desc: "Secure your place, complete deposit, attend orientation sessions, and select academic modules." }
-            ].map((item, index) => {
-              const isActive = activeAdmissionsStep >= item.step;
-              return (
-                <div 
-                  key={index} 
-                  className={`timeline-step-el relative flex flex-col lg:flex-row mb-20 last:mb-0 z-20 ${index % 2 === 0 ? 'lg:justify-start' : 'lg:justify-end'}`}
-                >
-                  {/* Step point marker */}
-                  <div className={`absolute left-8 lg:left-1/2 -translate-x-1/2 w-[50px] h-[50px] rounded-full border-2 bg-white flex justify-center items-center transition-all duration-300 ${isActive ? 'bg-burgundy border-gold shadow-gold ring-6 ring-burgundy/15' : 'border-burgundy/15'}`}>
-                    <span className={`font-sans font-bold transition-all duration-300 ${isActive ? 'text-gold' : 'text-burgundy'}`}>
-                      {item.step}
-                    </span>
-                  </div>
-
-                  {/* Step Description Card */}
-                  <div className={`w-[calc(100%-5rem)] ml-20 lg:ml-0 lg:w-[45%] bg-white p-8 border border-black/5 shadow-sm transition-all duration-300 ${index % 2 === 0 ? 'lg:text-right' : 'lg:text-left'} ${isActive ? 'border-gold/20 shadow-md scale-[1.02]' : ''}`}>
-                    <h3 className="text-2xl font-serif text-burgundy mb-2">{item.title}</h3>
-                    <p className="text-sm text-text-secondary leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ==========================================
-         BLOG SECTION
-         ========================================== */}
-      <section id="blog" className="py-32 bg-ivory">
-        <div className="max-w-[1200px] mx-auto px-8">
-          <div className="text-center mb-20">
-            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-              Academic Insights
-            </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
-              The Academy Journal
-            </h2>
-            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
-          </div>
-
-          <div className="blog-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-            {[
-              { cat: "Academics", title: "The Future of Global Business Leadership", date: "May 28, 2026", img: "/library_students.png", summary: "Dr. Julian Vance discusses the integration of quantum computing and business ethics in modern MBA courses." },
-              { cat: "Innovation", title: "Pioneering AI in Higher Education", date: "May 15, 2026", img: "/campus_innovation.png", summary: "Exploring how Beever's quantum innovation labs are deploying tailored student teaching AI assistants." },
-              { cat: "Student Life", title: "Spring Convocation & Gala Highlights", date: "Apr 30, 2026", img: "/campus_events.png", summary: "A visual recap of this year's convocation ceremony, featuring keynote addresses from global ambassadors." }
-            ].map((post, i) => (
-              <article key={i} className="blog-card-el bg-white border border-black/5 shadow-sm overflow-hidden hover:-translate-y-2 hover:shadow-lg transition-all duration-300">
-                <div className="relative w-full h-[230px] overflow-hidden">
-                  <img src={post.img} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
-                  <div className="absolute top-6 left-6 bg-burgundy text-white font-sans text-[10px] font-semibold uppercase tracking-wider px-4 py-2 shadow-md">
-                    {post.date}
-                  </div>
-                </div>
-                <div className="p-8 text-left">
-                  <span className="font-sans text-[10px] font-semibold text-gold-dark uppercase tracking-wider block mb-2">{post.cat}</span>
-                  <h3 className="text-xl font-serif text-burgundy-dark mb-4 leading-snug">
-                    <a href="#blog" className="hover:text-gold-dark transition-colors">{post.title}</a>
-                  </h3>
-                  <p className="text-sm text-text-secondary leading-relaxed mb-6">{post.summary}</p>
-                  <a href="#blog" className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-wider font-semibold text-burgundy hover:text-gold-dark">
-                    <span>Read Article</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ==========================================
-         CALL TO ACTION PARALLAX BANNER
-         ========================================== */}
-      <section className="relative py-40 overflow-hidden text-center text-white">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-110 z-10" 
-          style={{ backgroundImage: "url('/campus_events.png')" }}
-        ></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-burgundy/90 to-charcoal/90 z-20"></div>
-
-        <div className="max-w-[1200px] mx-auto px-8 relative z-30 flex flex-col items-center">
-          <h2 className="text-5xl font-serif mb-6 leading-tight max-w-[800px] drop-shadow-md">
-            Begin Your Journey Toward Excellence
-          </h2>
-          <p className="text-base md:text-lg text-text-light font-light max-w-[600px] mb-12 leading-relaxed">
-            Admissions for the upcoming academic year are now open. Secure your legacy at Beever Academy.
-          </p>
-          <div className="flex flex-wrap justify-center gap-5">
-            <a href="#admissions" className="btn btn-gold gold-gradient-bg text-burgundy-dark px-10 py-4 font-semibold uppercase tracking-widest shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-all duration-300">
-              Apply Now
-            </a>
-            <a href="#contact" className="btn border border-white/30 text-white hover:bg-white hover:text-burgundy hover:border-white px-10 py-4 font-semibold uppercase tracking-widest hover:-translate-y-[2px] transition-all duration-300">
-              Request Information
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* ==========================================
-         CONTACT SECTION & FORM
-         ========================================== */}
-      <section id="contact" className="py-32 bg-white">
-        <div className="max-w-[1200px] mx-auto px-8">
-          <div className="text-center mb-20">
-            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-              Reach Out
-            </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
-              Schedule A Visit & Inquiry
-            </h2>
-            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-            {/* Form Wrap */}
-            <div className="lg:col-span-7 bg-ivory p-10 sm:p-14 border border-black/5 shadow-sm text-left">
-              <form onSubmit={handleInquirySubmit} className="flex flex-col gap-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                  <div className="flex flex-col gap-2">
-                    <label htmlFor="name" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Full Name</label>
-                    <input type="text" id="name" placeholder="John Doe" required className="font-sans text-sm p-4 border border-burgundy/10 bg-white focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label htmlFor="email" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Email Address</label>
-                    <input type="email" id="email" placeholder="john@example.com" required className="font-sans text-sm p-4 border border-burgundy/10 bg-white focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                  <div className="flex flex-col gap-2">
-                    <label htmlFor="program" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Program of Interest</label>
-                    <select id="program" className="font-sans text-sm p-4 border border-burgundy/10 bg-white focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200">
-                      <option value="undergraduate">Undergraduate Studies</option>
-                      <option value="postgraduate">Postgraduate Programs</option>
-                      <option value="executive">Executive Education</option>
-                      <option value="other">Other / General Inquiry</option>
-                    </select>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label htmlFor="date" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Preferred Visit Date</label>
-                    <input type="date" id="date" className="font-sans text-sm p-4 border border-burgundy/10 bg-white focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="msg" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Your Message</label>
-                  <textarea id="msg" rows="5" placeholder="Tell us about your academic goals..." required className="font-sans text-sm p-4 border border-burgundy/10 bg-white focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200"></textarea>
-                </div>
-
-                <button 
-                  type="submit" 
-                  disabled={formStatus.loading}
-                  className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white font-semibold uppercase tracking-widest py-4 w-full cursor-pointer disabled:opacity-75 hover:-translate-y-[2px] shadow-sm hover:shadow-md transition-all duration-300"
-                >
-                  {formStatus.loading ? 'PROCESSING INQUIRY...' : 'SUBMIT INQUIRY'}
-                </button>
-              </form>
-            </div>
-
-            {/* Info Cards Wrap */}
-            <div className="lg:col-span-5 flex flex-col gap-8 text-left">
-              {[
-                { icon: <MapPin className="w-5.5 h-5.5" />, title: "Academy Campus", desc: "100 Academic Circle, Royal Estates, NY 10021" },
-                { icon: <Phone className="w-5.5 h-5.5" />, title: "Admissions Office", desc: "+1 (800) 555-BEEV • +1 (212) 555-0198" },
-                { icon: <Mail className="w-5.5 h-5.5" />, title: "Electronic Mail", desc: "admissions@beeveracademy.edu • info@beeveracademy.edu" }
-              ].map((card, i) => (
-                <div key={i} className="flex gap-6 items-start bg-white p-8 border border-black/3 shadow-sm">
-                  <div className="w-[48px] h-[48px] bg-ivory border border-burgundy/5 flex justify-center items-center text-burgundy flex-shrink-0">
-                    {card.icon}
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-serif text-burgundy font-medium mb-1">{card.title}</h4>
-                    <p className="text-sm text-text-secondary leading-relaxed">{card.desc}</p>
-                  </div>
-                </div>
-              ))}
-
-              <div className="h-[220px] bg-cover bg-center border border-black/5 shadow-sm relative" style={{ backgroundImage: "url('/hero_building.png')" }}>
-                <div className="absolute inset-0 bg-burgundy/30 flex justify-center items-center">
-                  <a href="https://maps.google.com" target="_blank" rel="noreferrer" className="btn btn-gold text-[10px] font-semibold tracking-wider gold-gradient-bg text-burgundy-dark px-5 py-3 uppercase flex items-center gap-2">
-                    <Globe className="w-4 h-4" /> View Map
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      )}
 
       {/* ==========================================
          FOOTER SECTION
@@ -1016,7 +1456,7 @@ export default function App() {
                 { icon: <Linkedin className="w-4 h-4" />, label: "LinkedIn" },
                 { icon: <Youtube className="w-4 h-4" />, label: "YouTube" }
               ].map((soc, i) => (
-                <a key={i} href="#" className="w-[38px] h-[38px] bg-white/5 border border-white/10 rounded-none flex justify-center items-center text-white hover:bg-gold-gradient hover:text-burgundy-dark hover:border-transparent hover:scale-105 transition-all duration-300" aria-label={soc.label}>
+                <a key={i} href="#" className="w-[38px] h-[38px] bg-white/5 border border-white/10 rounded-full flex justify-center items-center text-white hover:bg-gold-gradient hover:text-burgundy-dark hover:border-transparent hover:scale-105 transition-all duration-300" aria-label={soc.label}>
                   {soc.icon}
                 </a>
               ))}
