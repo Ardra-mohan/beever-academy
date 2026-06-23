@@ -11,6 +11,7 @@ import {
 
 // Import local logo from assets
 import logo from './assets/logo.png';
+import homeImg from './assets/home.png';
 
 // Register GSAP ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -152,19 +153,15 @@ export default function App() {
       if (currentPage === 'home') {
         const heroTl = gsap.timeline();
         if (prefersReducedMotion) {
-          heroTl.fromTo('.hero-badge', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut', overwrite: 'auto' })
-                .fromTo('.hero-heading', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35')
+          heroTl.fromTo('.hero-heading', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut', overwrite: 'auto' })
                 .fromTo('.hero-desc', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35')
                 .fromTo('.hero-btn', { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35')
-                .fromTo('.hero-img-box', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.45')
-                .fromTo('.hero-logo-badge', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35');
+                .fromTo('.hero-feature-item', { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35');
         } else {
-          heroTl.fromTo('.hero-badge', { y: 15, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' })
-                .fromTo('.hero-heading', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.4')
+          heroTl.fromTo('.hero-heading', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' })
                 .fromTo('.hero-desc', { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.4')
                 .fromTo('.hero-btn', { y: 5, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.15, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.4')
-                .fromTo('.hero-img-box', { scale: 0.98, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.8')
-                .fromTo('.hero-logo-badge', { scale: 0.95, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.4');
+                .fromTo('.hero-feature-item', { y: 15, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.3');
                 
           // Subtle background zoom
           gsap.to('.hero-bg-img', { scale: 1.02, duration: 6, ease: 'power1.inOut' });
@@ -387,70 +384,106 @@ export default function App() {
   // ==========================================
   
   const renderHero = () => (
-    <section id="home" className="relative min-h-screen bg-white flex items-center overflow-hidden pt-32 pb-20 lg:pb-24">
-      {/* Diagonal Background Split */}
+    <section id="home" className="relative min-h-screen bg-[#1a0206] flex flex-col justify-between overflow-hidden pt-32 pb-6 text-white">
+      {/* Background Image & Overlays */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        {/* Burgundy side with drop shadow */}
-        <div className="absolute inset-0 hero-diagonal-wrapper">
-          <div className="absolute inset-0 bg-burgundy-dark hero-diagonal-bg">
-            {/* Subtle background image zoom inside the burgundy side */}
-            <div 
-              className="hero-bg-img absolute inset-0 bg-cover bg-center opacity-15 z-0"
-              style={{ backgroundImage: "url('/hero_building.png')" }}
-            ></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-burgundy-dark/95 to-burgundy-dark/70 z-10"></div>
-          </div>
-        </div>
+        <div 
+          className="hero-bg-img absolute inset-0 bg-[length:100%_100%] bg-no-repeat opacity-80 scale-100 z-0"
+          style={{ backgroundImage: `url(${homeImg})` }}
+        ></div>
+        {/* Darker burgundy gradient with a subtle fade on the left */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a0206_0%,rgba(26,2,6,0.92)_20%,rgba(26,2,6,0.3)_45%,transparent_75%)] z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1a0206] via-transparent to-[#1a0206]/30 z-10"></div>
       </div>
       
-      <div className="relative max-w-[1300px] w-full mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 items-center gap-6 lg:gap-16 z-20">
-        {/* Hero Left Content */}
-        <div className="lg:col-span-7 text-white text-left">
-          <div className="hero-badge mb-6 inline-block">
-            <span className="font-sans text-[11px] font-semibold tracking-[0.15em] uppercase text-gold border border-gold/30 px-4 py-2 bg-gold/5 backdrop-blur-[5px]">
-              Est. 2016 &bull; Institution of Excellence
-            </span>
-          </div>
-          <h1 className="hero-heading text-5xl md:text-7xl font-serif leading-[1.15] mb-8 font-medium">
-            Learn Today.<br/>
-            <span className="gold-gradient-text font-bold">Lead Tomorrow.</span>
+      {/* Main Copy Area */}
+      <div className="relative max-w-[1300px] w-full mx-auto px-8 z-20 flex-grow flex flex-col justify-center">
+        <div className="max-w-[700px] text-left mt-6 md:mt-12">
+          <h1 className="hero-heading text-5xl md:text-7xl lg:text-[76px] font-serif leading-[1.1] mb-8 font-medium">
+            LEARN TODAY,<br/>
+            <span className="gold-gradient-text font-bold">LEAD TOMORROW.</span>
           </h1>
-          <p className="hero-desc text-base md:text-lg font-light text-text-light mb-6 md:mb-12 max-w-[580px] leading-relaxed">
-            Transforming Knowledge Into Success Through Practical, Industry-Focused Learning.
+          <p className="hero-desc text-base md:text-lg font-light text-text-light/90 mb-10 max-w-[580px] leading-relaxed">
+            Dubai's premium academy for financial markets, professional skills and personal growth. Practical education. Real insights. Future ready.
           </p>
           <div className="flex flex-wrap gap-5">
-            <a href="#programs" className="hero-btn btn btn-gold gold-gradient-bg text-burgundy-dark px-9 py-4 font-semibold uppercase tracking-widest shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-colors duration-300">
-              Explore Programs
+            <a href="#programs" className="hero-btn btn btn-gold gold-gradient-bg text-burgundy-dark px-8 py-4 font-semibold uppercase tracking-widest shadow-lg hover:shadow-xl hover:-translate-y-[2px] transition-all duration-300 flex items-center gap-2">
+              <span>Start Your Journey</span>
+              <ArrowRight className="w-4 h-4" />
             </a>
-            <a href="#contact" className="hero-btn btn border border-white/30 text-white hover:bg-white hover:text-burgundy hover:border-white px-9 py-4 font-semibold uppercase tracking-widest hover:-translate-y-[2px] transition-colors duration-300">
-              Schedule Campus Visit
+            <a href="#contact" className="hero-btn btn border border-gold/40 text-gold-light hover:bg-white/5 px-8 py-4 font-semibold uppercase tracking-widest hover:-translate-y-[2px] transition-all duration-300 flex items-center gap-2">
+              <svg className="w-4.5 h-4.5 text-gold-light" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round" />
+                <line x1="16" y1="2" x2="16" y2="6" strokeLinecap="round" strokeLinejoin="round" />
+                <line x1="8" y1="2" x2="8" y2="6" strokeLinecap="round" strokeLinejoin="round" />
+                <line x1="3" y1="10" x2="21" y2="10" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span>Book a Consultation</span>
             </a>
-          </div>
-        </div>
-
-        {/* Hero Right Visual */}
-        <div className="lg:col-span-5 flex justify-center relative">
-          <div className="hero-img-box relative w-full max-w-[450px] border-2 border-burgundy p-3 bg-burgundy/5 shadow-2xl rounded-2xl">
-            <img src="/hero_building.png" alt="Grand Academy Building" className="w-full h-[320px] sm:h-[420px] lg:h-[520px] object-cover transition-transform duration-500 hover:scale-105 rounded-xl" />
-            
-            {/* Emblem Overlay - Logo used here */}
-            <div className="hero-logo-badge absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110px] h-[110px] sm:w-[130px] sm:h-[130px] lg:w-[160px] lg:h-[160px] bg-burgundy-dark/85 border border-gold rounded-full flex justify-center items-center shadow-[0_10px_40px_rgba(0,0,0,0.5),_0_0_20px_rgba(201,162,77,0.3)] backdrop-blur-[8px]">
-              <img src={logo} alt="Beever Academy Shield" className="w-[64px] sm:w-[76px] lg:w-[96px] h-auto drop-shadow-md" />
-            </div>
-            
-            {/* Parallax Light Flares */}
-            <div className="absolute w-[300px] h-[300px] -top-[50px] -right-[50px] bg-radial from-gold/20 to-transparent z-[-1] animate-glow-float-1"></div>
-            <div className="absolute w-[250px] h-[250px] -bottom-[30px] -left-[60px] bg-radial from-gold/20 to-transparent z-[-1] animate-glow-float-2"></div>
           </div>
         </div>
       </div>
 
-      {/* Mouse scroll down indicator */}
-      <a href="#why-choose-us" className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex justify-center" aria-label="Scroll Down">
-        <span className="w-[26px] h-[44px] border-2 border-white/40 rounded-[12px] relative block">
-          <span className="w-[4px] h-[8px] bg-gold rounded-[2px] absolute top-2 left-1/2 -translate-x-1/2 animate-mouse-scroll"></span>
-        </span>
-      </a>
+      {/* Bottom Features Row & Scroll Indicator */}
+      <div className="relative z-20 w-full max-w-[1300px] mx-auto px-8 mt-auto pt-6 flex flex-col gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 pt-8 border-t border-white/10 text-left">
+          {/* Feature 1 */}
+          <div className="hero-feature-item flex gap-4 items-start">
+            <div className="p-2.5 bg-white/5 rounded-lg border border-gold/20 text-gold flex-shrink-0">
+              <MapPin className="w-5 h-5 text-gold" strokeWidth={1.5} />
+            </div>
+            <div>
+              <h4 className="font-serif text-sm font-bold text-gold uppercase tracking-wider mb-1">Dubai Based</h4>
+              <p className="text-xs text-white/70 leading-relaxed">Located in the heart of Dubai's business district.</p>
+            </div>
+          </div>
+
+          {/* Feature 2 */}
+          <div className="hero-feature-item flex gap-4 items-start">
+            <div className="p-2.5 bg-white/5 rounded-lg border border-gold/20 text-gold flex-shrink-0">
+              <svg className="w-5 h-5 text-gold" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3L2 8h20L12 3zM4 10h2v10H4V10zm5 0h2v10H9V10zm6 0h2v10h-2V10zm5 0h2v10h-2V10zM2 21h20" />
+              </svg>
+            </div>
+            <div>
+              <h4 className="font-serif text-sm font-bold text-gold uppercase tracking-wider mb-1">Modern Environment</h4>
+              <p className="text-xs text-white/70 leading-relaxed">State-of-the-art classrooms for focused learning.</p>
+            </div>
+          </div>
+
+          {/* Feature 3 */}
+          <div className="hero-feature-item flex gap-4 items-start">
+            <div className="p-2.5 bg-white/5 rounded-lg border border-gold/20 text-gold flex-shrink-0">
+              <TrendingUp className="w-5 h-5 text-gold" strokeWidth={1.5} />
+            </div>
+            <div>
+              <h4 className="font-serif text-sm font-bold text-gold uppercase tracking-wider mb-1">Industry Focused</h4>
+              <p className="text-xs text-white/70 leading-relaxed">Practical training aligned with real market needs.</p>
+            </div>
+          </div>
+
+          {/* Feature 4 */}
+          <div className="hero-feature-item flex gap-4 items-start">
+            <div className="p-2.5 bg-white/5 rounded-lg border border-gold/20 text-gold flex-shrink-0">
+              <Users className="w-5 h-5 text-gold" strokeWidth={1.5} />
+            </div>
+            <div>
+              <h4 className="font-serif text-sm font-bold text-gold uppercase tracking-wider mb-1">Community Driven</h4>
+              <p className="text-xs text-white/70 leading-relaxed">Learn, grow and network with like-minded people.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="text-center pt-2">
+          <a href="#why-choose-us" className="inline-flex flex-col items-center gap-2 cursor-pointer" aria-label="Scroll Down">
+            <span className="w-[20px] h-[34px] border border-white/40 rounded-[10px] relative block">
+              <span className="w-[3px] h-[6px] bg-gold rounded-[1px] absolute top-1.5 left-1/2 -translate-x-1/2 animate-mouse-scroll"></span>
+            </span>
+            <span className="text-[9px] uppercase tracking-[0.2em] text-white/40 font-semibold">Scroll to Explore</span>
+          </a>
+        </div>
+      </div>
     </section>
   );
 
@@ -1327,13 +1360,13 @@ export default function App() {
       {/* ==========================================
          STICKY HEADER NAVBAR
          ========================================== */}
-      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-4 bg-burgundy border-b border-burgundy-dark shadow-md' : 'py-6 bg-white border-b-2 border-burgundy shadow-sm'}`}>
+      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-4 bg-[#1a0206] border-b border-gold/10 shadow-md' : 'py-6 bg-[#1a0206]/95 border-b border-burgundy/20 shadow-sm'}`}>
         <div className="max-w-[1300px] mx-auto px-6 sm:px-8 flex justify-between items-center">
           <a href="#home" className="flex items-center gap-3">
             {/* Logo used here */}
             <img src={logo} alt="Beever Academy Logo" className="w-[50px] sm:w-[64px] h-auto drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]" />
-            <span className={`font-serif text-lg sm:text-xl md:text-2xl font-semibold tracking-wider transition-colors duration-300 ${isScrolled ? 'text-white' : 'text-burgundy'}`}>
-              BEEVER <span className={isScrolled ? 'text-gold' : 'text-gold-dark'}>ACADEMY</span>
+            <span className="font-serif text-lg sm:text-xl md:text-2xl font-semibold tracking-wider transition-colors duration-300 text-white">
+              BEEVER <span className="text-gold">ACADEMY</span>
             </span>
           </a>
 
@@ -1345,9 +1378,9 @@ export default function App() {
                   href={`#${sec}`} 
                   className={`font-sans text-xs uppercase tracking-wider font-semibold transition-all duration-200 relative py-2 ${
                     activeNavSection === sec 
-                      ? (isScrolled ? 'text-gold-light after:w-full' : 'text-gold-dark after:w-full') 
-                      : (isScrolled ? 'text-white/80 hover:text-gold-light after:w-0' : 'text-burgundy/80 hover:text-gold-dark after:w-0')
-                  } after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1px] ${isScrolled ? 'after:bg-gold' : 'after:bg-burgundy'} hover:after:w-full after:transition-all after:duration-300`}
+                      ? 'text-gold-light after:w-full' 
+                      : 'text-white/80 hover:text-gold-light after:w-0'
+                  } after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1px] after:bg-gold hover:after:w-full after:transition-all after:duration-300`}
                 >
                   {sec.replace('-', ' ')}
                 </a>
@@ -1358,17 +1391,13 @@ export default function App() {
           <div className="flex items-center gap-6">
             <a 
               href="#admissions" 
-              className={`hidden sm:inline-flex btn text-xs px-6 py-3 font-semibold shadow-sm transition-all duration-300 uppercase tracking-widest ${
-                isScrolled 
-                  ? 'gold-gradient-bg text-burgundy-dark hover:shadow-md hover:-translate-y-[2px]' 
-                  : 'bg-burgundy text-white hover:bg-burgundy-light hover:-translate-y-[2px]'
-              }`}
+              className="hidden sm:inline-flex btn text-xs px-6 py-3 font-semibold shadow-sm transition-all duration-300 uppercase tracking-widest gold-gradient-bg text-burgundy-dark hover:shadow-md hover:-translate-y-[2px]"
             >
               Enroll Now
             </a>
             {/* Mobile Hamburger toggle */}
             <button 
-              className={`lg:hidden flex flex-col gap-[6px] cursor-pointer z-[1100] ${mobileMenuOpen ? 'text-white' : (isScrolled ? 'text-white' : 'text-burgundy')}`}
+              className="lg:hidden flex flex-col gap-[6px] cursor-pointer z-[1100] text-white"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle Menu"
             >
@@ -1376,9 +1405,9 @@ export default function App() {
                 <X className="w-6 h-6 text-white" />
               ) : (
                 <>
-                  <span className={`w-6 h-[2px] block transition-colors duration-300 ${isScrolled ? 'bg-white' : 'bg-burgundy'}`}></span>
-                  <span className={`w-6 h-[2px] block transition-colors duration-300 ${isScrolled ? 'bg-white' : 'bg-burgundy'}`}></span>
-                  <span className={`w-6 h-[2px] block transition-colors duration-300 ${isScrolled ? 'bg-white' : 'bg-burgundy'}`}></span>
+                  <span className="w-6 h-[2px] block transition-colors duration-300 bg-white"></span>
+                  <span className="w-6 h-[2px] block transition-colors duration-300 bg-white"></span>
+                  <span className="w-6 h-[2px] block transition-colors duration-300 bg-white"></span>
                 </>
               )}
             </button>
