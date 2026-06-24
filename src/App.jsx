@@ -10,11 +10,218 @@ import {
 } from 'lucide-react';
 
 // Import local logo from assets
-import logo from './assets/logo.png';
+import logo from './assets/logo_clean.png';
 import homeImg from './assets/homee.jpeg';
 
 // Register GSAP ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
+
+// ==========================================
+// CUSTOM GOLDEN SPRINKLE CURSOR COMPONENT
+// ==========================================
+function GoldenSprinkleCursor() {
+  const dotRef = useRef(null);
+  const ringRef = useRef(null);
+  const canvasRef = useRef(null);
+  const requestRef = useRef(null);
+  const particlesRef = useRef([]);
+
+  useEffect(() => {
+    // Check if device supports touch/coarse pointers (mobile)
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    if (isTouchDevice) {
+      if (dotRef.current) dotRef.current.style.display = 'none';
+      if (ringRef.current) ringRef.current.style.display = 'none';
+      if (canvasRef.current) canvasRef.current.style.display = 'none';
+      return;
+    }
+
+    const dot = dotRef.current;
+    const ring = ringRef.current;
+    const canvas = canvasRef.current;
+    if (!dot || !ring || !canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas sizes
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Mouse coordinates tracking
+    let mouse = { x: -100, y: -100 };
+    let lastMouse = { x: -100, y: -100 };
+
+    // Set initial custom cursor positioning
+    gsap.set(dot, { xPercent: -50, yPercent: -50 });
+    gsap.set(ring, { xPercent: -50, yPercent: -50 });
+
+    const handleMouseMove = (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+
+      // Move custom dot (fast lag) and ring (slower lag for smooth drag follow feel)
+      gsap.to(dot, { x: mouse.x, y: mouse.y, duration: 0.05, ease: "power2.out" });
+      gsap.to(ring, { x: mouse.x, y: mouse.y, duration: 0.22, ease: "power2.out" });
+
+      // Generate golden sprinkle particles based on cursor speed
+      const distance = Math.hypot(mouse.x - lastMouse.x, mouse.y - lastMouse.y);
+      if (distance > 2) {
+        const spawnCount = Math.min(3, Math.floor(distance / 5) + 1);
+        for (let i = 0; i < spawnCount; i++) {
+          particlesRef.current.push(createParticle(mouse.x, mouse.y));
+        }
+      }
+
+      lastMouse.x = mouse.x;
+      lastMouse.y = mouse.y;
+    };
+
+    // Curated color values for luxury gold sparkles
+    const goldColors = [
+      { r: 201, g: 162, b: 77 },   // --color-gold (#C9A24D)
+      { r: 242, g: 223, b: 162 },  // --color-gold-light (#F2DFA2)
+      { r: 166, g: 126, b: 45 }    // --color-gold-dark (#A67E2D)
+    ];
+
+    const createParticle = (x, y) => {
+      const colorObj = goldColors[Math.floor(Math.random() * goldColors.length)];
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 1.5 + 0.5;
+      return {
+        x,
+        y,
+        vx: Math.cos(angle) * speed + (Math.random() - 0.5) * 0.4,
+        vy: Math.sin(angle) * speed + 0.3, // biased slightly downwards
+        size: Math.random() * 3 + 1.5,
+        r: colorObj.r,
+        g: colorObj.g,
+        b: colorObj.b,
+        alpha: 1.0,
+        decay: Math.random() * 0.02 + 0.015,
+        rotation: Math.random() * Math.PI,
+        rotationSpeed: (Math.random() - 0.5) * 0.08
+      };
+    };
+
+    // Hover scales the cursor ring & adds translucent gold fill
+    const handleMouseEnterLink = () => {
+      gsap.to(ring, {
+        scale: 1.5,
+        backgroundColor: 'rgba(201, 162, 77, 0.15)',
+        borderColor: '#F2DFA2',
+        boxShadow: '0 0 15px rgba(201, 162, 77, 0.4)',
+        duration: 0.25
+      });
+      gsap.to(dot, {
+        scale: 0.5,
+        backgroundColor: '#F2DFA2',
+        duration: 0.2
+      });
+    };
+
+    const handleMouseLeaveLink = () => {
+      gsap.to(ring, {
+        scale: 1,
+        backgroundColor: 'transparent',
+        borderColor: 'rgba(201, 162, 77, 0.6)',
+        boxShadow: '0 0 10px rgba(201, 162, 77, 0.2)',
+        duration: 0.25
+      });
+      gsap.to(dot, {
+        scale: 1,
+        backgroundColor: '#C9A24D',
+        duration: 0.2
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    // Apply custom cursor interactions to all interactive nodes
+    const bindLinkListeners = () => {
+      const nodes = document.querySelectorAll('a, button, select, input, textarea, [role="button"], .cursor-pointer');
+      nodes.forEach(node => {
+        node.removeEventListener('mouseenter', handleMouseEnterLink);
+        node.removeEventListener('mouseleave', handleMouseLeaveLink);
+        node.addEventListener('mouseenter', handleMouseEnterLink);
+        node.addEventListener('mouseleave', handleMouseLeaveLink);
+      });
+    };
+
+    bindLinkListeners();
+
+    // Auto-listen to SPA page navigation or DOM layout modifications
+    const observer = new MutationObserver(bindLinkListeners);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Sparkles canvas rendering loop
+    const animateParticles = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const particles = particlesRef.current;
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.035; // simulated gravity drift
+        p.alpha -= p.decay;
+        p.rotation += p.rotationSpeed;
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        // Draw diamond-shaped sparkle element
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.beginPath();
+        ctx.moveTo(0, -p.size);
+        ctx.lineTo(p.size, 0);
+        ctx.lineTo(0, p.size);
+        ctx.lineTo(-p.size, 0);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha})`;
+        
+        // Add subtle bloom glow shadow
+        ctx.shadowBlur = 4;
+        ctx.shadowColor = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha})`;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      requestRef.current = requestAnimationFrame(animateParticles);
+    };
+
+    requestRef.current = requestAnimationFrame(animateParticles);
+
+    // Cleanup events & timers
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(requestRef.current);
+      observer.disconnect();
+      const nodes = document.querySelectorAll('a, button, select, input, textarea, [role="button"], .cursor-pointer');
+      nodes.forEach(node => {
+        node.removeEventListener('mouseenter', handleMouseEnterLink);
+        node.removeEventListener('mouseleave', handleMouseLeaveLink);
+      });
+    };
+  }, []);
+
+  return (
+    <>
+      <div ref={dotRef} className="custom-cursor-dot hidden lg:block" />
+      <div ref={ringRef} className="custom-cursor-ring hidden lg:block" />
+      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[10000] hidden lg:block" />
+    </>
+  );
+}
+
 
 export default function App() {
   // ==========================================
@@ -388,7 +595,7 @@ export default function App() {
       {/* Background Image & Overlays */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div 
-          className="hero-bg-img absolute inset-0 bg-[length:100%_100%] bg-no-repeat opacity-80 scale-100 z-0"
+          className="hero-bg-img absolute inset-0 bg-cover bg-[position:75%_center] md:bg-[length:100%_100%] bg-no-repeat opacity-80 scale-100 z-0"
           style={{ backgroundImage: `url(${homeImg})` }}
         ></div>
         {/* Darker burgundy gradient with a subtle fade on the left */}
@@ -1339,6 +1546,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-charcoal font-sans bg-white relative">
+      <GoldenSprinkleCursor />
       {/* ==========================================
          PAGE LOADER
          ========================================== */}
@@ -1346,7 +1554,9 @@ export default function App() {
         <div className="fixed inset-0 bg-burgundy-dark flex justify-center items-center z-[9999] transition-opacity duration-800">
           <div className="text-center">
             {/* Logo used here */}
-            <img src={logo} alt="Beever Academy Emblem" className="w-[130px] h-auto mx-auto animate-logo-pulse" />
+            <div className="gold-glass-logo-frame w-[130px] h-[130px] mx-auto animate-logo-pulse mb-6">
+              <img src={logo} alt="Beever Academy Emblem" className="w-full h-full object-contain" />
+            </div>
             <div className="w-[180px] h-[2px] bg-white/10 mx-auto my-6 relative overflow-hidden">
               <div className="h-full bg-gold-gradient w-full animate-bar-fill"></div>
             </div>
@@ -1364,7 +1574,9 @@ export default function App() {
         <div className="max-w-[1300px] mx-auto px-6 sm:px-8 flex justify-between items-center">
           <a href="#home" className="flex items-center gap-3">
             {/* Logo used here */}
-            <img src={logo} alt="Beever Academy Logo" className="w-[50px] sm:w-[64px] h-auto drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]" />
+            <div className="gold-glass-logo-frame w-[54px] h-[54px] sm:w-[62px] sm:h-[62px] flex-shrink-0">
+              <img src={logo} alt="Beever Academy Logo" className="w-full h-full object-contain" />
+            </div>
             <span className="font-serif text-lg sm:text-xl md:text-2xl font-semibold tracking-wider transition-colors duration-300 text-white">
               BEEVER <span className="text-gold">ACADEMY</span>
             </span>
@@ -1467,7 +1679,9 @@ export default function App() {
           <div className="flex flex-col gap-6">
             <a href="#home" className="flex items-center gap-3">
               {/* Logo used here */}
-              <img src={logo} alt="Beever Academy Logo" className="w-[68px] h-auto" />
+              <div className="gold-glass-logo-frame w-[64px] h-[64px] flex-shrink-0">
+                <img src={logo} alt="Beever Academy Logo" className="w-full h-full object-contain" />
+              </div>
               <span className="font-serif text-white text-xl font-semibold tracking-wider">
                 BEEVER ACADEMY
               </span>
