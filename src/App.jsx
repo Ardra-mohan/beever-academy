@@ -11,7 +11,7 @@ import {
 
 // Import local logo from assets
 import logo from './assets/logo.png';
-import homeImg from './assets/home.png';
+import homeImg from './assets/homee.jpeg';
 
 // Register GSAP ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
