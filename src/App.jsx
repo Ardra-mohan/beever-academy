@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 // Import local logo from assets
-import logo from './assets/logo_clean.png';
+import logo from './assets/logo.png';
 import homeImg from './assets/homee.jpeg';
 
 // Register GSAP ScrollTrigger plugin
@@ -237,6 +237,8 @@ export default function App() {
   const [activeNavSection, setActiveNavSection] = useState('home');
   const [allowScrollHome, setAllowScrollHome] = useState(false);
   const [activeJourneyStep, setActiveJourneyStep] = useState(0);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [careerFormStatus, setCareerFormStatus] = useState({ loading: false, submitted: false });
 
   // Testimonial Autoplay Ref
   const autoplayRef = useRef(null);
@@ -293,21 +295,14 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
-      if (hash === '#about') {
-        setCurrentPage('about');
-        window.scrollTo(0, 0);
-      } else if (hash === '#home' || hash === '' || hash === '#/') {
-        setCurrentPage('home');
-        window.scrollTo(0, 0);
-      } else if (hash === '#contact') {
-        setCurrentPage('home');
-        setTimeout(() => {
-          const el = document.getElementById('contact');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+      if (hash === '' || hash === '#/' || hash === '#home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        // For existing hash hashes (#programs, #admissions, #blog, #testimonials) that exist on both pages:
-        // Keep current page state, let browser naturally scroll.
+        const id = hash.substring(1);
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     };
 
@@ -322,13 +317,8 @@ export default function App() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
       
-      if (currentPage === 'about' && window.scrollY < 300) {
-        setActiveNavSection('about');
-        return;
-      }
-
       // Track active section for navbar highlighting
-      const sections = ['home', 'about', 'programs', 'admissions', 'blog', 'contact'];
+      const sections = ['home', 'about', 'programs', 'admissions', 'blog', 'careers', 'contact'];
       const scrollY = window.pageYOffset;
       
       for (const sectionId of sections) {
@@ -346,7 +336,7 @@ export default function App() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [currentPage]);
+  }, []);
 
   // GSAP Animations once loader is gone or page changes
   useEffect(() => {
@@ -439,6 +429,22 @@ export default function App() {
         );
       }
 
+      // 5.5. Careers Cards
+      if (document.querySelector('.careers-grid-el')) {
+        gsap.fromTo('.career-card-el', 
+          { y: prefersReducedMotion ? 0 : 20, opacity: 0 },
+          {
+            scrollTrigger: { trigger: '.careers-grid-el', start: 'top 85%' },
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.1,
+            ease: 'power1.inOut',
+            overwrite: 'auto'
+          }
+        );
+      }
+
       // 6. About animations
       if (document.querySelector('.about-grid-el')) {
         gsap.fromTo('.about-img-box-el', 
@@ -486,7 +492,7 @@ export default function App() {
         clearTimeout(timer);
       };
     }
-  }, [isLoading, currentPage]);
+  }, [isLoading]);
 
   // Testimonials slide autoplay loops
   useEffect(() => {
@@ -497,71 +503,6 @@ export default function App() {
     }
     return () => clearInterval(autoplayRef.current);
   }, [currentTestimonial, isTestimonialHovered]);
-
-  // Scroll up on About page cooldown to prevent instant scroll back
-  useEffect(() => {
-    if (currentPage === 'about') {
-      setAllowScrollHome(false);
-      const timer = setTimeout(() => {
-        setAllowScrollHome(true);
-      }, 800); // 800ms cooldown after page navigation
-      return () => clearTimeout(timer);
-    } else {
-      setAllowScrollHome(false);
-    }
-  }, [currentPage]);
-
-  // Scroll up on About page to lead back to Home page
-  useEffect(() => {
-    let lastScrollY = window.scrollY;
-    let touchStartY = 0;
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentPage === 'about' && allowScrollHome) {
-        // Scroll up to reach absolute top (scrollY === 0)
-        if (currentScrollY === 0 && lastScrollY > 0) {
-          window.location.hash = '#home';
-        }
-      }
-      lastScrollY = currentScrollY;
-    };
-
-    const handleWheel = (e) => {
-      if (currentPage === 'about' && allowScrollHome && window.scrollY <= 5) {
-        // e.deltaY < 0 means scroll up attempt at the top
-        if (e.deltaY < 0) {
-          window.location.hash = '#home';
-        }
-      }
-    };
-
-    const handleTouchStart = (e) => {
-      touchStartY = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e) => {
-      if (currentPage === 'about' && allowScrollHome && window.scrollY <= 5) {
-        const touchEndY = e.touches[0].clientY;
-        // swiping down (touchEndY > touchStartY) at top scrolls up
-        if (touchEndY - touchStartY > 60) {
-          window.location.hash = '#home';
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('wheel', handleWheel, { passive: true });
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, [currentPage, allowScrollHome]);
 
   const startAutoplay = () => {
     clearInterval(autoplayRef.current);
@@ -1360,6 +1301,187 @@ export default function App() {
     </section>
   );
 
+  const renderCareers = () => {
+    const openings = [
+      {
+        id: "sen-admissions",
+        title: "Senior Admissions Advisor",
+        dept: "Admissions & Student Relations",
+        location: "Dubai (On-site)",
+        type: "Full-time",
+        desc: "Lead student consultations, evaluate applications, and support prospective students in selecting their optimal educational pathway at Beever Academy."
+      },
+      {
+        id: "fin-instructor",
+        title: "Financial Markets Instructor",
+        dept: "Academic Department",
+        location: "Dubai (Hybrid)",
+        type: "Full-time or Part-time",
+        desc: "Deliver practical, real-market trading education and proprietary fund management strategies to executive and postgraduate students."
+      },
+      {
+        id: "corp-relations",
+        title: "Corporate Relations Manager",
+        dept: "Business Development",
+        location: "Dubai (On-site)",
+        type: "Full-time",
+        desc: "Build strategic relations with institutional funds, investment banks, and corporate entities in Dubai to secure postgraduate placements."
+      }
+    ];
+
+    const handleApplyClick = (jobTitle) => {
+      setSelectedJob(jobTitle);
+    };
+
+    const handleCareerSubmit = (e) => {
+      e.preventDefault();
+      setCareerFormStatus({ loading: true, submitted: false });
+      
+      setTimeout(() => {
+        setCareerFormStatus({ loading: false, submitted: true });
+        alert(`Application for ${selectedJob} submitted successfully. Our talent acquisition team will review your resume and contact you soon.`);
+        setSelectedJob(null);
+        setCareerFormStatus({ loading: false, submitted: false });
+        e.target.reset();
+      }, 1500);
+    };
+
+    return (
+      <section id="careers" className="py-32 bg-ivory text-center relative">
+        <div className="max-w-[1200px] mx-auto px-8">
+          <div className="mb-20">
+            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
+              Careers at Beever Academy
+            </span>
+            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
+              Shape the Future of Professional Learning
+            </h2>
+            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-6"></div>
+            <p className="text-sm text-text-secondary max-w-[650px] mx-auto leading-relaxed">
+              Join an elite team of educators, specialists, and academic advisors dedicated to cultivating the next generation of financial and business leaders in Dubai.
+            </p>
+          </div>
+
+          <div className="careers-grid-el grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+            {openings.map((job) => (
+              <div 
+                key={job.id} 
+                className="career-card-el bg-white border border-black/5 rounded-2xl p-8 shadow-sm hover:shadow-xl hover:border-gold/30 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden"
+              >
+                <div>
+                  <span className="font-sans text-[10px] font-bold text-gold-dark uppercase tracking-widest block mb-4">
+                    {job.dept}
+                  </span>
+                  <h3 className="text-xl font-serif font-bold text-burgundy mb-3 group-hover:text-gold transition-colors duration-300">
+                    {job.title}
+                  </h3>
+                  <div className="flex gap-4 items-center text-[11px] text-text-secondary/70 font-semibold mb-6">
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-gold" />
+                      {job.location}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-gold" />
+                      {job.type}
+                    </span>
+                  </div>
+                  <p className="text-xs text-text-secondary leading-relaxed mb-8">
+                    {job.desc}
+                  </p>
+                </div>
+                
+                <button 
+                  onClick={() => handleApplyClick(job.title)}
+                  className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white text-[11px] px-6 py-3.5 font-bold uppercase tracking-widest rounded-xl transition-all duration-300 w-full hover:-translate-y-[2px] shadow-sm hover:shadow-md cursor-pointer block text-center"
+                >
+                  Apply For Role
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Application Modal */}
+        {selectedJob && (
+          <div className="fixed inset-0 bg-burgundy-dark/65 backdrop-blur-[6px] flex justify-center items-center z-[10000] px-4">
+            <div className="bg-white border border-gold/30 rounded-2xl w-full max-w-[550px] p-8 sm:p-10 shadow-2xl relative animate-grid-fade text-left text-charcoal">
+              <button 
+                onClick={() => setSelectedJob(null)}
+                className="absolute top-6 right-6 text-burgundy/65 hover:text-burgundy transition-colors cursor-pointer"
+                aria-label="Close Modal"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              <div className="mb-6">
+                <span className="font-sans text-[10px] font-bold text-gold-dark uppercase tracking-widest block mb-1">
+                  Job Application
+                </span>
+                <h3 className="text-2xl font-serif text-burgundy font-bold">
+                  {selectedJob}
+                </h3>
+              </div>
+
+              <form onSubmit={handleCareerSubmit} className="flex flex-col gap-5">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="appl-name" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Full Name</label>
+                  <input 
+                    type="text" 
+                    id="appl-name" 
+                    placeholder="Enter your full name" 
+                    required 
+                    className="font-sans text-sm p-3.5 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold focus:ring-4 focus:ring-gold/15 transition-all duration-200" 
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="appl-email" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Email Address</label>
+                  <input 
+                    type="email" 
+                    id="appl-email" 
+                    placeholder="Enter your email address" 
+                    required 
+                    className="font-sans text-sm p-3.5 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold focus:ring-4 focus:ring-gold/15 transition-all duration-200" 
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="appl-resume" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Resume / Portfolio Link</label>
+                  <input 
+                    type="url" 
+                    id="appl-resume" 
+                    placeholder="https://linkedin.com/in/username or drive link" 
+                    required 
+                    className="font-sans text-sm p-3.5 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold focus:ring-4 focus:ring-gold/15 transition-all duration-200" 
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="appl-msg" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Cover Letter Summary</label>
+                  <textarea 
+                    id="appl-msg" 
+                    rows="4" 
+                    placeholder="Tell us why you are a great fit for Beever Academy..." 
+                    required 
+                    className="font-sans text-sm p-3.5 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold focus:ring-4 focus:ring-gold/15 transition-all duration-200"
+                  ></textarea>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={careerFormStatus.loading}
+                  className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white font-bold uppercase tracking-widest py-4 w-full cursor-pointer rounded-xl disabled:opacity-75 hover:-translate-y-[2px] shadow-sm hover:shadow-md transition-all duration-300 text-xs mt-2"
+                >
+                  {careerFormStatus.loading ? 'SUBMITTING APPLICATION...' : 'SUBMIT APPLICATION'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+      </section>
+    );
+  };
+
   const renderTestimonials = () => (
     <section id="testimonials" className="py-32 bg-ivory">
       <div className="max-w-[1200px] mx-auto px-8">
@@ -1552,15 +1674,15 @@ export default function App() {
          ========================================== */}
       {isLoading && (
         <div className="fixed inset-0 bg-burgundy-dark flex justify-center items-center z-[9999] transition-opacity duration-800">
-          <div className="text-center">
+          <div className="flex flex-col items-center justify-center text-center">
             {/* Logo used here */}
-            <div className="gold-glass-logo-frame w-[130px] h-[130px] mx-auto animate-logo-pulse mb-6">
+            <div className="gold-glass-logo-frame w-[130px] h-[130px] animate-logo-pulse mb-6">
               <img src={logo} alt="Beever Academy Emblem" className="w-full h-full object-contain" />
             </div>
-            <div className="w-[180px] h-[2px] bg-white/10 mx-auto my-6 relative overflow-hidden">
+            <div className="w-[180px] h-[2px] bg-white/10 my-6 relative overflow-hidden">
               <div className="h-full bg-gold-gradient w-full animate-bar-fill"></div>
             </div>
-            <span className="font-serif text-gold-light tracking-[0.3em] text-sm font-medium block">
+            <span className="font-serif text-gold-light tracking-[0.3em] pl-[0.3em] text-sm font-medium block">
               BEEVER ACADEMY
             </span>
           </div>
@@ -1584,7 +1706,7 @@ export default function App() {
 
           {/* Desktop Nav */}
           <ul className="hidden lg:flex gap-7">
-            {['home', 'about', 'programs', 'admissions', 'blog', 'contact'].map(sec => (
+            {['home', 'about', 'programs', 'admissions', 'blog', 'careers', 'contact'].map(sec => (
               <li key={sec}>
                 <a 
                   href={`#${sec}`} 
@@ -1631,7 +1753,7 @@ export default function App() {
       {mobileMenuOpen && (
         <div className="fixed inset-0 bg-burgundy-dark z-[990] flex justify-center items-center transition-all duration-500">
           <ul className="flex flex-col items-center gap-8">
-            {['home', 'about', 'programs', 'admissions', 'blog', 'contact'].map(sec => (
+            {['home', 'about', 'programs', 'admissions', 'blog', 'careers', 'contact'].map(sec => (
               <li key={sec} onClick={() => setMobileMenuOpen(false)}>
                 <a href={`#${sec}`} className="font-serif text-white text-3xl tracking-wide hover:text-gold transition-colors duration-200 capitalize">
                   {sec.replace('-', ' ')}
@@ -1647,27 +1769,17 @@ export default function App() {
         </div>
       )}
 
-      {currentPage === 'home' ? (
-        <>
-          {renderHero()}
-          {renderWhyChooseUs()}
-          {renderAbout()}
-          {renderStrengths()}
-          {renderJourney()}
-          {renderInsideGallery()}
-          {renderTestimonials()}
-          {renderContact()}
-        </>
-      ) : (
-        <div className="pt-24">
-          {renderWhyChooseUs()}
-          {renderStrengths()}
-          {renderJourney()}
-          {renderInsideGallery()}
-          {renderAbout()}
-          {renderTestimonials()}
-        </div>
-      )}
+      <>
+        {renderHero()}
+        {renderWhyChooseUs()}
+        {renderAbout()}
+        {renderStrengths()}
+        {renderJourney()}
+        {renderInsideGallery()}
+        {renderCareers()}
+        {renderTestimonials()}
+        {renderContact()}
+      </>
 
       {/* ==========================================
          FOOTER SECTION
