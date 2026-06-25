@@ -545,7 +545,7 @@ export default function App() {
       </div>
       
       {/* Main Copy Area */}
-      <div className="relative max-w-[1300px] w-full mx-auto px-8 z-20 flex-grow flex flex-col justify-center">
+      <div className="relative max-w-[1440px] w-full mx-auto px-8 z-20 flex-grow flex flex-col justify-center">
         <div className="max-w-[700px] text-left mt-6 md:mt-12">
           <h1 className="hero-heading text-5xl md:text-7xl lg:text-[76px] font-serif leading-[1.1] mb-8 font-medium">
             LEARN TODAY,<br/>
@@ -573,7 +573,7 @@ export default function App() {
       </div>
 
       {/* Bottom Features Row & Scroll Indicator */}
-      <div className="relative z-20 w-full max-w-[1300px] mx-auto px-8 mt-auto pt-6 flex flex-col gap-8">
+      <div className="relative z-20 w-full max-w-[1440px] mx-auto px-8 mt-auto pt-6 flex flex-col gap-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 pt-8 border-t border-white/10 text-left">
           {/* Feature 1 */}
           <div className="hero-feature-item flex gap-4 items-start">
@@ -637,7 +637,7 @@ export default function App() {
 
   const renderWhyChooseUs = () => (
     <section id="why-choose-us" className="py-32 bg-white text-center">
-      <div className="max-w-[1200px] mx-auto px-8">
+      <div className="max-w-[1440px] mx-auto px-8">
         <div className="mb-20">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Heritage of Distinction
@@ -687,7 +687,7 @@ export default function App() {
 
   const renderAbout = () => (
     <section id="about" className="py-32 bg-ivory">
-      <div className="max-w-[1200px] mx-auto px-8">
+      <div className="max-w-[1440px] mx-auto px-8">
         <div className="about-grid-el grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           {/* Visual Column */}
           <div className="about-img-box-el relative border border-burgundy/10 p-[15px] bg-white shadow-md rounded-2xl">
@@ -755,7 +755,7 @@ export default function App() {
 
   const renderStrengths = () => (
     <section id="programs" className="py-32 bg-white text-center">
-      <div className="max-w-[1300px] mx-auto px-8">
+      <div className="max-w-[1440px] mx-auto px-8">
         <div className="mb-20">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Elite Competencies
@@ -888,7 +888,7 @@ export default function App() {
         {/* Decorative background grid subtle effect */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(90,15,29,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(90,15,29,0.015)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none"></div>
 
-        <div className="max-w-[1200px] mx-auto px-8 relative z-10">
+        <div className="max-w-[1440px] mx-auto px-8 relative z-10">
           <div className="mb-16">
             <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3 animate-pulse">
               Strategic Progression
@@ -1241,7 +1241,7 @@ export default function App() {
 
   const renderInsideGallery = () => (
     <section id="blog" className="py-32 bg-white text-center">
-      <div className="max-w-[1200px] mx-auto px-8">
+      <div className="max-w-[1440px] mx-auto px-8">
         <div className="mb-20">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Campus Life & Environment
@@ -1348,7 +1348,7 @@ export default function App() {
 
     return (
       <section id="careers" className="py-32 bg-ivory text-center relative">
-        <div className="max-w-[1200px] mx-auto px-8">
+        <div className="max-w-[1440px] mx-auto px-8">
           <div className="mb-20">
             <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
               Careers at Beever Academy
@@ -1484,7 +1484,7 @@ export default function App() {
 
   const renderTestimonials = () => (
     <section id="testimonials" className="py-32 bg-ivory">
-      <div className="max-w-[1200px] mx-auto px-8">
+      <div className="max-w-[1440px] mx-auto px-8">
         <div className="text-center mb-16">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Alumni Testimonials
@@ -1578,7 +1578,7 @@ export default function App() {
 
   const renderContact = () => (
     <section id="contact" className="py-32 bg-white">
-      <div className="max-w-[1200px] mx-auto px-8">
+      <div className="max-w-[1440px] mx-auto px-8">
         <div className="text-center mb-20">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Reach Out
@@ -1693,13 +1693,13 @@ export default function App() {
          STICKY HEADER NAVBAR
          ========================================== */}
       <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-4 bg-[#1a0206] border-b border-gold/10 shadow-md' : 'py-6 bg-[#1a0206]/95 border-b border-burgundy/20 shadow-sm'}`}>
-        <div className="max-w-[1300px] mx-auto px-6 sm:px-8 flex justify-between items-center">
+        <div className="max-w-[1440px] mx-auto px-8 flex justify-between items-center">
           <a href="#home" className="flex items-center gap-3">
             {/* Logo used here */}
             <div className="gold-glass-logo-frame w-[54px] h-[54px] sm:w-[62px] sm:h-[62px] flex-shrink-0">
               <img src={logo} alt="Beever Academy Logo" className="w-full h-full object-contain" />
             </div>
-            <span className="font-serif text-lg sm:text-xl md:text-2xl font-semibold tracking-wider transition-colors duration-300 text-white">
+            <span className="font-serif text-xl sm:text-2xl md:text-3xl font-semibold tracking-wider transition-colors duration-300 text-white">
               BEEVER <span className="text-gold">ACADEMY</span>
             </span>
           </a>
@@ -1785,7 +1785,7 @@ export default function App() {
          FOOTER SECTION
          ========================================== */}
       <footer className="bg-burgundy-dark text-white border-t-2 border-gold">
-        <div className="max-w-[1200px] mx-auto px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 py-28 text-left">
+        <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 py-28 text-left">
           
           {/* Brand Col */}
           <div className="flex flex-col gap-6">
@@ -1878,7 +1878,7 @@ export default function App() {
 
         {/* Bottom Bar */}
         <div className="bg-[#240000] border-t border-white/5 py-8">
-          <div className="max-w-[1200px] mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/40">
+          <div className="max-w-[1440px] mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/40">
             <p>&copy; 2026 Beever Academy. All Rights Reserved. Designed for Luxury Educational Institutions.</p>
             <div className="flex gap-8">
               <a href="#" className="hover:text-white">Privacy Policy</a>
