@@ -1699,7 +1699,7 @@ export default function App() {
             <div className="gold-glass-logo-frame w-[54px] h-[54px] sm:w-[62px] sm:h-[62px] flex-shrink-0">
               <img src={logo} alt="Beever Academy Logo" className="w-full h-full object-contain" />
             </div>
-            <span className="font-serif text-xl sm:text-2xl md:text-3xl font-semibold tracking-wider transition-colors duration-300 text-white">
+            <span className="font-serif text-2xl sm:text-3xl md:text-4xl font-semibold tracking-wider transition-colors duration-300 text-white">
               BEEVER <span className="text-gold">ACADEMY</span>
             </span>
           </a>
