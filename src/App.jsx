@@ -223,6 +223,446 @@ function GoldenSprinkleCursor() {
 }
 
 
+// ==========================================
+// CINEMATIC GLOBAL NETWORK CANVAS COMPONENT
+// ==========================================
+function GlobalNetworkCanvas() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    // LANDMASS DEFINITIONS FOR STYLIZED MAP
+    const LANDMASSES = [
+      // North America
+      { cx: 12, cy: 18, rx: 6, ry: 4 },   // Alaska
+      { cx: 22, cy: 15, rx: 8, ry: 6 },   // Northern Canada / Islands
+      { cx: 38, cy: 12, rx: 5, ry: 6 },   // Greenland
+      { cx: 17, cy: 26, rx: 6, ry: 5 },   // Canada / US Border (West)
+      { cx: 25, cy: 26, rx: 6, ry: 5 },   // Canada / US Border (East)
+      { cx: 22, cy: 33, rx: 7, ry: 5 },   // USA Midwest/South
+      { cx: 26, cy: 35, rx: 3, ry: 4 },   // US East Coast / New York
+      { cx: 28, cy: 40, rx: 2, ry: 3 },   // Florida / Caribbean
+      { cx: 18, cy: 41, rx: 4, ry: 5 },   // Mexico
+      { cx: 24, cy: 47, rx: 1.5, ry: 3 }, // Central America
+
+      // South America
+      { cx: 31, cy: 56, rx: 4, ry: 6 },   // North-West (Colombia/Ecuador/Peru)
+      { cx: 37, cy: 59, rx: 7, ry: 8 },   // North-East (Brazil)
+      { cx: 33, cy: 68, rx: 5, ry: 7 },   // Central South America
+      { cx: 31, cy: 78, rx: 2.5, ry: 9 }, // Southern Cone (Argentina/Chile)
+
+      // Europe
+      { cx: 50, cy: 14, rx: 3, ry: 6 },   // Scandinavia
+      { cx: 47.5, cy: 23, rx: 2, ry: 3 }, // United Kingdom & Ireland (covers London)
+      { cx: 48, cy: 24, rx: 4, ry: 4 },   // Western Europe
+      { cx: 54, cy: 21, rx: 6, ry: 6 },   // Eastern Europe / European Russia
+      { cx: 50, cy: 28, rx: 5, ry: 3 },   // Southern Europe / Mediterranean
+
+      // Africa
+      { cx: 50, cy: 40, rx: 8, ry: 6 },   // North Africa
+      { cx: 44, cy: 46, rx: 5, ry: 5 },   // West Africa
+      { cx: 53, cy: 52, rx: 5, ry: 6 },   // Central Africa
+      { cx: 58, cy: 48, rx: 4, ry: 5 },   // East Africa / Horn of Africa
+      { cx: 54, cy: 65, rx: 4.5, ry: 8 }, // Southern Africa (covers Johannesburg)
+      { cx: 60, cy: 66, rx: 1.5, ry: 4.5 }, // Madagascar
+
+      // Middle East
+      { cx: 58, cy: 41, rx: 4, ry: 4.5 },  // Arabian Peninsula (covers Dubai)
+      { cx: 61, cy: 34, rx: 5, ry: 4 },   // Middle East / Iran / Central Asia
+
+      // Asia
+      { cx: 72, cy: 16, rx: 15, ry: 7 },  // Siberia / Northern Asia
+      { cx: 70, cy: 24, rx: 10, ry: 5 },  // Central Asia / Mongolia
+      { cx: 74, cy: 30, rx: 8, ry: 6 },   // China
+      { cx: 66, cy: 38, rx: 4, ry: 5 },   // India
+      { cx: 75, cy: 42, rx: 3.5, ry: 4.5 }, // Indochina / Southeast Asia
+      { cx: 84.5, cy: 30, rx: 1.8, ry: 5 }, // Japan (covers Tokyo)
+      { cx: 77, cy: 51, rx: 6, ry: 4 },   // Maritime Southeast Asia / Indonesia / Philippines (covers Singapore)
+
+      // Australia & Oceania
+      { cx: 84, cy: 70, rx: 7, ry: 6 },   // Australia main
+      { cx: 86, cy: 74, rx: 3.5, ry: 3.5 }, // Sydney area / South-East Australia
+      { cx: 91, cy: 79, rx: 1.5, ry: 4 }, // New Zealand
+
+      // Antarctica
+      { cx: 50, cy: 92, rx: 45, ry: 4 }   // Antarctica
+    ];
+
+    // CITIES
+    const DESTINATIONS = [
+      { name: "London", xPct: 0.50, yPct: 0.24 },
+      { name: "New York", xPct: 0.25, yPct: 0.35 },
+      { name: "Tokyo", xPct: 0.85, yPct: 0.32 },
+      { name: "Singapore", xPct: 0.76, yPct: 0.54 },
+      { name: "Sydney", xPct: 0.86, yPct: 0.76 },
+      { name: "Johannesburg", xPct: 0.54, yPct: 0.70 }
+    ];
+
+    const dxP = 0.58; // Dubai
+    const dyP = 0.42;
+
+    // GENERATE MAP PARTICLES
+    const points = [];
+    const cols = 120;
+    const rows = 60;
+    for (let c = 0; c < cols; c++) {
+      for (let r = 0; r < rows; r++) {
+        const xPct = c / cols;
+        const yPct = r / rows;
+        let isLand = false;
+        for (const lm of LANDMASSES) {
+          const dx = (xPct * 100 - lm.cx) / lm.rx;
+          const dy = (yPct * 100 - lm.cy) / lm.ry;
+          if (dx * dx + dy * dy <= 1) {
+            isLand = true;
+            break;
+          }
+        }
+        if (isLand) {
+          points.push({
+            xPct,
+            yPct,
+            jitterX: (Math.random() - 0.5) * 0.15,
+            jitterY: (Math.random() - 0.5) * 0.15,
+            size: Math.random() * 0.6 + 0.8,
+            phaseOffset: Math.random() * Math.PI * 2
+          });
+        }
+      }
+    }
+
+    const resizeCanvas = () => {
+      const parent = canvas.parentElement;
+      canvas.width = parent.clientWidth;
+      canvas.height = Math.max(500, Math.min(650, parent.clientWidth * 0.55));
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // EASING
+    const easeInOutQuad = t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    const easeOutBounce = t => {
+      const n1 = 7.5625;
+      const d1 = 2.75;
+      if (t < 1 / d1) {
+        return n1 * t * t;
+      } else if (t < 2 / d1) {
+        return n1 * (t -= 1.5 / d1) * t + 0.75;
+      } else if (t < 2.5 / d1) {
+        return n1 * (t -= 2.25 / d1) * t + 0.9375;
+      } else {
+        return n1 * (t -= 2.625 / d1) * t + 0.984375;
+      }
+    };
+
+    const getControlPoint = (x1, y1, x2, y2) => {
+      const mx = (x1 + x2) / 2;
+      const my = (y1 + y2) / 2;
+      const dist = Math.hypot(x2 - x1, y2 - y1);
+      return { x: mx, y: my - dist * 0.18 };
+    };
+
+    const getBezierPoint = (t, s, c, e) => {
+      const u = 1 - t;
+      return {
+        x: u * u * s.x + 2 * u * t * c.x + t * t * e.x,
+        y: u * u * s.y + 2 * u * t * c.y + t * t * e.y
+      };
+    };
+
+    let start = null;
+
+    const animate = (timestamp) => {
+      if (!start) start = timestamp;
+      const elapsed = (timestamp - start) / 1000;
+      const loopTime = elapsed % 16.0;
+
+      const width = canvas.width;
+      const height = canvas.height;
+      const centerX = width / 2;
+      const centerY = height / 2;
+
+      // Radial background
+      const bgGrad = ctx.createRadialGradient(centerX, centerY, 50, centerX, centerY, Math.max(width, height) / 1.5);
+      bgGrad.addColorStop(0, '#2b030b');
+      bgGrad.addColorStop(1, '#0e0103');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Grid lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.lineWidth = 1;
+      const gridSpacing = 40;
+      for (let x = 0; x < width; x += gridSpacing) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSpacing) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      let progress = 0;
+      if (loopTime < 4) {
+        progress = 0;
+      } else if (loopTime >= 4 && loopTime < 6) {
+        progress = easeInOutQuad((loopTime - 4) / 2);
+      } else if (loopTime >= 6 && loopTime < 14) {
+        progress = 1;
+      } else if (loopTime >= 14 && loopTime < 16) {
+        progress = easeInOutQuad(1 - (loopTime - 14) / 2);
+      }
+
+      const rotY = (loopTime * 0.4) % (Math.PI * 2);
+      const rotX = 0.15;
+
+      const flatW = width * 0.82;
+      const flatH = height * 0.65;
+
+      let zoom = 1.0;
+      let panX = 0;
+      let panY = 0;
+
+      const dxbFlatX = (dxP - 0.5) * flatW + centerX;
+      const dxbFlatY = (dyP - 0.5) * flatH + centerY;
+
+      if (loopTime >= 6 && loopTime < 14) {
+        const zoomProg = Math.min(1.0, (loopTime - 6) / 2.0);
+        const easedZoom = easeInOutQuad(zoomProg);
+        zoom = 1.0 + easedZoom * 0.32;
+        panX = easedZoom * (centerX - dxbFlatX) * 0.28;
+        panY = easedZoom * (centerY - dxbFlatY) * 0.28;
+      } else if (loopTime >= 14 && loopTime < 16) {
+        const zoomProg = (loopTime - 14) / 2.0;
+        const easedZoom = easeInOutQuad(zoomProg);
+        zoom = 1.32 - easedZoom * 0.32;
+        panX = (1 - easedZoom) * (centerX - dxbFlatX) * 0.28;
+        panY = (1 - easedZoom) * (centerY - dxbFlatY) * 0.28;
+      }
+
+      const R = Math.min(width, height) * 0.32;
+      const D = R * 2.5;
+
+      points.forEach(p => {
+        const theta = p.xPct * Math.PI * 2 - Math.PI;
+        const phi = p.yPct * Math.PI - Math.PI / 2;
+
+        const xSphere = R * Math.cos(phi) * Math.sin(theta);
+        const ySphere = R * Math.sin(phi);
+        const zSphere = R * Math.cos(phi) * Math.cos(theta);
+
+        const x1 = xSphere * Math.cos(rotY) - zSphere * Math.sin(rotY);
+        const z1 = xSphere * Math.sin(rotY) + zSphere * Math.cos(rotY);
+
+        const y2 = ySphere * Math.cos(rotX) - z1 * Math.sin(rotX);
+        const z2 = ySphere * Math.sin(rotX) + z1 * Math.cos(rotX);
+
+        const xProj = x1 * (D / (D + z2)) + centerX;
+        const yProj = y2 * (D / (D + z2)) + centerY;
+
+        const xFlat = (p.xPct - 0.5) * flatW + centerX + p.jitterX * 12;
+        const yFlat = (p.yPct - 0.5) * flatH + centerY + p.jitterY * 12;
+
+        let curX = (1 - progress) * xProj + progress * xFlat;
+        let curY = (1 - progress) * yProj + progress * yFlat;
+
+        const finalX = (curX - centerX) * zoom + centerX + panX;
+        const finalY = (curY - centerY) * zoom + centerY + panY;
+
+        if (progress < 0.05 && z2 > 0) return;
+
+        let opacityFactor = 1.0;
+        if (progress < 0.2) {
+          const depthRatio = (z2 + R) / (2 * R);
+          opacityFactor = 1 - Math.max(0, Math.min(1, depthRatio));
+        }
+
+        const shimmer = Math.sin(loopTime * 3.5 + p.phaseOffset) * 0.25 + 0.75;
+        ctx.fillStyle = `rgba(242, 223, 162, ${opacityFactor * shimmer * (0.35 + progress * 0.25)})`;
+        ctx.beginPath();
+        ctx.arc(finalX, finalY, p.size * (progress * 0.15 + 0.85), 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      const dxbDrawX = (dxbFlatX - centerX) * zoom + centerX + panX;
+      const dxbDrawY = (dxbFlatY - centerY) * zoom + centerY + panY;
+
+      if (progress > 0.95 && loopTime >= 6.2 && loopTime < 14) {
+        const dropDur = 0.6;
+        const dropProg = Math.min(1.0, (loopTime - 6.2) / dropDur);
+        
+        if (loopTime >= 6.6) {
+          const rippleProg = ((loopTime - 6.6) % 1.8) / 1.8;
+          ctx.strokeStyle = `rgba(201, 162, 77, ${1 - rippleProg})`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(dxbDrawX, dxbDrawY, rippleProg * 45, 0, Math.PI * 2);
+          ctx.stroke();
+
+          if (loopTime >= 7.2) {
+            const rippleProg2 = ((loopTime - 7.2) % 1.8) / 1.8;
+            ctx.strokeStyle = `rgba(201, 162, 77, ${(1 - rippleProg2) * 0.6})`;
+            ctx.beginPath();
+            ctx.arc(dxbDrawX, dxbDrawY, rippleProg2 * 35, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+
+        const pinHeight = 20;
+        const bounceY = (1 - easeOutBounce(dropProg)) * -50;
+        const py = dxbDrawY + bounceY;
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.beginPath();
+        ctx.ellipse(dxbDrawX, dxbDrawY + 1.5, 5 * dropProg, 1.5 * dropProg, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#C9A24D';
+        ctx.strokeStyle = '#F2DFA2';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(dxbDrawX, py);
+        ctx.bezierCurveTo(dxbDrawX - 6, py - 10, dxbDrawX - 6, py - pinHeight, dxbDrawX, py - pinHeight);
+        ctx.bezierCurveTo(dxbDrawX + 6, py - pinHeight, dxbDrawX + 6, py - 10, dxbDrawX, py);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#37060F';
+        ctx.beginPath();
+        ctx.arc(dxbDrawX, py - pinHeight + 6, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if (progress > 0.95 && loopTime >= 6.8 && loopTime < 14) {
+        const connDuration = 1.5;
+        const connProg = Math.min(1.0, (loopTime - 6.8) / connDuration);
+
+        DESTINATIONS.forEach((dest, i) => {
+          const dFlatX = (dest.xPct - 0.5) * flatW + centerX;
+          const dFlatY = (dest.yPct - 0.5) * flatH + centerY;
+
+          const dDrawX = (dFlatX - centerX) * zoom + centerX + panX;
+          const dDrawY = (dFlatY - centerY) * zoom + centerY + panY;
+
+          const cp = getControlPoint(dxbDrawX, dxbDrawY, dDrawX, dDrawY);
+
+          ctx.save();
+          const lineGrad = ctx.createLinearGradient(dxbDrawX, dxbDrawY, dDrawX, dDrawY);
+          lineGrad.addColorStop(0, 'rgba(201, 162, 77, 0.7)');
+          lineGrad.addColorStop(1, 'rgba(255, 255, 255, 0.15)');
+          
+          ctx.strokeStyle = lineGrad;
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(dxbDrawX, dxbDrawY);
+
+          const resolution = 30;
+          const endT = connProg;
+          for (let step = 0; step <= resolution; step++) {
+            const tVal = (step / resolution) * endT;
+            const pt = getBezierPoint(tVal, { x: dxbDrawX, y: dxbDrawY }, cp, { x: dDrawX, y: dDrawY });
+            ctx.lineTo(pt.x, pt.y);
+          }
+          ctx.stroke();
+          ctx.restore();
+
+          if (loopTime >= 7.2) {
+            ctx.save();
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.beginPath();
+            ctx.arc(dDrawX, dDrawY, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(242, 223, 162, 0.9)';
+            ctx.font = '8px monospace';
+            ctx.fillText(dest.name.toUpperCase(), dDrawX + 6, dDrawY + 3);
+            ctx.restore();
+          }
+
+          if (loopTime >= 7.5) {
+            const pulseProg = ((loopTime - 7.5) % 2.0) / 2.0;
+            const pulsePt = getBezierPoint(pulseProg, { x: dxbDrawX, y: dxbDrawY }, cp, { x: dDrawX, y: dDrawY });
+
+            ctx.save();
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = '#F2DFA2';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(pulsePt.x, pulsePt.y, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        });
+      }
+
+      ctx.save();
+      ctx.font = '9px monospace';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+
+      ctx.fillStyle = 'rgba(242, 223, 162, 0.7)';
+      ctx.fillText('NETWORK_HUB: DUBAI CENTRAL', 20, 30);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.fillText(`STATUS: LIVE SYNERGY (${progress > 0.95 ? 'FLAT_MAP_DASHBOARD' : 'SPHERE_ROTATION_MODE'})`, 20, 45);
+      ctx.fillText(`ROT_ANGLE: ${(rotY * 180 / Math.PI).toFixed(0)}°`, 20, 60);
+
+      ctx.fillStyle = 'rgba(242, 223, 162, 0.7)';
+      ctx.fillText(`ACTIVE GATEWAYS: ${loopTime >= 7.2 ? '6 / 6 ESTABLISHED' : 'CONNECTING...'}`, width - 180, 30);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.fillText(`SYSTEM LOAD: ${(45.2 + Math.sin(loopTime * 1.5) * 2.3).toFixed(1)} GB/S`, width - 180, 45);
+      ctx.fillText(`LATENCY: ${(34 + Math.sin(loopTime * 4) * 2).toFixed(0)}MS (EXCELLENT)`, width - 180, 60);
+
+      ctx.strokeStyle = 'rgba(201, 162, 77, 0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(20, height - 40);
+      for (let i = 0; i < 12; i++) {
+        const yVal = Math.sin((loopTime * 3) + i * 0.6) * 12 + 18;
+        ctx.lineTo(20 + i * 10, height - 20 - yVal);
+      }
+      ctx.stroke();
+      ctx.fillText('GLOBAL OPERATIONS THROUGHPUT', 20, height - 10);
+
+      ctx.fillText('HUB GPS COORDINATES', width - 150, height - 40);
+      ctx.fillStyle = 'rgba(242, 223, 162, 0.8)';
+      ctx.fillText('LAT: 25.2048° N', width - 150, height - 25);
+      ctx.fillText('LON: 55.2708° E', width - 150, height - 10);
+
+      ctx.restore();
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return (
+    <canvas 
+      ref={canvasRef} 
+      className="w-full block select-none cursor-crosshair relative z-20"
+      style={{ minHeight: '520px' }}
+    />
+  );
+}
+
+
 export default function App() {
   // ==========================================
   // STATE MANAGEMENT
@@ -429,17 +869,17 @@ export default function App() {
         );
       }
 
-      // 5.5. Careers Cards
+      // 5.5. Careers Cards (Slide in towards the left)
       if (document.querySelector('.careers-grid-el')) {
         gsap.fromTo('.career-card-el', 
-          { y: prefersReducedMotion ? 0 : 20, opacity: 0 },
+          { x: prefersReducedMotion ? 0 : 80, opacity: 0 },
           {
             scrollTrigger: { trigger: '.careers-grid-el', start: 'top 85%' },
-            y: 0,
+            x: 0,
             opacity: 1,
-            duration: 0.5,
-            stagger: 0.1,
-            ease: 'power1.inOut',
+            duration: 0.6,
+            stagger: 0.15,
+            ease: 'power2.out',
             overwrite: 'auto'
           }
         );
@@ -748,6 +1188,33 @@ export default function App() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+
+  const renderGlobalNetwork = () => (
+    <section id="global-network" className="py-32 bg-[#170105] text-center text-white relative overflow-hidden">
+      {/* Decorative gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#1a0206] via-transparent to-[#1a0206] pointer-events-none z-10"></div>
+      
+      <div className="max-w-[1440px] mx-auto px-8 relative z-20">
+        <div className="mb-16">
+          <span className="font-sans uppercase text-gold-light text-[11px] tracking-[0.2em] font-semibold block mb-3">
+            Global Connectivity Hub
+          </span>
+          <h2 className="text-4xl md:text-5xl font-serif text-white mb-6 font-bold">
+            Beever Academy Network
+          </h2>
+          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-4"></div>
+          <p className="text-sm text-white/70 max-w-[650px] mx-auto leading-relaxed">
+            Connecting Dubai to the world. Charting live knowledge pathways and professional synergies across major global markets.
+          </p>
+        </div>
+
+        {/* Dynamic Interactive Canvas */}
+        <div className="w-full bg-[#1b0207] border border-gold/15 rounded-2xl overflow-hidden shadow-2xl relative">
+          <GlobalNetworkCanvas />
         </div>
       </div>
     </section>
@@ -1362,20 +1829,20 @@ export default function App() {
             </p>
           </div>
 
-          <div className="careers-grid-el grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+          <div className="careers-grid-el flex flex-col gap-8 max-w-[1000px] mx-auto text-left">
             {openings.map((job) => (
               <div 
                 key={job.id} 
-                className="career-card-el bg-white border border-black/5 rounded-2xl p-8 shadow-sm hover:shadow-xl hover:border-gold/30 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden"
+                className="career-card-el bg-white border border-black/5 rounded-2xl p-8 shadow-sm hover:shadow-xl hover:border-gold/30 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6 group relative overflow-hidden"
               >
-                <div>
-                  <span className="font-sans text-[10px] font-bold text-gold-dark uppercase tracking-widest block mb-4">
+                <div className="flex-grow">
+                  <span className="font-sans text-[10px] font-bold text-gold-dark uppercase tracking-widest block mb-2">
                     {job.dept}
                   </span>
-                  <h3 className="text-xl font-serif font-bold text-burgundy mb-3 group-hover:text-gold transition-colors duration-300">
+                  <h3 className="text-xl font-serif font-bold text-burgundy mb-2 group-hover:text-gold transition-colors duration-300">
                     {job.title}
                   </h3>
-                  <div className="flex gap-4 items-center text-[11px] text-text-secondary/70 font-semibold mb-6">
+                  <div className="flex flex-wrap gap-4 items-center text-[11px] text-text-secondary/70 font-semibold mb-4">
                     <span className="flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5 text-gold" />
                       {job.location}
@@ -1385,17 +1852,19 @@ export default function App() {
                       {job.type}
                     </span>
                   </div>
-                  <p className="text-xs text-text-secondary leading-relaxed mb-8">
+                  <p className="text-xs text-text-secondary leading-relaxed max-w-[700px]">
                     {job.desc}
                   </p>
                 </div>
                 
-                <button 
-                  onClick={() => handleApplyClick(job.title)}
-                  className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white text-[11px] px-6 py-3.5 font-bold uppercase tracking-widest rounded-xl transition-all duration-300 w-full hover:-translate-y-[2px] shadow-sm hover:shadow-md cursor-pointer block text-center"
-                >
-                  Apply For Role
-                </button>
+                <div className="flex-shrink-0 w-full md:w-auto">
+                  <button 
+                    onClick={() => handleApplyClick(job.title)}
+                    className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white text-[11px] px-8 py-4 font-bold uppercase tracking-widest rounded-xl transition-all duration-300 w-full md:w-auto hover:-translate-y-[2px] shadow-sm hover:shadow-md cursor-pointer block text-center"
+                  >
+                    Apply For Role
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -1773,6 +2242,7 @@ export default function App() {
         {renderHero()}
         {renderWhyChooseUs()}
         {renderAbout()}
+        {renderGlobalNetwork()}
         {renderStrengths()}
         {renderJourney()}
         {renderInsideGallery()}
