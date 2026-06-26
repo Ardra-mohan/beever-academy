@@ -536,7 +536,7 @@ export default function App() {
       {/* Background Image & Overlays */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div 
-          className="hero-bg-img absolute inset-0 bg-cover bg-[position:75%_center] md:bg-[length:100%_100%] bg-no-repeat opacity-80 scale-100 z-0"
+          className="hero-bg-img absolute top-24 md:top-28 inset-x-0 bottom-0 bg-cover bg-[position:75%_15%] md:bg-cover bg-no-repeat opacity-80 scale-100 z-0"
           style={{ backgroundImage: `url(${homeImg})` }}
         ></div>
         {/* Darker burgundy gradient with a subtle fade on the left */}
