@@ -536,16 +536,16 @@ export default function App() {
       {/* Background Image & Overlays */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div 
-          className="hero-bg-img absolute top-24 md:top-28 inset-x-0 bottom-0 bg-cover bg-[position:75%_15%] md:bg-cover bg-no-repeat opacity-80 scale-100 z-0"
-          style={{ backgroundImage: `url(${homeImg})` }}
+          className="hero-bg-img absolute top-24 md:top-28 inset-x-0 bottom-0 bg-cover bg-[position:75%_15%] md:bg-cover bg-no-repeat opacity-95 scale-100 z-0"
+          style={{ backgroundImage: `url(${homeImg})`, filter: 'brightness(1.15) contrast(1.12) saturate(1.18)' }}
         ></div>
         {/* Darker burgundy gradient with a subtle fade on the left */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a0206_0%,rgba(26,2,6,0.92)_20%,rgba(26,2,6,0.3)_45%,transparent_75%)] z-10"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a0206] via-transparent to-[#1a0206]/30 z-10"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a0206_0%,rgba(26,2,6,0.8)_15%,rgba(26,2,6,0.15)_35%,transparent_60%)] z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1a0206] via-transparent to-[#1a0206]/20 z-10"></div>
       </div>
       
       {/* Main Copy Area */}
-      <div className="relative max-w-[1440px] w-full mx-auto px-8 z-20 flex-grow flex flex-col justify-center">
+      <div className="relative w-full px-4 sm:px-6 md:px-10 z-20 flex-grow flex flex-col justify-center">
         <div className="max-w-[700px] text-left mt-6 md:mt-12">
           <h1 className="hero-heading text-5xl md:text-7xl lg:text-[76px] font-serif leading-[1.1] mb-8 font-medium">
             LEARN TODAY,<br/>
@@ -573,7 +573,7 @@ export default function App() {
       </div>
 
       {/* Bottom Features Row & Scroll Indicator */}
-      <div className="relative z-20 w-full max-w-[1440px] mx-auto px-8 mt-auto pt-6 flex flex-col gap-8">
+      <div className="relative z-20 w-full px-4 sm:px-6 md:px-10 mt-auto pt-6 flex flex-col gap-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 pt-8 border-t border-white/10 text-left">
           {/* Feature 1 */}
           <div className="hero-feature-item flex gap-4 items-start">
@@ -1693,7 +1693,7 @@ export default function App() {
          STICKY HEADER NAVBAR
          ========================================== */}
       <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-4 bg-[#1a0206] border-b border-gold/10 shadow-md' : 'py-6 bg-[#1a0206]/95 border-b border-burgundy/20 shadow-sm'}`}>
-        <div className="max-w-[1440px] mx-auto px-8 flex justify-between items-center">
+        <div className="w-full px-4 sm:px-6 md:px-10 flex justify-between items-center">
           <a href="#home" className="flex items-center gap-3">
             {/* Logo used here */}
             <div className="gold-glass-logo-frame w-[54px] h-[54px] sm:w-[62px] sm:h-[62px] flex-shrink-0">
