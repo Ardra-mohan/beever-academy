@@ -663,6 +663,88 @@ function GlobalNetworkCanvas() {
 }
 
 
+// ==========================================
+// CINEMATIC ADMISSIONS BACKGROUND PARTICLES
+// ==========================================
+function AdmissionsBackgroundParticles() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    let particles = [];
+    const particleCount = 45;
+
+    const resizeCanvas = () => {
+      canvas.width = canvas.parentElement.clientWidth || window.innerWidth;
+      canvas.height = canvas.parentElement.clientHeight || 800;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Create particles
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 1.8 + 0.6,
+        speedY: -(Math.random() * 0.22 + 0.05),
+        speedX: (Math.random() - 0.5) * 0.12,
+        opacity: Math.random() * 0.6 + 0.15,
+        color: Math.random() > 0.4 ? 'rgba(201, 162, 77, 0.45)' : 'rgba(126, 28, 44, 0.35)'
+      });
+    }
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(p => {
+        p.y += p.speedY;
+        p.x += p.speedX;
+
+        // Wrap around borders
+        if (p.y < 0) {
+          p.y = canvas.height;
+          p.x = Math.random() * canvas.width;
+        }
+        if (p.x < 0 || p.x > canvas.width) {
+          p.speedX = -p.speedX;
+        }
+
+        ctx.save();
+        ctx.fillStyle = p.color;
+        ctx.shadowBlur = 3;
+        ctx.shadowColor = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return (
+    <canvas 
+      ref={canvasRef} 
+      className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-70"
+    />
+  );
+}
+
+
 export default function App() {
   // ==========================================
   // STATE MANAGEMENT
@@ -679,6 +761,13 @@ export default function App() {
   const [activeJourneyStep, setActiveJourneyStep] = useState(0);
   const [selectedJob, setSelectedJob] = useState(null);
   const [careerFormStatus, setCareerFormStatus] = useState({ loading: false, submitted: false });
+
+  // Futuristic Dashboard States
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const dashboardRef = useRef(null);
+  const [candleOffsets, setCandleOffsets] = useState([0, 0, 0, 0, 0, 0, 0, 0]); // 8 candles
+  const [stats, setStats] = useState({ sharpe: 0, winRate: 0, drawdown: 0, profit: 0 });
+  const [portfolioValue, setPortfolioValue] = useState(0);
 
   // Testimonial Autoplay Ref
   const autoplayRef = useRef(null);
@@ -731,6 +820,30 @@ export default function App() {
     }
   }, []);
 
+  // 1. Live Market Candlestick Fluctuations (8 Candles wiggles)
+  useEffect(() => {
+    let frameId;
+    let time = 0;
+    
+    const updateMarket = () => {
+      time += 0.04;
+      setCandleOffsets([
+        Math.sin(time) * 1.2 + (Math.sin(time * 0.7) * 0.3),
+        Math.cos(time * 0.8) * 1.0 + (Math.sin(time * 0.5) * 0.2),
+        Math.sin(time * 1.2) * 1.5 + (Math.cos(time * 0.6) * 0.3),
+        Math.cos(time * 0.5) * 1.3 + (Math.sin(time * 0.9) * 0.2),
+        Math.sin(time * 0.9) * 1.1 + (Math.cos(time * 0.4) * 0.4),
+        Math.cos(time * 1.1) * 1.4 + (Math.sin(time * 0.7) * 0.3),
+        Math.sin(time * 0.7) * 1.2 + (Math.cos(time * 1.0) * 0.2),
+        Math.cos(time * 1.3) * 1.0 + (Math.sin(time * 0.5) * 0.3)
+      ]);
+      frameId = requestAnimationFrame(updateMarket);
+    };
+    
+    frameId = requestAnimationFrame(updateMarket);
+    return () => cancelAnimationFrame(frameId);
+  }, []);
+
   // Hash Change SPA Routing
   useEffect(() => {
     const handleHashChange = () => {
@@ -751,6 +864,18 @@ export default function App() {
 
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
+
+  // Mobile Menu Body Scroll Lock
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [mobileMenuOpen]);
 
   // Navbar Scroll Trigger
   useEffect(() => {
@@ -837,19 +962,104 @@ export default function App() {
         );
       }
 
-      // 4. Learning Journey Timeline steps stagger
-      if (document.querySelector('.journey-timeline-el')) {
-        gsap.fromTo('.journey-step-el', 
-          { scale: prefersReducedMotion ? 1 : 0.9, opacity: 0 },
-          {
-            scrollTrigger: { trigger: '.journey-timeline-el', start: 'top 85%' },
-            scale: 1,
-            opacity: 1,
-            duration: 0.6,
-            stagger: 0.15,
-            ease: 'power1.inOut',
-            overwrite: 'auto'
+      // 4. Learning Journey / Ultra-Premium Trading Dashboard Animation Sequence
+      if (document.querySelector('#admissions')) {
+        const animObj = {
+          portfolio: 0,
+          sharpe: 0,
+          winRate: 0,
+          drawdown: 0,
+          profit: 0
+        };
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: '#admissions',
+            start: 'top 65%',
+            once: true
           }
+        });
+
+        // 1 & 2. Fade in from darkness & Slide in panels
+        tl.fromTo('.premium-glass-card', 
+          { opacity: 0, y: prefersReducedMotion ? 0 : 40, filter: prefersReducedMotion ? 'none' : 'blur(10px)' },
+          { opacity: 1, y: 0, filter: 'none', duration: 1.4, stagger: 0.2, ease: 'power3.out' }
+        );
+
+        // 3. Count up portfolio value & statistics cards (Step 4 stagger embedded)
+        tl.to(animObj, {
+          portfolio: 1254820,
+          sharpe: 3.92,
+          winRate: 78.4,
+          drawdown: 4.2,
+          profit: 14.8,
+          duration: 3.0,
+          ease: 'power1.out',
+          onUpdate: () => {
+            setPortfolioValue(Math.floor(animObj.portfolio));
+            setStats({
+              sharpe: animObj.sharpe.toFixed(2),
+              winRate: animObj.winRate.toFixed(1),
+              drawdown: animObj.drawdown.toFixed(1),
+              profit: animObj.profit.toFixed(1)
+            });
+          }
+        }, '-=1.0');
+
+        // 5. SVG Candlestick sequential draw
+        tl.fromTo('.terminal-candle',
+          { scaleY: 0, opacity: 0 },
+          { scaleY: 1, opacity: 1, duration: 1.0, stagger: 0.1, transformOrigin: 'bottom', ease: 'power2.out' },
+          '-=2.2'
+        );
+
+        // 6. SVG profit trendline draw
+        const trendline = document.querySelector('.profit-trendline');
+        if (trendline) {
+          const length = trendline.getTotalLength() || 1000;
+          tl.fromTo('.profit-trendline',
+            { strokeDasharray: length, strokeDashoffset: length },
+            { strokeDashoffset: 0, duration: 2.2, ease: 'power1.inOut' },
+            '-=2.5'
+          );
+        }
+        
+        tl.fromTo('.trendline-glow-dot',
+          { opacity: 0, scale: 0 },
+          { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out' },
+          '-=0.3'
+        );
+
+        // 7. Donut segments rot and fill
+        tl.fromTo('.donut-segment',
+          { strokeDashoffset: 283 },
+          { strokeDashoffset: (i, target) => {
+              const offset = target.getAttribute('data-offset');
+              return offset ? parseFloat(offset) : 0;
+            }, 
+            duration: 1.6, 
+            ease: 'power2.out' 
+          },
+          '-=1.4'
+        );
+        tl.fromTo('.donut-chart-svg',
+          { rotate: -180 },
+          { rotate: 0, duration: 1.6, ease: 'power2.out' },
+          '-=1.6'
+        );
+
+        // 8. Performance vertical bars grow
+        tl.fromTo('.performance-bar',
+          { scaleY: 0 },
+          { scaleY: 1, duration: 1.2, stagger: 0.08, transformOrigin: 'bottom', ease: 'power2.out' },
+          '-=1.4'
+        );
+
+        // 9. Recent trades panel slide from right
+        tl.fromTo('.trade-row',
+          { x: 30, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, stagger: 0.08, ease: 'power2.out' },
+          '-=1.0'
         );
       }
 
@@ -977,7 +1187,7 @@ export default function App() {
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div 
           className="hero-bg-img absolute top-24 md:top-28 inset-x-0 bottom-0 bg-cover bg-[position:75%_15%] md:bg-cover bg-no-repeat opacity-95 scale-100 z-0"
-          style={{ backgroundImage: `url(${homeImg})`, filter: 'brightness(1.15) contrast(1.12) saturate(1.18)' }}
+          style={{ backgroundImage: `url(${homeImg})`, filter: 'brightness(0.70) contrast(1.12) saturate(1.18)' }}
         ></div>
         {/* Darker burgundy gradient with a subtle fade on the left */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a0206_0%,rgba(26,2,6,0.8)_15%,rgba(26,2,6,0.15)_35%,transparent_60%)] z-10"></div>
@@ -989,7 +1199,7 @@ export default function App() {
         <div className="max-w-[700px] text-left mt-6 md:mt-12">
           <h1 className="hero-heading text-5xl md:text-7xl lg:text-[76px] font-serif leading-[1.1] mb-8 font-medium">
             LEARN TODAY,<br/>
-            <span className="gold-gradient-text font-bold">LEAD TOMORROW.</span>
+            <span className="text-white font-bold">LEAD TOMORROW.</span>
           </h1>
           <p className="hero-desc text-base md:text-lg font-light text-text-light/90 mb-10 max-w-[580px] leading-relaxed">
             Dubai's premium academy for financial markets, professional skills and personal growth. Practical education. Real insights. Future ready.
@@ -1076,8 +1286,8 @@ export default function App() {
   );
 
   const renderWhyChooseUs = () => (
-    <section id="why-choose-us" className="py-32 bg-white text-center">
-      <div className="max-w-[1440px] mx-auto px-8">
+    <section id="why-choose-us" className="py-20 md:py-32 bg-white text-center">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
         <div className="mb-20">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Heritage of Distinction
@@ -1126,8 +1336,8 @@ export default function App() {
   );
 
   const renderAbout = () => (
-    <section id="about" className="py-32 bg-ivory">
-      <div className="max-w-[1440px] mx-auto px-8">
+    <section id="about" className="py-20 md:py-32 bg-ivory">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
         <div className="about-grid-el grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           {/* Visual Column */}
           <div className="about-img-box-el relative border border-burgundy/10 p-[15px] bg-white shadow-md rounded-2xl">
@@ -1194,11 +1404,11 @@ export default function App() {
   );
 
   const renderGlobalNetwork = () => (
-    <section id="global-network" className="py-32 bg-[#170105] text-center text-white relative overflow-hidden">
+    <section id="global-network" className="py-20 md:py-32 bg-[#170105] text-center text-white relative overflow-hidden">
       {/* Decorative gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#1a0206] via-transparent to-[#1a0206] pointer-events-none z-10"></div>
       
-      <div className="max-w-[1440px] mx-auto px-8 relative z-20">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-20">
         <div className="mb-16">
           <span className="font-sans uppercase text-gold-light text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Global Connectivity Hub
@@ -1221,8 +1431,8 @@ export default function App() {
   );
 
   const renderStrengths = () => (
-    <section id="programs" className="py-32 bg-white text-center">
-      <div className="max-w-[1440px] mx-auto px-8">
+    <section id="programs" className="py-20 md:py-32 bg-white text-center">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
         <div className="mb-20">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Elite Competencies
@@ -1290,425 +1500,473 @@ export default function App() {
   );
 
   const renderJourney = () => {
-    const journeySteps = [
-      {
-        step: "01",
-        label: "Market Analysis",
-        phase: "Learn",
-        desc: "Master the fundamentals of market mechanics, order books, and price action dynamics.",
-        icon: <BookOpen className="w-5 h-5" />,
-        value: "$1,000",
-        x: 100,
-        y: 280,
-        candle: { open: 290, close: 270, high: 260, low: 300 }
-      },
-      {
-        step: "02",
-        label: "Risk & Probability",
-        phase: "Understand",
-        desc: "Formulate quantitative models, risk-management rules, and risk-reward strategies.",
-        icon: <Shield className="w-5 h-5" />,
-        value: "$2,500",
-        x: 300,
-        y: 230,
-        candle: { open: 245, close: 215, high: 200, low: 260 }
-      },
-      {
-        step: "03",
-        label: "Live Simulation",
-        phase: "Apply",
-        desc: "Execute trades in real-time simulated environments to test discipline and emotional control.",
-        icon: <Monitor className="w-5 h-5" />,
-        value: "$5,000",
-        x: 500,
-        y: 170,
-        candle: { open: 190, close: 150, high: 130, low: 210 }
-      },
-      {
-        step: "04",
-        label: "Capital Allocation",
-        phase: "Grow",
-        desc: "Scale position sizes safely, manage leverage, and diversify multi-asset portfolios.",
-        icon: <TrendingUp className="w-5 h-5" />,
-        value: "$12,000",
-        x: 700,
-        y: 100,
-        candle: { open: 120, close: 80, high: 60, low: 140 }
-      },
-      {
-        step: "05",
-        label: "Fund Management",
-        phase: "Lead",
-        desc: "Direct trading desks, manage proprietary firm capital, and build professional market operations.",
-        icon: <Trophy className="w-5 h-5" />,
-        value: "$50,000",
-        x: 900,
-        y: 40,
-        candle: { open: 55, close: 25, high: 10, low: 70 }
-      }
+    // 8 Candles data for sequential rendering & live wiggles
+    const candles = [
+      { id: 0, x: 80, open: 260, close: 240, high: 220, low: 280, color: 'up' },
+      { id: 1, x: 180, open: 240, close: 220, high: 200, low: 260, color: 'up' },
+      { id: 2, x: 280, open: 225, close: 245, high: 210, low: 265, color: 'down' },
+      { id: 3, x: 380, open: 240, close: 200, high: 180, low: 250, color: 'up' },
+      { id: 4, x: 480, open: 200, close: 170, high: 150, low: 220, color: 'up' },
+      { id: 5, x: 580, open: 175, close: 195, high: 160, low: 215, color: 'down' },
+      { id: 6, x: 680, open: 190, close: 130, high: 110, low: 200, color: 'up' },
+      { id: 7, x: 780, open: 130, close: 80, high: 60, low: 150, color: 'up' }
     ];
 
-    const activeStepData = journeySteps[activeJourneyStep];
+    const performanceBars = [
+      { month: "Jan", val: 8.5 },
+      { month: "Feb", val: 12.2 },
+      { month: "Mar", val: 14.8 },
+      { month: "Apr", val: 9.1 },
+      { month: "May", val: 16.4 },
+      { month: "Jun", val: 13.0 }
+    ];
+
+    const recentTrades = [
+      { time: "10:34:12", type: "BUY", asset: "BEEV/INR", size: "1,250", profit: "+₹14,250", status: "WIN" },
+      { time: "10:32:05", type: "SELL", asset: "GOLD/INR", size: "2.5oz", profit: "+₹8,120", status: "WIN" },
+      { time: "10:28:49", type: "BUY", asset: "BEEV/INR", size: "900", profit: "-₹2,400", status: "LOSS" },
+      { time: "10:25:11", type: "BUY", asset: "BTC/INR", size: "0.15", profit: "+₹22,940", status: "WIN" },
+      { time: "10:19:30", type: "SELL", asset: "EUR/INR", size: "20k", profit: "+₹5,800", status: "WIN" }
+    ];
+
+    const handleMouseMove = (e) => {
+      if (!dashboardRef.current) return;
+      const rect = dashboardRef.current.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
+      const relX = (e.clientX - rect.left) / width - 0.5;
+      const relY = (e.clientY - rect.top) / height - 0.5;
+      const maxRotation = 3.5; // very subtle luxury 3-5 degrees
+      setTilt({
+        x: relX * maxRotation,
+        y: -relY * maxRotation
+      });
+    };
+
+    const handleMouseLeave = () => {
+      setTilt({ x: 0, y: 0 });
+    };
 
     return (
-      <section id="admissions" className="py-32 bg-ivory text-center relative overflow-hidden">
-        {/* Decorative background grid subtle effect */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(90,15,29,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(90,15,29,0.015)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none"></div>
+      <section id="admissions" className="py-20 md:py-32 bg-[#0c0103] text-center relative overflow-hidden">
+        {/* Cinematic Backdrop Volumetric lighting */}
+        <div className="absolute inset-0 bg-radial-gradient from-burgundy-dark/45 via-[#0c0103] to-[#090001] pointer-events-none z-0"></div>
+        <div className="light-blob light-blob-gold z-0 opacity-25"></div>
+        <div className="light-blob light-blob-burgundy z-0 opacity-40"></div>
 
-        <div className="max-w-[1440px] mx-auto px-8 relative z-10">
+        {/* Faint Background Particle System */}
+        <AdmissionsBackgroundParticles />
+
+        {/* Backdrop Grid Pattern */}
+        <div className="absolute inset-0 terminal-grid-bg opacity-35 z-0 pointer-events-none"></div>
+
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
           <div className="mb-16">
-            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3 animate-pulse">
-              Strategic Progression
+            <span className="font-sans uppercase text-gold text-[11px] tracking-[0.2em] font-semibold block mb-3 animate-pulse">
+              PRO TRADING PLATFORM
             </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6 font-bold">
-              Your Learning Journey
+            <h2 className="text-4xl md:text-5xl font-serif text-white mb-6 font-bold tracking-wide">
+              Elite Educational Environment
             </h2>
-            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-4"></div>
-            <p className="text-sm text-text-secondary max-w-[600px] mx-auto leading-relaxed">
-              Track your development from foundations to prop-firm management on our proprietary academy chart.
+            <div className="w-[80px] h-[2px] bg-gold mx-auto mb-4 opacity-50"></div>
+            <p className="text-sm text-white/50 max-w-[650px] mx-auto leading-relaxed">
+              Step into the Beever Trading Academy Terminal. Master liquidity flows, risk metrics, and automated algorithms in real-time.
             </p>
           </div>
 
-          {/* Desktop/Tablet Trading Terminal Layout */}
-          <div className="journey-timeline-el hidden md:block mb-12">
-            <div className="bg-white border border-burgundy/10 rounded-2xl shadow-xl overflow-hidden transition-all duration-500 hover:shadow-2xl">
+          {/* Interactive Parallax tilt container */}
+          <div 
+            ref={dashboardRef}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            className="transition-transform duration-500 ease-out select-none relative z-10 w-full"
+            style={{
+              transform: `perspective(1200px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
+              transformStyle: 'preserve-3d'
+            }}
+          >
+            {/* Unified Luxury Dashboard Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               
-              {/* Terminal Header Bar */}
-              <div className="bg-burgundy-dark text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4 font-sans text-xs border-b border-white/10 shadow-inner select-none">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
-                  <span className="font-bold tracking-wider text-[10px] text-white/90">BEEVER TERMINAL v4.2</span>
-                </div>
-                <div className="flex items-center gap-6 overflow-x-auto py-1 whitespace-nowrap scrollbar-none text-[11px]">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-white/40 font-medium">PAIR:</span>
-                    <span className="font-semibold text-gold font-mono">BEEV/USD</span>
+              {/* LEFT & CENTER PANEL: Chart Terminal, Allocation & Growth */}
+              <div className="lg:col-span-8 flex flex-col gap-6">
+                
+                {/* Main Pro Chart Terminal */}
+                <div className="premium-glass-card sheen-overlay flex flex-col justify-between overflow-hidden relative border border-gold/15 bg-burgundy-dark/10 rounded-2xl shadow-2xl">
+                  
+                  {/* Header Bar */}
+                  <div className="bg-burgundy-dark/90 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4 font-sans text-xs border-b border-gold/15 select-none relative z-10">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></div>
+                      <span className="font-bold tracking-widest text-[9.5px] text-white/95">BEEVER PRO TERMINAL v5.0</span>
+                    </div>
+                    
+                    {/* Live Portfolio Value Rolling Display */}
+                    <div className="flex items-center gap-6 font-mono text-[11px]">
+                      <div className="flex items-center gap-2">
+                        <span className="text-white/40 font-medium">PAIR:</span>
+                        <span className="font-semibold text-gold">BEEV/INR</span>
+                      </div>
+                      <div className="flex items-center gap-2 border-l border-white/10 pl-6">
+                        <span className="text-white/40 font-medium">PORTFOLIO VAL:</span>
+                        <span className="font-bold text-white tracking-wide text-xs">
+                          ₹{portfolioValue.toLocaleString('en-IN')}.50
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-white/40 font-medium">GROWTH:</span>
-                    <span className="font-semibold text-emerald-400 font-mono">+5,000%</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-white/40 font-medium">STATUS:</span>
-                    <span className="font-semibold text-emerald-400 font-mono tracking-wider">UPTREND CONFIRMED</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-white/40 font-medium">SHARPE RATIO:</span>
-                    <span className="font-semibold text-gold font-mono">3.82</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-white/40 font-medium">RSI(14):</span>
-                    <span className="font-semibold text-white/90 font-mono">68.2 (BULLISH)</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Legend Indicator */}
-              <div className="flex items-center gap-5 text-[10px] text-burgundy/60 border-b border-burgundy/5 px-6 py-2.5 bg-ivory/30 select-none">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-1.5 rounded-sm bg-emerald-500"></span>
-                  <span>Bullish Candlestick</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-4 h-0.5 bg-gradient-to-r from-burgundy to-gold"></span>
-                  <span>Skill Growth Trendline</span>
-                </div>
-                <div className="flex items-center gap-1.5 font-semibold text-burgundy">
-                  <span className="w-2.5 h-2.5 rounded-full border border-gold bg-white flex items-center justify-center">
-                    <span className="w-1.5 h-1.5 rounded-full bg-burgundy"></span>
-                  </span>
-                  <span>Active Phase (Step ${activeStepData.step})</span>
-                </div>
-              </div>
+                  {/* SVG Chart Screen */}
+                  <div className="p-6 md:p-8 relative overflow-hidden select-none bg-burgundy-dark/5 min-h-[300px]">
+                    
+                    {/* Live indicator dot */}
+                    <div className="absolute top-4 right-4 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono text-[8px] tracking-widest font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></span> LIVE CONNECTED
+                    </div>
 
-              {/* Chart Screen (SVG) */}
-              <div className="p-6 md:p-8 bg-white relative overflow-hidden select-none">
-                <svg viewBox="0 0 1000 350" className="w-full h-auto overflow-visible">
-                  {/* Defs for gradients and filters */}
-                  <defs>
-                    <filter id="chartGlow" x="-20%" y="-20%" width="140%" height="140%">
-                      <feGaussianBlur stdDeviation="4" result="blur" />
-                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                    </filter>
-                    <linearGradient id="curveGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#5A0F1D" />
-                      <stop offset="100%" stopColor="#C9A24D" />
-                    </linearGradient>
-                    <linearGradient id="areaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#C9A24D" stopOpacity="0.12" />
-                      <stop offset="100%" stopColor="#C9A24D" stopOpacity="0.0" />
-                    </linearGradient>
-                    <linearGradient id="activeCandleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#C9A24D" />
-                      <stop offset="100%" stopColor="#A88135" />
-                    </linearGradient>
-                    <linearGradient id="normalCandleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#34D399" />
-                      <stop offset="100%" stopColor="#059669" />
-                    </linearGradient>
-                  </defs>
+                    <svg viewBox="0 0 900 320" className="w-full h-auto overflow-visible">
+                      <defs>
+                        <filter id="chartGlow" x="-20%" y="-20%" width="140%" height="140%">
+                          <feGaussianBlur stdDeviation="3.5" result="blur" />
+                          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                        <linearGradient id="curveGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#7E1C2C" />
+                          <stop offset="100%" stopColor="#D4AF37" />
+                        </linearGradient>
+                        <linearGradient id="areaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.06" />
+                          <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.0" />
+                        </linearGradient>
+                        <linearGradient id="candleUpGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stopColor="#10B981" />
+                          <stop offset="100%" stopColor="#059669" />
+                        </linearGradient>
+                        <linearGradient id="candleDownGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stopColor="#EF4444" />
+                          <stop offset="100%" stopColor="#DC2626" />
+                        </linearGradient>
+                      </defs>
 
-                  {/* Horizontal grid lines */}
-                  {[40, 110, 180, 250, 320].map((yVal, index) => (
-                    <g key={`grid-h-${index}`}>
-                      <line x1={50} y1={yVal} x2={950} y2={yVal} stroke="#5A0F1D" strokeOpacity="0.04" strokeWidth="1" />
-                      <text x={960} y={yVal + 3} fill="#5A0F1D" fillOpacity="0.4" fontSize={9} fontFamily="monospace" textAnchor="start">
-                        {index === 0 && "$50,000"}
-                        {index === 1 && "$12,000"}
-                        {index === 2 && "$5,000"}
-                        {index === 3 && "$2,500"}
-                        {index === 4 && "$1,000"}
-                      </text>
-                    </g>
-                  ))}
+                      {/* Horizontal Grid lines */}
+                      {[40, 110, 180, 250].map((yVal, index) => (
+                        <g key={`grid-h-${index}`}>
+                          <line x1={50} y1={yVal} x2={830} y2={yVal} stroke="rgba(212, 175, 55, 0.05)" strokeWidth="0.75" />
+                          <text x={840} y={yVal + 3} fill="rgba(255, 255, 255, 0.3)" fontSize={8.5} fontFamily="monospace" textAnchor="start">
+                            ₹{(400000 - index * 100000).toLocaleString('en-IN')}
+                          </text>
+                        </g>
+                      ))}
 
-                  {/* Vertical grid lines */}
-                  {[100, 300, 500, 700, 900].map((xVal, index) => (
-                    <line key={`grid-v-${index}`} x1={xVal} y1={20} x2={xVal} y2={320} stroke="#5A0F1D" strokeOpacity="0.04" strokeWidth="1" />
-                  ))}
-
-                  {/* Shaded Area Under the Curve */}
-                  <path 
-                    d="M 100,280 C 200,260 200,230 300,230 C 400,230 400,170 500,170 C 600,170 600,100 700,100 C 800,100 800,40 900,40 L 900,320 L 100,320 Z" 
-                    fill="url(#areaGrad)" 
-                  />
-
-                  {/* Glowing Trendline Curve */}
-                  <path 
-                    d="M 100,280 C 200,260 200,230 300,230 C 400,230 400,170 500,170 C 600,170 600,100 700,100 C 800,100 800,40 900,40" 
-                    fill="none" 
-                    stroke="url(#curveGrad)" 
-                    strokeWidth="3" 
-                    filter="url(#chartGlow)"
-                  />
-
-                  {/* Active Step Crosshairs */}
-                  <line 
-                    x1={activeStepData.x} 
-                    y1={20} 
-                    x2={activeStepData.x} 
-                    y2={320} 
-                    stroke="#5A0F1D" 
-                    strokeOpacity="0.12" 
-                    strokeDasharray="4 4" 
-                    className="transition-all duration-300"
-                  />
-                  <line 
-                    x1={50} 
-                    y1={activeStepData.y} 
-                    x2={950} 
-                    y2={activeStepData.y} 
-                    stroke="#5A0F1D" 
-                    strokeOpacity="0.12" 
-                    strokeDasharray="4 4" 
-                    className="transition-all duration-300"
-                  />
-
-                  {/* Y-axis Active Price Coordinate Badge */}
-                  <g className="transition-all duration-300" style={{ transform: `translateY(${activeStepData.y}px)` }}>
-                    <rect x={954} y={-8} width={42} height={16} rx={3} fill="#5A0F1D" />
-                    <text x={975} y={3} fill="#C9A24D" fontSize={8} fontWeight="bold" textAnchor="middle" fontFamily="monospace">
-                      {activeStepData.value}
-                    </text>
-                  </g>
-
-                  {/* X-axis Active Step Coordinate Badge */}
-                  <g className="transition-all duration-300" style={{ transform: `translateX(${activeStepData.x}px)` }}>
-                    <rect x={-25} y={322} width={50} height={15} rx={3} fill="#5A0F1D" />
-                    <text x={0} y={332} fill="#C9A24D" fontSize={8} fontWeight="bold" textAnchor="middle" fontFamily="monospace">
-                      STEP {activeStepData.step}
-                    </text>
-                  </g>
-
-                  {/* Candlesticks Layer */}
-                  {journeySteps.map((item, i) => {
-                    const isActive = activeJourneyStep === i;
-                    const { high, low, open, close } = item.candle;
-                    const x = item.x;
-                    return (
-                      <g 
-                        key={`candle-${i}`} 
-                        className="cursor-pointer group"
-                        onMouseEnter={() => setActiveJourneyStep(i)}
-                      >
-                        {/* Transparent click/hover helper rect */}
-                        <rect x={x - 20} y={20} width={40} height={300} fill="transparent" />
-                        
-                        {/* Candlestick Wick (Shadow & Line) */}
-                        <line 
-                          x1={x} 
-                          y1={high} 
-                          x2={x} 
-                          y2={low} 
-                          stroke={isActive ? "#C9A24D" : "#10B981"} 
-                          strokeWidth={isActive ? 2 : 1.25} 
-                          strokeOpacity={isActive ? 1.0 : 0.7}
-                          className="transition-all duration-300"
-                        />
-                        {/* Candlestick Body */}
-                        <rect 
-                          x={isActive ? x - 8 : x - 5} 
-                          y={close} 
-                          width={isActive ? 16 : 10} 
-                          height={Math.max(4, Math.abs(open - close))} 
-                          fill={isActive ? "url(#activeCandleGrad)" : "url(#normalCandleGrad)"} 
-                          stroke={isActive ? "#C9A24D" : "none"}
-                          strokeWidth={isActive ? 1 : 0}
-                          rx={2}
-                          className="transition-all duration-300 shadow-sm"
-                        />
-                      </g>
-                    );
-                  })}
-
-                  {/* Line Node Points Layer */}
-                  {journeySteps.map((item, i) => {
-                    const isActive = activeJourneyStep === i;
-                    return (
-                      <circle 
-                        key={`node-${i}`}
-                        cx={item.x}
-                        cy={item.y}
-                        r={isActive ? 7 : 4.5}
-                        fill={isActive ? "#C9A24D" : "#5A0F1D"}
-                        stroke="#FFFFFF"
-                        strokeWidth={isActive ? 2 : 1.5}
-                        className="transition-all duration-300 cursor-pointer shadow-md"
-                        onMouseEnter={() => setActiveJourneyStep(i)}
+                      {/* Shaded Area Under the Curve */}
+                      <path 
+                        d="M 80,250 C 180,240 180,220 280,235 C 380,200 480,170 580,185 C 680,130 780,80 820,70 L 820,290 L 80,290 Z" 
+                        fill="url(#areaGrad)" 
                       />
-                    );
-                  })}
-                </svg>
+
+                      {/* Glowing Trendline Curve */}
+                      <path 
+                        className="profit-trendline"
+                        d="M 80,250 C 180,240 180,220 280,235 C 380,200 480,170 580,185 C 680,130 780,80 820,70" 
+                        fill="none" 
+                        stroke="url(#curveGrad)" 
+                        strokeWidth="2.5" 
+                        filter="url(#chartGlow)"
+                      />
+
+                      {/* Trendline tip glowing dot */}
+                      <circle 
+                        className="trendline-glow-dot glow-dot-pulse"
+                        cx={820}
+                        cy={70}
+                        r={5.5}
+                        fill="#D4AF37"
+                        stroke="#0c0103"
+                        strokeWidth={2}
+                      />
+
+                      {/* Candlesticks Sequential Layer */}
+                      {candles.map((candle, i) => {
+                        const { high, low, open, close, color } = candle;
+                        const x = candle.x;
+                        const offset = candleOffsets[i] || 0;
+                        const currentOpen = open + offset;
+                        const currentClose = close - offset * 0.8;
+                        const bodyY = Math.min(currentOpen, currentClose);
+                        const bodyH = Math.max(5, Math.abs(currentOpen - currentClose));
+                        const wickHigh = high + offset * 1.1;
+                        const wickLow = low + offset * 0.9;
+
+                        return (
+                          <g key={`candle-${i}`} className="terminal-candle">
+                            {/* Wick */}
+                            <line 
+                              x1={x} 
+                              y1={wickHigh} 
+                              x2={x} 
+                              y2={wickLow} 
+                              stroke={color === 'up' ? "#10B981" : "#EF4444"} 
+                              strokeWidth={1} 
+                              strokeOpacity={0.6}
+                            />
+                            {/* Candle Body */}
+                            <rect 
+                              x={x - 4} 
+                              y={bodyY} 
+                              width={8} 
+                              height={bodyH} 
+                              fill={color === 'up' ? "url(#candleUpGrad)" : "url(#candleDownGrad)"} 
+                              rx={1.5}
+                            />
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Sub row: Donut Allocation & Performance Bars */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  
+                  {/* Donut Allocation Panel */}
+                  <div className="premium-glass-card sheen-overlay p-6 border border-gold/15 bg-burgundy-dark/15 rounded-xl text-left relative overflow-hidden flex flex-col justify-between">
+                    <div>
+                      <span className="text-[9px] uppercase tracking-widest text-gold font-mono block mb-1">ASSET ALLOCATION</span>
+                      <h4 className="text-base text-white font-serif font-semibold">Active Fund Distribution</h4>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-6 mt-6">
+                      <div className="w-[120px] h-[120px] relative flex justify-center items-center flex-shrink-0">
+                        {/* Radial SVG Donut */}
+                        <svg width="120" height="120" viewBox="0 0 120 120" className="donut-chart-svg overflow-visible">
+                          {/* Track */}
+                          <circle cx="60" cy="60" r="45" fill="transparent" stroke="rgba(255, 255, 255, 0.04)" strokeWidth="12" />
+                          
+                          {/* Segment 1: Equities 45% (offset: 283 * 0.55 = 155.65) */}
+                          <circle 
+                            className="donut-segment" 
+                            cx="60" 
+                            cy="60" 
+                            r="45" 
+                            fill="transparent" 
+                            stroke="#D4AF37" 
+                            strokeWidth="12" 
+                            strokeDasharray="283" 
+                            data-offset="155.65"
+                          />
+                          
+                          {/* Segment 2: Crypto 25% (offset: 283 * 0.75 = 212.25) */}
+                          <circle 
+                            className="donut-segment" 
+                            cx="60" 
+                            cy="60" 
+                            r="45" 
+                            fill="transparent" 
+                            stroke="#10B981" 
+                            strokeWidth="12" 
+                            strokeDasharray="283" 
+                            data-offset="212.25"
+                            style={{ transform: 'rotate(72deg)', transformOrigin: '50% 50%' }}
+                          />
+
+                          {/* Segment 3: Forex 20% (offset: 283 * 0.80 = 226.4) */}
+                          <circle 
+                            className="donut-segment" 
+                            cx="60" 
+                            cy="60" 
+                            r="45" 
+                            fill="transparent" 
+                            stroke="#EF4444" 
+                            strokeWidth="12" 
+                            strokeDasharray="283" 
+                            data-offset="226.4"
+                            style={{ transform: 'rotate(162deg)', transformOrigin: '50% 50%' }}
+                          />
+
+                          {/* Segment 4: Cash 10% (offset: 283 * 0.90 = 254.7) */}
+                          <circle 
+                            className="donut-segment" 
+                            cx="60" 
+                            cy="60" 
+                            r="45" 
+                            fill="transparent" 
+                            stroke="rgba(255, 255, 255, 0.2)" 
+                            strokeWidth="12" 
+                            strokeDasharray="283" 
+                            data-offset="254.7"
+                            style={{ transform: 'rotate(234deg)', transformOrigin: '50% 50%' }}
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col justify-center items-center">
+                          <span className="font-mono text-xs font-bold text-white">4 Funds</span>
+                          <span className="text-[8px] text-white/40 tracking-wider">SECURED</span>
+                        </div>
+                      </div>
+
+                      <div className="flex-grow flex flex-col gap-2 font-sans text-[10.5px]">
+                        <div className="flex justify-between items-center">
+                          <span className="flex items-center gap-1.5 text-white/70">
+                            <span className="w-2 h-2 rounded-full bg-gold"></span> Equities
+                          </span>
+                          <span className="font-mono font-bold text-white">45%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="flex items-center gap-1.5 text-white/70">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Cryptos
+                          </span>
+                          <span className="font-mono font-bold text-white">25%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="flex items-center gap-1.5 text-white/70">
+                            <span className="w-2 h-2 rounded-full bg-red-500"></span> Forex
+                          </span>
+                          <span className="font-mono font-bold text-white">20%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="flex items-center gap-1.5 text-white/70">
+                            <span className="w-2 h-2 rounded-full bg-white/20"></span> Liquidity
+                          </span>
+                          <span className="font-mono font-bold text-white">10%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Growth/Performance vertical bars */}
+                  <div className="premium-glass-card sheen-overlay p-6 border border-gold/15 bg-burgundy-dark/15 rounded-xl text-left relative overflow-hidden flex flex-col justify-between">
+                    <div>
+                      <span className="text-[9px] uppercase tracking-widest text-gold font-mono block mb-1">PERFORMANCE METRICS</span>
+                      <h4 className="text-base text-white font-serif font-semibold">Monthly Profit Expansion</h4>
+                    </div>
+
+                    <div className="flex items-end justify-between gap-3 h-[100px] mt-6 select-none font-mono text-[9px]">
+                      {performanceBars.map((bar, index) => {
+                        // Max value is 16.4 for scaling
+                        const heightPct = (bar.val / 18) * 100;
+                        return (
+                          <div key={index} className="flex flex-col items-center flex-grow">
+                            <span className="text-gold/90 text-[8px] mb-1">+{bar.val}%</span>
+                            <div className="w-full bg-burgundy/25 border border-gold/10 hover:border-gold/30 rounded-t-sm relative overflow-hidden h-[70px]">
+                              <div 
+                                className="performance-bar absolute bottom-0 left-0 right-0 gold-gradient-bg opacity-75"
+                                style={{ height: `${heightPct}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-white/40 text-[9px] mt-2 block">{bar.month}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
               </div>
+
+              {/* RIGHT SIDE PANEL: Stats Cards & Recent Trade Logs */}
+              <div className="lg:col-span-4 flex flex-col gap-6">
+                
+                {/* Staggered Stats Cards */}
+                <div className="grid grid-cols-2 gap-4">
+                  
+                  {/* Win Rate */}
+                  <div className="premium-glass-card p-4 border border-gold/15 bg-burgundy-dark/20 text-left rounded-xl animate-pulse-slow">
+                    <span className="text-[9px] uppercase tracking-widest text-white/40 block mb-1 font-mono">Win Ratio</span>
+                    <h4 className="text-2xl font-serif font-bold text-white gold-glow-text">
+                      {stats.winRate}%
+                    </h4>
+                    <span className="text-[8px] text-emerald-400 font-mono tracking-wider block mt-1">✔ MODEL SECURED</span>
+                  </div>
+
+                  {/* Sharpe Ratio */}
+                  <div className="premium-glass-card p-4 border border-gold/15 bg-burgundy-dark/20 text-left rounded-xl">
+                    <span className="text-[9px] uppercase tracking-widest text-white/40 block mb-1 font-mono">Sharpe Index</span>
+                    <h4 className="text-2xl font-serif font-bold text-white gold-glow-text">
+                      {stats.sharpe}
+                    </h4>
+                    <span className="text-[8px] text-gold font-mono tracking-wider block mt-1">★ EXCELLENT GRADE</span>
+                  </div>
+
+                  {/* Max Drawdown */}
+                  <div className="premium-glass-card p-4 border border-gold/15 bg-burgundy-dark/20 text-left rounded-xl">
+                    <span className="text-[9px] uppercase tracking-widest text-white/40 block mb-1 font-mono">Max Drawdown</span>
+                    <h4 className="text-2xl font-serif font-bold text-white gold-glow-text">
+                      {stats.drawdown}%
+                    </h4>
+                    <span className="text-[8px] text-emerald-400 font-mono tracking-wider block mt-1">↓ RISK STABLE</span>
+                  </div>
+
+                  {/* Monthly Profit */}
+                  <div className="premium-glass-card p-4 border border-gold/15 bg-burgundy-dark/20 text-left rounded-xl">
+                    <span className="text-[9px] uppercase tracking-widest text-white/40 block mb-1 font-mono">Avg Return</span>
+                    <h4 className="text-2xl font-serif font-bold text-white gold-glow-text">
+                      +{stats.profit}%
+                    </h4>
+                    <span className="text-[8px] text-gold font-mono tracking-wider block mt-1">↑ PERFORMANCE</span>
+                  </div>
+
+                </div>
+
+                {/* Recent Trade Panel (Slides from right) */}
+                <div className="premium-glass-card p-6 border border-gold/15 bg-burgundy-dark/15 rounded-2xl flex-grow flex flex-col justify-between text-left relative overflow-hidden">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <span className="text-[9px] uppercase tracking-widest text-gold font-mono block mb-1">TRANSACTIONS FEED</span>
+                        <h4 className="text-base text-white font-serif font-semibold">Live Academy Trades</h4>
+                      </div>
+                      <span className="flex items-center gap-1.5 text-[8.5px] uppercase font-mono text-emerald-400 border border-emerald-500/25 px-2 py-0.5 rounded bg-emerald-500/5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> PULSING FEED
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-3 font-mono text-[10.5px]">
+                      {recentTrades.map((trade, index) => {
+                        const isWin = trade.status === "WIN";
+                        return (
+                          <div 
+                            key={index} 
+                            className="trade-row p-3 rounded-lg bg-burgundy/15 border border-white/5 flex items-center justify-between hover:border-gold/20 transition-all duration-300 select-none"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded leading-none ${isWin ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                                {trade.type}
+                              </span>
+                              <div>
+                                <span className="font-semibold text-white block leading-none mb-1">{trade.asset}</span>
+                                <span className="text-white/40 text-[9px] block leading-none">{trade.time}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="text-right">
+                              <span className={`font-bold block leading-none mb-1 ${isWin ? 'text-emerald-400' : 'text-red-400'}`}>{trade.profit}</span>
+                              <span className="text-white/40 text-[9px] block leading-none">Size: {trade.size}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-white/10">
+                    <a href="#contact" className="btn btn-gold w-full text-center text-[10px] py-3.5 tracking-wider font-semibold uppercase block shadow-gold bg-gold text-burgundy-dark hover:-translate-y-[2px] transition-all duration-300">
+                      Connect to Academy API
+                    </a>
+                  </div>
+                </div>
+
+              </div>
+
             </div>
           </div>
 
-          {/* Responsive Details Cards Grid (Desktop/Tablet) */}
-          <div className="hidden md:grid grid-cols-5 gap-4">
-            {journeySteps.map((item, i) => {
-              const isActive = activeJourneyStep === i;
-              return (
-                <div 
-                  key={i}
-                  onMouseEnter={() => setActiveJourneyStep(i)}
-                  className={`journey-step-el p-6 text-left rounded-2xl border transition-all duration-300 cursor-pointer ${
-                    isActive 
-                      ? 'bg-white border-gold shadow-lg -translate-y-1' 
-                      : 'bg-white/60 border-burgundy/10 hover:border-gold/40 hover:bg-white hover:-translate-y-0.5'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`w-10 h-10 rounded-full flex justify-center items-center transition-all duration-300 ${
-                      isActive ? 'bg-burgundy text-gold shadow-md' : 'bg-ivory text-burgundy'
-                    }`}>
-                      {item.icon}
-                    </div>
-                    <span className={`font-mono text-xs font-bold transition-colors duration-300 ${isActive ? 'text-gold-dark' : 'text-gold-dark/60'}`}>
-                      {item.step}
-                    </span>
-                  </div>
-                  <div className="font-sans text-[10px] font-bold uppercase tracking-wider text-gold-dark mb-1">
-                    {item.phase}
-                  </div>
-                  <h3 className="font-serif text-lg text-burgundy font-semibold mb-2 leading-tight">
-                    {item.label}
-                  </h3>
-                  <p className="text-[11px] text-text-secondary leading-relaxed">
-                    {item.desc}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Mobile Vertical Candlestick Timeline Layout */}
-          <div className="journey-timeline-el md:hidden space-y-4 text-left">
-            {journeySteps.map((item, i) => {
-              const isActive = activeJourneyStep === i;
-              return (
-                <div 
-                  key={i} 
-                  className={`flex items-stretch gap-4 p-4 rounded-xl border transition-all duration-300 cursor-pointer ${
-                    isActive 
-                      ? 'bg-white border-gold shadow-md' 
-                      : 'bg-white/60 border-burgundy/10'
-                  }`}
-                  onClick={() => setActiveJourneyStep(i)}
-                >
-                  {/* Left Side Candlestick Column */}
-                  <div className="flex flex-col items-center w-10 flex-shrink-0 select-none relative">
-                    {/* Dashed background connector */}
-                    {i < 4 && (
-                      <div className="absolute top-[45px] bottom-[-25px] left-1/2 -translate-x-1/2 w-[1.5px] border-l border-dashed border-burgundy/20 z-0"></div>
-                    )}
-                    
-                    <svg width="30" height="90" viewBox="0 0 30 90" className="overflow-visible relative z-10">
-                      <defs>
-                        <linearGradient id={`mobActCandle-${i}`} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#C9A24D" />
-                          <stop offset="100%" stopColor="#8A6E32" />
-                        </linearGradient>
-                        <linearGradient id={`mobNormCandle-${i}`} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#34D399" />
-                          <stop offset="100%" stopColor="#059669" />
-                        </linearGradient>
-                      </defs>
-                      {/* Wick */}
-                      <line x1="15" y1="8" x2="15" y2="82" stroke={isActive ? "#C9A24D" : "#10B981"} strokeWidth="1.5" />
-                      {/* Candle Body */}
-                      <rect 
-                        x="10" 
-                        y="22" 
-                        width="10" 
-                        height="46" 
-                        fill={isActive ? `url(#mobActCandle-${i})` : `url(#mobNormCandle-${i})`} 
-                        rx="1.5"
-                      />
-                      {/* Marker Circle */}
-                      <circle 
-                        cx="15" 
-                        cy="45" 
-                        r={isActive ? 6 : 4} 
-                        fill={isActive ? "#C9A24D" : "#5A0F1D"} 
-                        stroke="#FFFFFF"
-                        strokeWidth={isActive ? 2 : 1.5}
-                      />
-                      {/* Price Label Badge */}
-                      <text x="15" y="6" fill={isActive ? "#C9A24D" : "#5A0F1D"} fillOpacity="0.7" fontSize="7" fontWeight="bold" fontFamily="monospace" textAnchor="middle">
-                        {item.value}
-                      </text>
-                    </svg>
-                  </div>
-
-                  {/* Right Side Card Details */}
-                  <div className="flex-grow flex flex-col justify-center">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`font-mono text-[10px] font-bold ${isActive ? 'text-gold-dark' : 'text-gold-dark/60'}`}>
-                        STEP {item.step}
-                      </span>
-                      <span className="font-sans text-[9px] font-bold uppercase tracking-wider text-burgundy/60">
-                        {item.phase}
-                      </span>
-                    </div>
-                    <h3 className="font-serif text-base text-burgundy font-semibold mb-1 leading-snug">
-                      {item.label}
-                    </h3>
-                    <p className="text-[11px] text-text-secondary leading-relaxed">
-                      {item.desc}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
       </section>
     );
   };
 
   const renderInsideGallery = () => (
-    <section id="blog" className="py-32 bg-white text-center">
-      <div className="max-w-[1440px] mx-auto px-8">
+    <section id="blog" className="py-20 md:py-32 bg-white text-center">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
         <div className="mb-20">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Campus Life & Environment
@@ -1814,8 +2072,8 @@ export default function App() {
     };
 
     return (
-      <section id="careers" className="py-32 bg-ivory text-center relative">
-        <div className="max-w-[1440px] mx-auto px-8">
+      <section id="careers" className="py-20 md:py-32 bg-ivory text-center relative">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
           <div className="mb-20">
             <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
               Careers at Beever Academy
@@ -1952,8 +2210,8 @@ export default function App() {
   };
 
   const renderTestimonials = () => (
-    <section id="testimonials" className="py-32 bg-ivory">
-      <div className="max-w-[1440px] mx-auto px-8">
+    <section id="testimonials" className="py-20 md:py-32 bg-ivory">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
         <div className="text-center mb-16">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Alumni Testimonials
@@ -2046,8 +2304,8 @@ export default function App() {
   );
 
   const renderContact = () => (
-    <section id="contact" className="py-32 bg-white">
-      <div className="max-w-[1440px] mx-auto px-8">
+    <section id="contact" className="py-20 md:py-32 bg-white">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
         <div className="text-center mb-20">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Reach Out
@@ -2136,7 +2394,7 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen text-charcoal font-sans bg-white relative">
+    <div className="min-h-screen text-charcoal font-sans bg-white relative overflow-x-hidden">
       <GoldenSprinkleCursor />
       {/* ==========================================
          PAGE LOADER
@@ -2161,7 +2419,7 @@ export default function App() {
       {/* ==========================================
          STICKY HEADER NAVBAR
          ========================================== */}
-      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-4 bg-[#1a0206] border-b border-gold/10 shadow-md' : 'py-6 bg-[#1a0206]/95 border-b border-burgundy/20 shadow-sm'}`}>
+      <nav className={`fixed top-0 left-0 w-full z-[1000] transition-all duration-300 ${isScrolled ? 'py-4 bg-[#1a0206] border-b border-gold/10 shadow-md' : 'py-6 bg-[#1a0206]/95 border-b border-burgundy/20 shadow-sm'}`}>
         <div className="w-full px-4 sm:px-6 md:px-10 flex justify-between items-center">
           <a href="#home" className="flex items-center gap-3">
             {/* Logo used here */}
@@ -2220,7 +2478,7 @@ export default function App() {
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-burgundy-dark z-[990] flex justify-center items-center transition-all duration-500">
+        <div className="fixed inset-0 bg-burgundy-dark z-[990] flex flex-col justify-start items-center overflow-y-auto pt-28 pb-12 transition-all duration-500">
           <ul className="flex flex-col items-center gap-8">
             {['home', 'about', 'programs', 'admissions', 'blog', 'careers', 'contact'].map(sec => (
               <li key={sec} onClick={() => setMobileMenuOpen(false)}>
@@ -2255,7 +2513,7 @@ export default function App() {
          FOOTER SECTION
          ========================================== */}
       <footer className="bg-burgundy-dark text-white border-t-2 border-gold">
-        <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 py-28 text-left">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 py-20 md:py-28 text-left">
           
           {/* Brand Col */}
           <div className="flex flex-col gap-6">

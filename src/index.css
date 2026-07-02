@@ -210,5 +210,170 @@ body {
   filter: contrast(1.15) brightness(1.15);
 }
 
+/* CUSTOM TRADING DASHBOARD STYLES */
+.cinematic-dark-bg {
+  background: radial-gradient(circle at 50% 50%, #1c0308 0%, #0c0103 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.light-blob {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(140px);
+  opacity: 0.15;
+  transition: opacity 1s ease-in-out;
+}
+
+.light-blob-gold {
+  background: radial-gradient(circle, rgba(201, 162, 77, 0.45) 0%, transparent 70%);
+  top: -10%;
+  left: 10%;
+  animation: glow-breathe-gold 12s infinite alternate ease-in-out;
+}
+
+.light-blob-burgundy {
+  background: radial-gradient(circle, rgba(126, 28, 44, 0.5) 0%, transparent 70%);
+  bottom: -10%;
+  right: 10%;
+  animation: glow-breathe-burgundy 15s infinite alternate ease-in-out;
+}
+
+@keyframes glow-breathe-gold {
+  0% { transform: scale(1) translate(0px, 0px); opacity: 0.12; }
+  100% { transform: scale(1.15) translate(40px, 30px); opacity: 0.22; }
+}
+
+@keyframes glow-breathe-burgundy {
+  0% { transform: scale(1) translate(0px, 0px); opacity: 0.15; }
+  100% { transform: scale(1.2) translate(-30px, -40px); opacity: 0.25; }
+}
+
+.premium-glass-card {
+  background: linear-gradient(135deg, rgba(38, 5, 11, 0.65) 0%, rgba(18, 2, 5, 0.8) 100%);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(201, 162, 77, 0.22);
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+}
+
+.sheen-overlay::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 30%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  transform: rotate(25deg);
+  pointer-events: none;
+  animation: glass-glimmer 12s infinite ease-in-out;
+}
+
+@keyframes glass-glimmer {
+  0%, 10% { left: -60%; }
+  45%, 100% { left: 160%; }
+}
+
+.drift-card-1 {
+  animation: float-panel-1 14s infinite alternate ease-in-out;
+}
+
+.drift-card-2 {
+  animation: float-panel-2 16s infinite alternate ease-in-out;
+}
+
+.drift-card-3 {
+  animation: float-panel-3 18s infinite alternate ease-in-out;
+}
+
+@keyframes float-panel-1 {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-8px) rotate(0.5deg); }
+}
+
+@keyframes float-panel-2 {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(6px) rotate(-0.5deg); }
+}
+
+@keyframes float-panel-3 {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-5px) rotate(0.3deg); }
+}
+
+.breathing-glow-gold {
+  box-shadow: 0 0 15px rgba(201, 162, 77, 0.15);
+  animation: soft-pulse-gold 4s infinite alternate ease-in-out;
+}
+
+.breathing-glow-burgundy {
+  box-shadow: 0 0 15px rgba(90, 15, 29, 0.3);
+  animation: soft-pulse-burgundy 5s infinite alternate ease-in-out;
+}
+
+@keyframes soft-pulse-gold {
+  0% { box-shadow: 0 0 8px rgba(201, 162, 77, 0.1); border-color: rgba(201, 162, 77, 0.18); }
+  100% { box-shadow: 0 0 20px rgba(201, 162, 77, 0.35); border-color: rgba(201, 162, 77, 0.45); }
+}
+
+@keyframes soft-pulse-burgundy {
+  0% { box-shadow: 0 0 8px rgba(90, 15, 29, 0.2); }
+  100% { box-shadow: 0 0 20px rgba(90, 15, 29, 0.5); }
+}
+
+.gold-glow-text {
+  text-shadow: 0 0 8px rgba(201, 162, 77, 0.5);
+}
+
+.burgundy-glow-text {
+  text-shadow: 0 0 8px rgba(90, 15, 29, 0.6);
+}
+
+/* PREMIUM TERMINAL ADDITIONAL EFFECTS */
+.terminal-grid-bg {
+  background-image: 
+    linear-gradient(rgba(201, 162, 77, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 162, 77, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+  animation: grid-drift-animation 24s infinite linear;
+}
+
+@keyframes grid-drift-animation {
+  0% { background-position: 0 0; }
+  100% { background-position: 32px 32px; }
+}
+
+.glow-dot-pulse {
+  transform-origin: center;
+  animation: glow-dot-ping-animation 2.2s infinite ease-in-out;
+}
+
+@keyframes glow-dot-ping-animation {
+  0%, 100% { r: 5px; opacity: 0.9; }
+  50% { r: 10px; opacity: 0.45; }
+}
+
+.donut-segment {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset 1.8s ease-out;
+}
+
+
+
 
 
