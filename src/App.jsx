@@ -744,6 +744,647 @@ function AdmissionsBackgroundParticles() {
   );
 }
 
+// ==========================================
+// PREMIUM INTERACTIVE TRADING TERMINAL COMPONENT
+// ==========================================
+function PremiumTradingTerminal() {
+  const [candles, setCandles] = useState([]);
+  const [ticker, setTicker] = useState({
+    symbol: "BEEV/USD",
+    price: 75420.50,
+    change: 1.24,
+    high: 75850.00,
+    low: 74900.00,
+    volume: 245820,
+    spread: 0.02,
+    session: "DUBAI LIVE"
+  });
+
+  // Crosshair coordinate state
+  const [crosshair, setCrosshair] = useState({ x: null, y: null, active: false, price: null, time: null });
+
+  // Execution flashes state
+  const [executions, setExecutions] = useState([]);
+
+  // Generate initial candle dataset
+  useEffect(() => {
+    let currentPrice = 75100;
+    const initialCandles = [];
+    const now = new Date();
+    
+    for (let i = 24; i >= 0; i--) {
+      const candleTime = new Date(now.getTime() - i * 60000);
+      const timeStr = `${String(candleTime.getHours()).padStart(2, '0')}:${String(candleTime.getMinutes()).padStart(2, '0')}:${String(candleTime.getSeconds()).padStart(2, '0')}`;
+      
+      const openPrice = currentPrice;
+      const change = (Math.random() - 0.47) * 220; // slight positive drift
+      const closePrice = openPrice + change;
+      const highPrice = Math.max(openPrice, closePrice) + Math.random() * 80;
+      const lowPrice = Math.min(openPrice, closePrice) - Math.random() * 80;
+      const volumeVal = Math.floor(Math.random() * 600) + 150;
+      
+      // Random Buy/Sell markers on historical candles
+      let markerType = null;
+      if (i > 2 && Math.random() < 0.12) {
+        markerType = Math.random() > 0.5 ? 'buy' : 'sell';
+      }
+
+      initialCandles.push({
+        time: timeStr,
+        open: openPrice,
+        close: closePrice,
+        high: highPrice,
+        low: lowPrice,
+        volume: volumeVal,
+        marker: markerType
+      });
+      
+      currentPrice = closePrice;
+    }
+    
+    setCandles(initialCandles);
+    setTicker(prev => ({
+      ...prev,
+      price: currentPrice,
+      high: Math.max(...initialCandles.map(c => c.high)),
+      low: Math.min(...initialCandles.map(c => c.low))
+    }));
+  }, []);
+
+  // Update simulator logic: ticks and new candles
+  useEffect(() => {
+    if (candles.length === 0) return;
+
+    // 1. Gentle tick fluctuation interval (every 200ms)
+    const tickInterval = setInterval(() => {
+      setCandles(prevCandles => {
+        if (prevCandles.length === 0) return prevCandles;
+        
+        const nextCandles = [...prevCandles];
+        const latestIdx = nextCandles.length - 1;
+        const current = nextCandles[latestIdx];
+        
+        // Fluctuate close price
+        const priceTick = (Math.random() - 0.5) * 35;
+        const newClose = current.close + priceTick;
+        const newHigh = Math.max(current.high, newClose);
+        const newLow = Math.min(current.low, newClose);
+        const newVol = current.volume + Math.floor(Math.random() * 8);
+
+        nextCandles[latestIdx] = {
+          ...current,
+          close: newClose,
+          high: newHigh,
+          low: newLow,
+          volume: newVol
+        };
+
+        // Update ticker values
+        const firstOpen = nextCandles[0].open;
+        const percentageChange = ((newClose - firstOpen) / firstOpen) * 100;
+        
+        setTicker(prev => ({
+          ...prev,
+          price: newClose,
+          change: percentageChange,
+          high: Math.max(prev.high, newHigh),
+          low: Math.min(prev.low, newLow),
+          volume: prev.volume + Math.floor(Math.random() * 4)
+        }));
+
+        return nextCandles;
+      });
+    }, 200);
+
+    // 2. New Candle interval (every 4000ms)
+    const candleInterval = setInterval(() => {
+      setCandles(prevCandles => {
+        if (prevCandles.length === 0) return prevCandles;
+        
+        const nextCandles = [...prevCandles];
+        const lastCandle = nextCandles[nextCandles.length - 1];
+
+        // Format timestamp
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+        
+        // Randomly place a buy/sell execution flash on the chart
+        const rand = Math.random();
+        let marker = null;
+        if (rand < 0.25) {
+          const type = Math.random() > 0.5 ? 'buy' : 'sell';
+          marker = type;
+
+          // Add active trade execution flash
+          const price = lastCandle.close;
+          const newExecution = {
+            id: Date.now() + '-' + Math.random(),
+            x: 50 + 24 * 34.4 + 17.2, // latest candle X pos
+            price: price,
+            type: type,
+            amount: type === 'buy' ? `+100 BEEV` : `-100 BEEV`
+          };
+          setExecutions(prev => [...prev, newExecution]);
+          // Clean up execution after 1 second
+          setTimeout(() => {
+            setExecutions(prev => prev.filter(e => e.id !== newExecution.id));
+          }, 1000);
+        }
+
+        const newCandle = {
+          time: timeStr,
+          open: lastCandle.close,
+          close: lastCandle.close,
+          high: lastCandle.close,
+          low: lastCandle.close,
+          volume: Math.floor(Math.random() * 200) + 50,
+          marker: marker
+        };
+
+        nextCandles.push(newCandle);
+        
+        // Shift out oldest candle to pan chart left
+        if (nextCandles.length > 25) {
+          nextCandles.shift();
+        }
+
+        return nextCandles;
+      });
+    }, 4000);
+
+    return () => {
+      clearInterval(tickInterval);
+      clearInterval(candleInterval);
+    };
+  }, [candles.length]);
+
+  // Dimension helpers for coordinate mapping
+  // viewBox="0 0 1000 450"
+  // Left: 50, Right: 910, Width: 860
+  // Top: 40, Bottom: 360, Height: 320
+  const CHART_LEFT = 50;
+  const CHART_RIGHT = 910;
+  const CHART_TOP = 40;
+  const CHART_BOTTOM = 360;
+  const CHART_WIDTH = CHART_RIGHT - CHART_LEFT;
+  const CHART_HEIGHT = CHART_BOTTOM - CHART_TOP;
+  const TOTAL_CANDLES = 25;
+  const CANDLE_SPACING = CHART_WIDTH / TOTAL_CANDLES; // 860 / 25 = 34.4
+
+  const getX = (index) => CHART_LEFT + index * CANDLE_SPACING + (CANDLE_SPACING / 2);
+
+  // Price boundary mapping
+  const prices = candles.flatMap(c => [c.high, c.low]);
+  const minPrice = prices.length ? Math.min(...prices) * 0.999 : 74000;
+  const maxPrice = prices.length ? Math.max(...prices) * 1.001 : 76500;
+  const priceRange = maxPrice - minPrice;
+
+  const getY = (price) => {
+    if (priceRange === 0) return CHART_TOP + CHART_HEIGHT / 2;
+    return CHART_BOTTOM - ((price - minPrice) / priceRange) * CHART_HEIGHT;
+  };
+
+  // Map Y to Price for crosshair tooltip
+  const getPriceFromY = (y) => {
+    return minPrice + ((CHART_BOTTOM - y) / CHART_HEIGHT) * priceRange;
+  };
+
+  // Map X to Candle for crosshair tooltip
+  const getCandleFromX = (x) => {
+    const adjustedX = x - CHART_LEFT;
+    const idx = Math.floor(adjustedX / CANDLE_SPACING);
+    if (idx >= 0 && idx < candles.length) {
+      return candles[idx];
+    }
+    return null;
+  };
+
+  // Indicators calculations
+  const calculateEMA = (data, period = 9) => {
+    const k = 2 / (period + 1);
+    let emaVal = [];
+    if (data.length === 0) return emaVal;
+    let current = data[0].close;
+    emaVal.push(current);
+    for (let i = 1; i < data.length; i++) {
+      current = data[i].close * k + current * (1 - k);
+      emaVal.push(current);
+    }
+    return emaVal;
+  };
+
+  const calculateVWAP = (data) => {
+    let vwapVal = [];
+    let cumPriceVol = 0;
+    let cumVol = 0;
+    for (let i = 0; i < data.length; i++) {
+      const typical = (data[i].high + data[i].low + data[i].close) / 3;
+      cumPriceVol += typical * data[i].volume;
+      cumVol += data[i].volume;
+      vwapVal.push(cumVol > 0 ? cumPriceVol / cumVol : typical);
+    }
+    return vwapVal;
+  };
+
+  const emaValues = calculateEMA(candles, 9);
+  const vwapValues = calculateVWAP(candles);
+
+  // Generate lines SVG paths
+  const makeLinePath = (values) => {
+    if (candles.length < 2 || values.length < 2) return "";
+    return values.map((val, i) => `${i === 0 ? 'M' : 'L'} ${getX(i)} ${getY(val)}`).join(" ");
+  };
+
+  const emaPath = makeLinePath(emaValues);
+  const vwapPath = makeLinePath(vwapValues);
+
+  // Handle Mouse Events for Crosshair
+  const handleMouseMove = (e) => {
+    const svg = e.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    
+    // Scale client coordinate to SVG viewBox
+    const clientX = e.clientX - rect.left;
+    const clientY = e.clientY - rect.top;
+    
+    const svgX = (clientX / rect.width) * 1000;
+    const svgY = (clientY / rect.height) * 450;
+
+    // Constraints to main chart canvas
+    if (svgX >= CHART_LEFT && svgX <= CHART_RIGHT && svgY >= CHART_TOP && svgY <= CHART_BOTTOM) {
+      const activeCandle = getCandleFromX(svgX);
+      const hoveredPrice = getPriceFromY(svgY);
+      
+      setCrosshair({
+        x: svgX,
+        y: svgY,
+        active: true,
+        price: hoveredPrice,
+        time: activeCandle ? activeCandle.time : null
+      });
+    } else {
+      setCrosshair(prev => ({ ...prev, active: false }));
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setCrosshair(prev => ({ ...prev, active: false }));
+  };
+
+  // Format volume bar scale
+  const volumes = candles.map(c => c.volume);
+  const maxVolume = volumes.length ? Math.max(...volumes) : 100;
+
+  // Bullish/Bearish class details
+  const isUpSession = ticker.change >= 0;
+
+  return (
+    <div className="w-full flex flex-col bg-[#080102] text-white select-none font-sans leading-none relative">
+      
+      {/* Tickers Tape/Data Header */}
+      <div className="bg-[#0e0204] border-b border-gold/15 py-3 px-6 flex flex-wrap items-center justify-between gap-4 select-none relative z-10 text-[10px] tracking-wider uppercase font-semibold text-white/60">
+        
+        {/* Symbol and Pulse indicator */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5 font-bold text-white tracking-widest text-[11px]">
+            <span className="text-gold font-bold">★ {ticker.symbol}</span>
+          </div>
+          <div className="flex items-center gap-2 border-l border-white/10 pl-4">
+            <span className={`w-2 h-2 rounded-full ${isUpSession ? 'bg-emerald-500 animate-pulse' : 'bg-red-500 animate-pulse'}`}></span>
+            <span className={isUpSession ? 'text-emerald-400 font-bold' : 'text-red-400 font-bold'}>
+              ${ticker.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </span>
+            <span className={`font-bold ml-1 ${isUpSession ? 'text-emerald-400' : 'text-red-400'}`}>
+              {isUpSession ? '+' : ''}{ticker.change.toFixed(2)}%
+            </span>
+          </div>
+        </div>
+
+        {/* Market Stats details */}
+        <div className="flex items-center gap-5 text-[9px] font-mono text-white/40">
+          <div>H: <span className="text-white/80">${ticker.high.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span></div>
+          <div>L: <span className="text-white/80">${ticker.low.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span></div>
+          <div>VOL: <span className="text-white/80">{(ticker.volume / 1000).toFixed(1)}k</span></div>
+          <div>SPREAD: <span className="text-gold">${ticker.spread}</span></div>
+          <div className="border-l border-white/10 pl-5 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span className="text-emerald-400 font-bold">{ticker.session}</span>
+          </div>
+        </div>
+
+      </div>
+
+      {/* Main SVG Viewport */}
+      <div className="relative w-full overflow-hidden">
+        <svg 
+          viewBox="0 0 1000 450" 
+          className="w-full h-auto cursor-crosshair overflow-visible"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+        >
+          
+          {/* Subtle Grid Lines */}
+          <g className="grid-lines opacity-10">
+            {/* Horizontal lines */}
+            {Array.from({ length: 5 }).map((_, i) => {
+              const yVal = CHART_TOP + (CHART_HEIGHT / 5) * i;
+              return <line key={`grid-h-${i}`} x1={CHART_LEFT} y1={yVal} x2={CHART_RIGHT} y2={yVal} stroke="#ffffff" strokeDasharray="3 3" strokeWidth="0.5" />;
+            })}
+            {/* Vertical lines */}
+            {Array.from({ length: 6 }).map((_, i) => {
+              const xVal = CHART_LEFT + (CHART_WIDTH / 6) * i;
+              return <line key={`grid-v-${i}`} x1={xVal} y1={CHART_TOP} x2={xVal} y2={CHART_BOTTOM} stroke="#ffffff" strokeDasharray="3 3" strokeWidth="0.5" />;
+            })}
+          </g>
+
+          {/* Indicators layer: EMA and VWAP */}
+          {candles.length > 2 && (
+            <>
+              {/* VWAP Line (Translucent Cyan/Blue) */}
+              <path d={vwapPath} fill="none" stroke="#2563eb" strokeWidth="1.75" strokeOpacity="0.8" className="transition-all duration-300 ease-out" />
+              {/* EMA Line (Golden) */}
+              <path d={emaPath} fill="none" stroke="#D4AF37" strokeWidth="1.75" strokeOpacity="0.9" className="transition-all duration-300 ease-out" />
+            </>
+          )}
+
+          {/* Volume Chart underlay (placed at bottom, max height of 60 pixels) */}
+          <g className="volume-bars opacity-30">
+            {candles.map((candle, i) => {
+              const x = getX(i) - 4;
+              const barHeight = (candle.volume / maxVolume) * 50;
+              const y = CHART_BOTTOM - barHeight;
+              const isUp = candle.close >= candle.open;
+              return (
+                <rect 
+                  key={`vol-${i}`}
+                  x={x}
+                  y={y}
+                  width="8"
+                  height={barHeight}
+                  fill={isUp ? "#10B981" : "#EF4444"}
+                  rx="1"
+                />
+              );
+            })}
+          </g>
+
+          {/* Realistic OHLC Candlesticks */}
+          <g className="candlesticks">
+            {candles.map((candle, i) => {
+              const x = getX(i);
+              const openY = getY(candle.open);
+              const closeY = getY(candle.close);
+              const highY = getY(candle.high);
+              const lowY = getY(candle.low);
+              
+              const isBullish = candle.close >= candle.open;
+              const bodyY = Math.min(openY, closeY);
+              const bodyHeight = Math.max(1.5, Math.abs(openY - closeY));
+              
+              const strokeColor = isBullish ? "#10B981" : "#EF4444";
+              const fillColor = isBullish ? "#10B981" : "#EF4444";
+
+              return (
+                <g key={`candle-${i}`}>
+                  {/* Wicks (High to Low line) */}
+                  <line 
+                    x1={x}
+                    y1={highY}
+                    x2={x}
+                    y2={lowY}
+                    stroke={strokeColor}
+                    strokeWidth="1.25"
+                  />
+                  {/* Candle Body */}
+                  <rect 
+                    x={x - 6}
+                    y={bodyY}
+                    width="12"
+                    height={bodyHeight}
+                    fill={fillColor}
+                    stroke={strokeColor}
+                    strokeWidth="0.5"
+                    className="transition-all duration-150 ease-out"
+                    rx="1.5"
+                  />
+
+                  {/* Buy/Sell markers appearing under/above the candle */}
+                  {candle.marker === 'buy' && (
+                    <g className="animate-pulse">
+                      {/* Triangle pointing up */}
+                      <polygon 
+                        points={`${x},${lowY + 12} ${x - 5.5},${lowY + 21} ${x + 5.5},${lowY + 21}`} 
+                        fill="#10B981" 
+                        stroke="#ffffff"
+                        strokeWidth="0.5"
+                      />
+                      <text x={x} y={lowY + 29} fill="#10B981" fontSize="7.5" fontFamily="monospace" textAnchor="middle" fontWeight="bold">BUY</text>
+                    </g>
+                  )}
+                  {candle.marker === 'sell' && (
+                    <g className="animate-pulse">
+                      {/* Triangle pointing down */}
+                      <polygon 
+                        points={`${x},${highY - 12} ${x - 5.5},${highY - 21} ${x + 5.5},${highY - 21}`} 
+                        fill="#EF4444" 
+                        stroke="#ffffff"
+                        strokeWidth="0.5"
+                      />
+                      <text x={x} y={highY - 25} fill="#EF4444" fontSize="7.5" fontFamily="monospace" textAnchor="middle" fontWeight="bold">SELL</text>
+                    </g>
+                  )}
+                </g>
+              );
+            })}
+          </g>
+
+          {/* Live Price Tag Tracker (follows latest candle price Y coord) */}
+          {candles.length > 0 && (
+            <g className="latest-price-tag">
+              {/* Horizontal price line indicator */}
+              <line 
+                x1={CHART_LEFT} 
+                y1={getY(ticker.price)} 
+                x2={CHART_RIGHT} 
+                y2={getY(ticker.price)} 
+                stroke={isUpSession ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"} 
+                strokeDasharray="2 2" 
+                strokeWidth="0.75" 
+              />
+              {/* Price scale tag block */}
+              <rect 
+                x={CHART_RIGHT + 2} 
+                y={getY(ticker.price) - 8} 
+                width="84" 
+                height="16" 
+                fill={isUpSession ? "#10B981" : "#EF4444"} 
+                rx="3" 
+              />
+              <text 
+                x={CHART_RIGHT + 44} 
+                y={getY(ticker.price) + 4} 
+                fill="#ffffff" 
+                fontSize="8.5" 
+                fontFamily="monospace" 
+                fontWeight="bold" 
+                textAnchor="middle"
+              >
+                ${ticker.price.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+              </text>
+            </g>
+          )}
+
+          {/* Trade Executions Flashing Dots overlay */}
+          {executions.map(exec => (
+            <g key={exec.id} className="trade-execution-flash">
+              <circle 
+                cx={exec.x} 
+                cy={getY(exec.price)} 
+                r="18" 
+                fill="none" 
+                stroke={exec.type === 'buy' ? "#10B981" : "#EF4444"} 
+                strokeWidth="1.5" 
+                className="animate-ping opacity-60" 
+              />
+              <circle 
+                cx={exec.x} 
+                cy={getY(exec.price)} 
+                r="6" 
+                fill={exec.type === 'buy' ? "#10B981" : "#EF4444"} 
+                stroke="#ffffff" 
+                strokeWidth="1" 
+              />
+              <text 
+                x={exec.x} 
+                y={getY(exec.price) - 14} 
+                fill={exec.type === 'buy' ? "#10B981" : "#EF4444"} 
+                fontSize="8" 
+                fontFamily="monospace" 
+                fontWeight="bold" 
+                textAnchor="middle"
+                className="animate-pulse"
+              >
+                {exec.amount}
+              </text>
+            </g>
+          ))}
+
+          {/* Crosshair Interaction Layer */}
+          {crosshair.active && (
+            <g className="crosshair-interactive-group">
+              {/* Horizontal line */}
+              <line 
+                x1={CHART_LEFT} 
+                y1={crosshair.y} 
+                x2={CHART_RIGHT} 
+                y2={crosshair.y} 
+                stroke="#ffffff" 
+                strokeDasharray="4 4" 
+                strokeWidth="0.75" 
+                strokeOpacity="0.5" 
+              />
+              {/* Vertical line */}
+              <line 
+                x1={crosshair.x} 
+                y1={CHART_TOP} 
+                x2={crosshair.x} 
+                y2={CHART_BOTTOM} 
+                stroke="#ffffff" 
+                strokeDasharray="4 4" 
+                strokeWidth="0.75" 
+                strokeOpacity="0.5" 
+              />
+              
+              {/* Price axis label tooltip */}
+              <rect 
+                x={CHART_RIGHT + 2} 
+                y={crosshair.y - 8} 
+                width="84" 
+                height="16" 
+                fill="#D4AF37" 
+                rx="3" 
+              />
+              <text 
+                x={CHART_RIGHT + 44} 
+                y={crosshair.y + 4} 
+                fill="#0c0103" 
+                fontSize="8.5" 
+                fontFamily="monospace" 
+                fontWeight="bold" 
+                textAnchor="middle"
+              >
+                ${crosshair.price.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+              </text>
+
+              {/* Time axis label tooltip */}
+              {crosshair.time && (
+                <g>
+                  <rect 
+                    x={crosshair.x - 30} 
+                    y={CHART_BOTTOM + 2} 
+                    width="60" 
+                    height="15" 
+                    fill="#D4AF37" 
+                    rx="3" 
+                  />
+                  <text 
+                    x={crosshair.x} 
+                    y={CHART_BOTTOM + 12} 
+                    fill="#0c0103" 
+                    fontSize="8.5" 
+                    fontFamily="monospace" 
+                    fontWeight="bold" 
+                    textAnchor="middle"
+                  >
+                    {crosshair.time}
+                  </text>
+                </g>
+              )}
+            </g>
+          )}
+
+          {/* Right Price Scale Axis grid line and text */}
+          <line x1={CHART_RIGHT} y1={CHART_TOP} x2={CHART_RIGHT} y2={CHART_BOTTOM} stroke="rgba(201,162,77,0.2)" strokeWidth="1" />
+          <g className="price-axis-text text-[8.5px] font-mono fill-white/40">
+            {Array.from({ length: 5 }).map((_, i) => {
+              const pricePoint = minPrice + (priceRange / 5) * i;
+              const yVal = CHART_BOTTOM - (CHART_HEIGHT / 5) * i;
+              return (
+                <text key={`price-lbl-${i}`} x={CHART_RIGHT + 8} y={yVal + 3} textAnchor="start">
+                  ${pricePoint.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </text>
+              );
+            })}
+          </g>
+
+          {/* Horizontal Timeline scale at the bottom */}
+          <line x1={CHART_LEFT} y1={CHART_BOTTOM} x2={CHART_RIGHT} y2={CHART_BOTTOM} stroke="rgba(201,162,77,0.2)" strokeWidth="1" />
+          <g className="time-axis-text text-[8.5px] font-mono fill-white/40">
+            {candles.filter((_, idx) => idx % 4 === 0).map((candle, idx) => {
+              const xVal = getX(idx * 4);
+              return (
+                <g key={`time-lbl-${idx}`}>
+                  <line x1={xVal} y1={CHART_BOTTOM} x2={xVal} y2={CHART_BOTTOM + 4} stroke="rgba(201,162,77,0.3)" strokeWidth="0.75" />
+                  <text x={xVal} y={CHART_BOTTOM + 16} textAnchor="middle">
+                    {candle.time}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+
+        </svg>
+      </div>
+
+      {/* Floating Indicator labels */}
+      <div className="absolute top-16 left-16 flex gap-3 text-[7.5px] font-mono font-bold select-none tracking-widest pointer-events-none">
+        <span className="text-[#D4AF37] border border-gold/25 px-1.5 py-0.5 rounded bg-black/40">EMA (9)</span>
+        <span className="text-[#2563eb] border border-blue-500/25 px-1.5 py-0.5 rounded bg-black/40">VWAP</span>
+      </div>
+
+    </div>
+  );
+}
 
 export default function App() {
   // ==========================================
@@ -762,12 +1403,7 @@ export default function App() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [careerFormStatus, setCareerFormStatus] = useState({ loading: false, submitted: false });
 
-  // Futuristic Dashboard States
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const dashboardRef = useRef(null);
-  const [candleOffsets, setCandleOffsets] = useState([0, 0, 0, 0, 0, 0, 0, 0]); // 8 candles
-  const [stats, setStats] = useState({ sharpe: 0, winRate: 0, drawdown: 0, profit: 0 });
-  const [portfolioValue, setPortfolioValue] = useState(0);
+  // Futuristic Dashboard States (Removed in favor of embedded PremiumTradingTerminal)
 
   // Testimonial Autoplay Ref
   const autoplayRef = useRef(null);
@@ -962,16 +1598,8 @@ export default function App() {
         );
       }
 
-      // 4. Learning Journey / Ultra-Premium Trading Dashboard Animation Sequence
+      // 4. Admissions Section Animation Sequence
       if (document.querySelector('#admissions')) {
-        const animObj = {
-          portfolio: 0,
-          sharpe: 0,
-          winRate: 0,
-          drawdown: 0,
-          profit: 0
-        };
-
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: '#admissions',
@@ -980,86 +1608,15 @@ export default function App() {
           }
         });
 
-        // 1 & 2. Fade in from darkness & Slide in panels
-        tl.fromTo('.premium-glass-card', 
-          { opacity: 0, y: prefersReducedMotion ? 0 : 40, filter: prefersReducedMotion ? 'none' : 'blur(10px)' },
-          { opacity: 1, y: 0, filter: 'none', duration: 1.4, stagger: 0.2, ease: 'power3.out' }
+        tl.fromTo('.admissions-left-content',
+          { opacity: 0, x: prefersReducedMotion ? 0 : -50 },
+          { opacity: 1, x: 0, duration: 1.0, ease: 'power3.out' }
         );
 
-        // 3. Count up portfolio value & statistics cards (Step 4 stagger embedded)
-        tl.to(animObj, {
-          portfolio: 1254820,
-          sharpe: 3.92,
-          winRate: 78.4,
-          drawdown: 4.2,
-          profit: 14.8,
-          duration: 3.0,
-          ease: 'power1.out',
-          onUpdate: () => {
-            setPortfolioValue(Math.floor(animObj.portfolio));
-            setStats({
-              sharpe: animObj.sharpe.toFixed(2),
-              winRate: animObj.winRate.toFixed(1),
-              drawdown: animObj.drawdown.toFixed(1),
-              profit: animObj.profit.toFixed(1)
-            });
-          }
-        }, '-=1.0');
-
-        // 5. SVG Candlestick sequential draw
-        tl.fromTo('.terminal-candle',
-          { scaleY: 0, opacity: 0 },
-          { scaleY: 1, opacity: 1, duration: 1.0, stagger: 0.1, transformOrigin: 'bottom', ease: 'power2.out' },
-          '-=2.2'
-        );
-
-        // 6. SVG profit trendline draw
-        const trendline = document.querySelector('.profit-trendline');
-        if (trendline) {
-          const length = trendline.getTotalLength() || 1000;
-          tl.fromTo('.profit-trendline',
-            { strokeDasharray: length, strokeDashoffset: length },
-            { strokeDashoffset: 0, duration: 2.2, ease: 'power1.inOut' },
-            '-=2.5'
-          );
-        }
-        
-        tl.fromTo('.trendline-glow-dot',
-          { opacity: 0, scale: 0 },
-          { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out' },
-          '-=0.3'
-        );
-
-        // 7. Donut segments rot and fill
-        tl.fromTo('.donut-segment',
-          { strokeDashoffset: 283 },
-          { strokeDashoffset: (i, target) => {
-              const offset = target.getAttribute('data-offset');
-              return offset ? parseFloat(offset) : 0;
-            }, 
-            duration: 1.6, 
-            ease: 'power2.out' 
-          },
-          '-=1.4'
-        );
-        tl.fromTo('.donut-chart-svg',
-          { rotate: -180 },
-          { rotate: 0, duration: 1.6, ease: 'power2.out' },
-          '-=1.6'
-        );
-
-        // 8. Performance vertical bars grow
-        tl.fromTo('.performance-bar',
-          { scaleY: 0 },
-          { scaleY: 1, duration: 1.2, stagger: 0.08, transformOrigin: 'bottom', ease: 'power2.out' },
-          '-=1.4'
-        );
-
-        // 9. Recent trades panel slide from right
-        tl.fromTo('.trade-row',
-          { x: 30, opacity: 0 },
-          { x: 0, opacity: 1, duration: 0.6, stagger: 0.08, ease: 'power2.out' },
-          '-=1.0'
+        tl.fromTo('.admissions-right-content',
+          { opacity: 0, x: prefersReducedMotion ? 0 : 50, scale: prefersReducedMotion ? 1 : 0.97 },
+          { opacity: 1, x: 0, scale: 1, duration: 1.2, ease: 'power3.out' },
+          '-=0.8'
         );
       }
 
@@ -1500,55 +2057,8 @@ export default function App() {
   );
 
   const renderJourney = () => {
-    // 8 Candles data for sequential rendering & live wiggles
-    const candles = [
-      { id: 0, x: 80, open: 260, close: 240, high: 220, low: 280, color: 'up' },
-      { id: 1, x: 180, open: 240, close: 220, high: 200, low: 260, color: 'up' },
-      { id: 2, x: 280, open: 225, close: 245, high: 210, low: 265, color: 'down' },
-      { id: 3, x: 380, open: 240, close: 200, high: 180, low: 250, color: 'up' },
-      { id: 4, x: 480, open: 200, close: 170, high: 150, low: 220, color: 'up' },
-      { id: 5, x: 580, open: 175, close: 195, high: 160, low: 215, color: 'down' },
-      { id: 6, x: 680, open: 190, close: 130, high: 110, low: 200, color: 'up' },
-      { id: 7, x: 780, open: 130, close: 80, high: 60, low: 150, color: 'up' }
-    ];
-
-    const performanceBars = [
-      { month: "Jan", val: 8.5 },
-      { month: "Feb", val: 12.2 },
-      { month: "Mar", val: 14.8 },
-      { month: "Apr", val: 9.1 },
-      { month: "May", val: 16.4 },
-      { month: "Jun", val: 13.0 }
-    ];
-
-    const recentTrades = [
-      { time: "10:34:12", type: "BUY", asset: "BEEV/INR", size: "1,250", profit: "+₹14,250", status: "WIN" },
-      { time: "10:32:05", type: "SELL", asset: "GOLD/INR", size: "2.5oz", profit: "+₹8,120", status: "WIN" },
-      { time: "10:28:49", type: "BUY", asset: "BEEV/INR", size: "900", profit: "-₹2,400", status: "LOSS" },
-      { time: "10:25:11", type: "BUY", asset: "BTC/INR", size: "0.15", profit: "+₹22,940", status: "WIN" },
-      { time: "10:19:30", type: "SELL", asset: "EUR/INR", size: "20k", profit: "+₹5,800", status: "WIN" }
-    ];
-
-    const handleMouseMove = (e) => {
-      if (!dashboardRef.current) return;
-      const rect = dashboardRef.current.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
-      const relX = (e.clientX - rect.left) / width - 0.5;
-      const relY = (e.clientY - rect.top) / height - 0.5;
-      const maxRotation = 3.5; // very subtle luxury 3-5 degrees
-      setTilt({
-        x: relX * maxRotation,
-        y: -relY * maxRotation
-      });
-    };
-
-    const handleMouseLeave = () => {
-      setTilt({ x: 0, y: 0 });
-    };
-
     return (
-      <section id="admissions" className="py-20 md:py-32 bg-[#0c0103] text-center relative overflow-hidden">
+      <section id="admissions" className="py-20 md:py-32 bg-[#0c0103] text-left relative overflow-hidden">
         {/* Cinematic Backdrop Volumetric lighting */}
         <div className="absolute inset-0 bg-radial-gradient from-burgundy-dark/45 via-[#0c0103] to-[#090001] pointer-events-none z-0"></div>
         <div className="light-blob light-blob-gold z-0 opacity-25"></div>
@@ -1561,404 +2071,36 @@ export default function App() {
         <div className="absolute inset-0 terminal-grid-bg opacity-35 z-0 pointer-events-none"></div>
 
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
-          <div className="mb-16">
-            <span className="font-sans uppercase text-gold text-[11px] tracking-[0.2em] font-semibold block mb-3 animate-pulse">
-              PRO TRADING PLATFORM
-            </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-white mb-6 font-bold tracking-wide">
-              Elite Educational Environment
-            </h2>
-            <div className="w-[80px] h-[2px] bg-gold mx-auto mb-4 opacity-50"></div>
-            <p className="text-sm text-white/50 max-w-[650px] mx-auto leading-relaxed">
-              Step into the Beever Trading Academy Terminal. Master liquidity flows, risk metrics, and automated algorithms in real-time.
-            </p>
-          </div>
-
-          {/* Interactive Parallax tilt container */}
-          <div 
-            ref={dashboardRef}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            className="transition-transform duration-500 ease-out select-none relative z-10 w-full"
-            style={{
-              transform: `perspective(1200px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
-              transformStyle: 'preserve-3d'
-            }}
-          >
-            {/* Unified Luxury Dashboard Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* LEFT COLUMN: Text Copy */}
+            <div className="lg:col-span-5 flex flex-col justify-center select-none z-10 text-white pr-0 lg:pr-8 admissions-left-content">
+              <span className="font-sans uppercase text-gold text-[11px] tracking-[0.2em] font-semibold block mb-4 animate-pulse">
+                ADMISSIONS & ENROLLMENT
+              </span>
+              <h2 className="text-4xl md:text-5xl lg:text-[52px] font-serif leading-[1.1] text-white mb-6 font-bold tracking-wide">
+                Master the Markets<br/>
+                <span className="text-gold">with Confidence.</span>
+              </h2>
+              <div className="w-[80px] h-[2px] bg-gold mb-6 opacity-60"></div>
+              <p className="text-sm md:text-base text-white/70 font-light leading-relaxed mb-8 max-w-[520px]">
+                Beever Academy offers Dubai's premier environment for high-end financial markets training and strategic wealth development. Gain access to expert instruction, institutional-grade tools, and real-time market simulators. Join a cohort of high-performing leaders, master liquidity dynamics, and advance your trading journey today.
+              </p>
               
-              {/* LEFT & CENTER PANEL: Chart Terminal, Allocation & Growth */}
-              <div className="lg:col-span-8 flex flex-col gap-6">
-                
-                {/* Main Pro Chart Terminal */}
-                <div className="premium-glass-card sheen-overlay flex flex-col justify-between overflow-hidden relative border border-gold/15 bg-burgundy-dark/10 rounded-2xl shadow-2xl">
-                  
-                  {/* Header Bar */}
-                  <div className="bg-burgundy-dark/90 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4 font-sans text-xs border-b border-gold/15 select-none relative z-10">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></div>
-                      <span className="font-bold tracking-widest text-[9.5px] text-white/95">BEEVER PRO TERMINAL v5.0</span>
-                    </div>
-                    
-                    {/* Live Portfolio Value Rolling Display */}
-                    <div className="flex items-center gap-6 font-mono text-[11px]">
-                      <div className="flex items-center gap-2">
-                        <span className="text-white/40 font-medium">PAIR:</span>
-                        <span className="font-semibold text-gold">BEEV/INR</span>
-                      </div>
-                      <div className="flex items-center gap-2 border-l border-white/10 pl-6">
-                        <span className="text-white/40 font-medium">PORTFOLIO VAL:</span>
-                        <span className="font-bold text-white tracking-wide text-xs">
-                          ₹{portfolioValue.toLocaleString('en-IN')}.50
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* SVG Chart Screen */}
-                  <div className="p-6 md:p-8 relative overflow-hidden select-none bg-burgundy-dark/5 min-h-[300px]">
-                    
-                    {/* Live indicator dot */}
-                    <div className="absolute top-4 right-4 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono text-[8px] tracking-widest font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></span> LIVE CONNECTED
-                    </div>
-
-                    <svg viewBox="0 0 900 320" className="w-full h-auto overflow-visible">
-                      <defs>
-                        <filter id="chartGlow" x="-20%" y="-20%" width="140%" height="140%">
-                          <feGaussianBlur stdDeviation="3.5" result="blur" />
-                          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                        </filter>
-                        <linearGradient id="curveGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#7E1C2C" />
-                          <stop offset="100%" stopColor="#D4AF37" />
-                        </linearGradient>
-                        <linearGradient id="areaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.06" />
-                          <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.0" />
-                        </linearGradient>
-                        <linearGradient id="candleUpGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="0%" stopColor="#10B981" />
-                          <stop offset="100%" stopColor="#059669" />
-                        </linearGradient>
-                        <linearGradient id="candleDownGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="0%" stopColor="#EF4444" />
-                          <stop offset="100%" stopColor="#DC2626" />
-                        </linearGradient>
-                      </defs>
-
-                      {/* Horizontal Grid lines */}
-                      {[40, 110, 180, 250].map((yVal, index) => (
-                        <g key={`grid-h-${index}`}>
-                          <line x1={50} y1={yVal} x2={830} y2={yVal} stroke="rgba(212, 175, 55, 0.05)" strokeWidth="0.75" />
-                          <text x={840} y={yVal + 3} fill="rgba(255, 255, 255, 0.3)" fontSize={8.5} fontFamily="monospace" textAnchor="start">
-                            ₹{(400000 - index * 100000).toLocaleString('en-IN')}
-                          </text>
-                        </g>
-                      ))}
-
-                      {/* Shaded Area Under the Curve */}
-                      <path 
-                        d="M 80,250 C 180,240 180,220 280,235 C 380,200 480,170 580,185 C 680,130 780,80 820,70 L 820,290 L 80,290 Z" 
-                        fill="url(#areaGrad)" 
-                      />
-
-                      {/* Glowing Trendline Curve */}
-                      <path 
-                        className="profit-trendline"
-                        d="M 80,250 C 180,240 180,220 280,235 C 380,200 480,170 580,185 C 680,130 780,80 820,70" 
-                        fill="none" 
-                        stroke="url(#curveGrad)" 
-                        strokeWidth="2.5" 
-                        filter="url(#chartGlow)"
-                      />
-
-                      {/* Trendline tip glowing dot */}
-                      <circle 
-                        className="trendline-glow-dot glow-dot-pulse"
-                        cx={820}
-                        cy={70}
-                        r={5.5}
-                        fill="#D4AF37"
-                        stroke="#0c0103"
-                        strokeWidth={2}
-                      />
-
-                      {/* Candlesticks Sequential Layer */}
-                      {candles.map((candle, i) => {
-                        const { high, low, open, close, color } = candle;
-                        const x = candle.x;
-                        const offset = candleOffsets[i] || 0;
-                        const currentOpen = open + offset;
-                        const currentClose = close - offset * 0.8;
-                        const bodyY = Math.min(currentOpen, currentClose);
-                        const bodyH = Math.max(5, Math.abs(currentOpen - currentClose));
-                        const wickHigh = high + offset * 1.1;
-                        const wickLow = low + offset * 0.9;
-
-                        return (
-                          <g key={`candle-${i}`} className="terminal-candle">
-                            {/* Wick */}
-                            <line 
-                              x1={x} 
-                              y1={wickHigh} 
-                              x2={x} 
-                              y2={wickLow} 
-                              stroke={color === 'up' ? "#10B981" : "#EF4444"} 
-                              strokeWidth={1} 
-                              strokeOpacity={0.6}
-                            />
-                            {/* Candle Body */}
-                            <rect 
-                              x={x - 4} 
-                              y={bodyY} 
-                              width={8} 
-                              height={bodyH} 
-                              fill={color === 'up' ? "url(#candleUpGrad)" : "url(#candleDownGrad)"} 
-                              rx={1.5}
-                            />
-                          </g>
-                        );
-                      })}
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Sub row: Donut Allocation & Performance Bars */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  
-                  {/* Donut Allocation Panel */}
-                  <div className="premium-glass-card sheen-overlay p-6 border border-gold/15 bg-burgundy-dark/15 rounded-xl text-left relative overflow-hidden flex flex-col justify-between">
-                    <div>
-                      <span className="text-[9px] uppercase tracking-widest text-gold font-mono block mb-1">ASSET ALLOCATION</span>
-                      <h4 className="text-base text-white font-serif font-semibold">Active Fund Distribution</h4>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-6 mt-6">
-                      <div className="w-[120px] h-[120px] relative flex justify-center items-center flex-shrink-0">
-                        {/* Radial SVG Donut */}
-                        <svg width="120" height="120" viewBox="0 0 120 120" className="donut-chart-svg overflow-visible">
-                          {/* Track */}
-                          <circle cx="60" cy="60" r="45" fill="transparent" stroke="rgba(255, 255, 255, 0.04)" strokeWidth="12" />
-                          
-                          {/* Segment 1: Equities 45% (offset: 283 * 0.55 = 155.65) */}
-                          <circle 
-                            className="donut-segment" 
-                            cx="60" 
-                            cy="60" 
-                            r="45" 
-                            fill="transparent" 
-                            stroke="#D4AF37" 
-                            strokeWidth="12" 
-                            strokeDasharray="283" 
-                            data-offset="155.65"
-                          />
-                          
-                          {/* Segment 2: Crypto 25% (offset: 283 * 0.75 = 212.25) */}
-                          <circle 
-                            className="donut-segment" 
-                            cx="60" 
-                            cy="60" 
-                            r="45" 
-                            fill="transparent" 
-                            stroke="#10B981" 
-                            strokeWidth="12" 
-                            strokeDasharray="283" 
-                            data-offset="212.25"
-                            style={{ transform: 'rotate(72deg)', transformOrigin: '50% 50%' }}
-                          />
-
-                          {/* Segment 3: Forex 20% (offset: 283 * 0.80 = 226.4) */}
-                          <circle 
-                            className="donut-segment" 
-                            cx="60" 
-                            cy="60" 
-                            r="45" 
-                            fill="transparent" 
-                            stroke="#EF4444" 
-                            strokeWidth="12" 
-                            strokeDasharray="283" 
-                            data-offset="226.4"
-                            style={{ transform: 'rotate(162deg)', transformOrigin: '50% 50%' }}
-                          />
-
-                          {/* Segment 4: Cash 10% (offset: 283 * 0.90 = 254.7) */}
-                          <circle 
-                            className="donut-segment" 
-                            cx="60" 
-                            cy="60" 
-                            r="45" 
-                            fill="transparent" 
-                            stroke="rgba(255, 255, 255, 0.2)" 
-                            strokeWidth="12" 
-                            strokeDasharray="283" 
-                            data-offset="254.7"
-                            style={{ transform: 'rotate(234deg)', transformOrigin: '50% 50%' }}
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex flex-col justify-center items-center">
-                          <span className="font-mono text-xs font-bold text-white">4 Funds</span>
-                          <span className="text-[8px] text-white/40 tracking-wider">SECURED</span>
-                        </div>
-                      </div>
-
-                      <div className="flex-grow flex flex-col gap-2 font-sans text-[10.5px]">
-                        <div className="flex justify-between items-center">
-                          <span className="flex items-center gap-1.5 text-white/70">
-                            <span className="w-2 h-2 rounded-full bg-gold"></span> Equities
-                          </span>
-                          <span className="font-mono font-bold text-white">45%</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="flex items-center gap-1.5 text-white/70">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Cryptos
-                          </span>
-                          <span className="font-mono font-bold text-white">25%</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="flex items-center gap-1.5 text-white/70">
-                            <span className="w-2 h-2 rounded-full bg-red-500"></span> Forex
-                          </span>
-                          <span className="font-mono font-bold text-white">20%</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="flex items-center gap-1.5 text-white/70">
-                            <span className="w-2 h-2 rounded-full bg-white/20"></span> Liquidity
-                          </span>
-                          <span className="font-mono font-bold text-white">10%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Growth/Performance vertical bars */}
-                  <div className="premium-glass-card sheen-overlay p-6 border border-gold/15 bg-burgundy-dark/15 rounded-xl text-left relative overflow-hidden flex flex-col justify-between">
-                    <div>
-                      <span className="text-[9px] uppercase tracking-widest text-gold font-mono block mb-1">PERFORMANCE METRICS</span>
-                      <h4 className="text-base text-white font-serif font-semibold">Monthly Profit Expansion</h4>
-                    </div>
-
-                    <div className="flex items-end justify-between gap-3 h-[100px] mt-6 select-none font-mono text-[9px]">
-                      {performanceBars.map((bar, index) => {
-                        // Max value is 16.4 for scaling
-                        const heightPct = (bar.val / 18) * 100;
-                        return (
-                          <div key={index} className="flex flex-col items-center flex-grow">
-                            <span className="text-gold/90 text-[8px] mb-1">+{bar.val}%</span>
-                            <div className="w-full bg-burgundy/25 border border-gold/10 hover:border-gold/30 rounded-t-sm relative overflow-hidden h-[70px]">
-                              <div 
-                                className="performance-bar absolute bottom-0 left-0 right-0 gold-gradient-bg opacity-75"
-                                style={{ height: `${heightPct}%` }}
-                              ></div>
-                            </div>
-                            <span className="text-white/40 text-[9px] mt-2 block">{bar.month}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
+              <div className="admission-action-btn relative z-10">
+                <a href="#contact" className="inline-flex btn px-8 py-4 font-semibold uppercase tracking-widest shadow-lg hover:shadow-xl hover:-translate-y-[2px] transition-all duration-300 items-center gap-2 gold-gradient-bg text-burgundy-dark font-sans text-xs">
+                  <span>Start Your Trading Journey</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
               </div>
-
-              {/* RIGHT SIDE PANEL: Stats Cards & Recent Trade Logs */}
-              <div className="lg:col-span-4 flex flex-col gap-6">
-                
-                {/* Staggered Stats Cards */}
-                <div className="grid grid-cols-2 gap-4">
-                  
-                  {/* Win Rate */}
-                  <div className="premium-glass-card p-4 border border-gold/15 bg-burgundy-dark/20 text-left rounded-xl animate-pulse-slow">
-                    <span className="text-[9px] uppercase tracking-widest text-white/40 block mb-1 font-mono">Win Ratio</span>
-                    <h4 className="text-2xl font-serif font-bold text-white gold-glow-text">
-                      {stats.winRate}%
-                    </h4>
-                    <span className="text-[8px] text-emerald-400 font-mono tracking-wider block mt-1">✔ MODEL SECURED</span>
-                  </div>
-
-                  {/* Sharpe Ratio */}
-                  <div className="premium-glass-card p-4 border border-gold/15 bg-burgundy-dark/20 text-left rounded-xl">
-                    <span className="text-[9px] uppercase tracking-widest text-white/40 block mb-1 font-mono">Sharpe Index</span>
-                    <h4 className="text-2xl font-serif font-bold text-white gold-glow-text">
-                      {stats.sharpe}
-                    </h4>
-                    <span className="text-[8px] text-gold font-mono tracking-wider block mt-1">★ EXCELLENT GRADE</span>
-                  </div>
-
-                  {/* Max Drawdown */}
-                  <div className="premium-glass-card p-4 border border-gold/15 bg-burgundy-dark/20 text-left rounded-xl">
-                    <span className="text-[9px] uppercase tracking-widest text-white/40 block mb-1 font-mono">Max Drawdown</span>
-                    <h4 className="text-2xl font-serif font-bold text-white gold-glow-text">
-                      {stats.drawdown}%
-                    </h4>
-                    <span className="text-[8px] text-emerald-400 font-mono tracking-wider block mt-1">↓ RISK STABLE</span>
-                  </div>
-
-                  {/* Monthly Profit */}
-                  <div className="premium-glass-card p-4 border border-gold/15 bg-burgundy-dark/20 text-left rounded-xl">
-                    <span className="text-[9px] uppercase tracking-widest text-white/40 block mb-1 font-mono">Avg Return</span>
-                    <h4 className="text-2xl font-serif font-bold text-white gold-glow-text">
-                      +{stats.profit}%
-                    </h4>
-                    <span className="text-[8px] text-gold font-mono tracking-wider block mt-1">↑ PERFORMANCE</span>
-                  </div>
-
-                </div>
-
-                {/* Recent Trade Panel (Slides from right) */}
-                <div className="premium-glass-card p-6 border border-gold/15 bg-burgundy-dark/15 rounded-2xl flex-grow flex flex-col justify-between text-left relative overflow-hidden">
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <span className="text-[9px] uppercase tracking-widest text-gold font-mono block mb-1">TRANSACTIONS FEED</span>
-                        <h4 className="text-base text-white font-serif font-semibold">Live Academy Trades</h4>
-                      </div>
-                      <span className="flex items-center gap-1.5 text-[8.5px] uppercase font-mono text-emerald-400 border border-emerald-500/25 px-2 py-0.5 rounded bg-emerald-500/5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> PULSING FEED
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col gap-3 font-mono text-[10.5px]">
-                      {recentTrades.map((trade, index) => {
-                        const isWin = trade.status === "WIN";
-                        return (
-                          <div 
-                            key={index} 
-                            className="trade-row p-3 rounded-lg bg-burgundy/15 border border-white/5 flex items-center justify-between hover:border-gold/20 transition-all duration-300 select-none"
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded leading-none ${isWin ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
-                                {trade.type}
-                              </span>
-                              <div>
-                                <span className="font-semibold text-white block leading-none mb-1">{trade.asset}</span>
-                                <span className="text-white/40 text-[9px] block leading-none">{trade.time}</span>
-                              </div>
-                            </div>
-                            
-                            <div className="text-right">
-                              <span className={`font-bold block leading-none mb-1 ${isWin ? 'text-emerald-400' : 'text-red-400'}`}>{trade.profit}</span>
-                              <span className="text-white/40 text-[9px] block leading-none">Size: {trade.size}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="mt-6 pt-4 border-t border-white/10">
-                    <a href="#contact" className="btn btn-gold w-full text-center text-[10px] py-3.5 tracking-wider font-semibold uppercase block shadow-gold bg-gold text-burgundy-dark hover:-translate-y-[2px] transition-all duration-300">
-                      Connect to Academy API
-                    </a>
-                  </div>
-                </div>
-
-              </div>
-
             </div>
-          </div>
 
+            {/* RIGHT COLUMN: Interactive Embedded Trading Terminal */}
+            <div className="lg:col-span-7 w-full overflow-hidden border border-gold/15 bg-black rounded-2xl shadow-2xl relative z-10 admissions-right-content">
+              <PremiumTradingTerminal />
+            </div>
+
+          </div>
         </div>
       </section>
     );
