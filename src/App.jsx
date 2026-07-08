@@ -6,7 +6,7 @@ import {
   Monitor, Briefcase, ChevronLeft, ChevronRight, 
   MapPin, Phone, Mail, Facebook, Instagram, Linkedin, Youtube, 
   Quote, Sparkles, Menu, X, ArrowRight, CheckCircle2,
-  Star, TrendingUp, Trophy, Clock, Compass
+  Star, TrendingUp, Trophy, Clock, Compass, MessageSquare
 } from 'lucide-react';
 
 // Import local logo from assets
@@ -1416,7 +1416,7 @@ export default function App() {
       name: "Victoria Kincaid",
       meta: "Investment Banking Associate",
       rating: 5,
-      img: "/student_avatar_woman.png"
+      img: "https://placehold.co/150x150/170105/D4AF37/png?text=VK"
     },
     {
       heading: "Professional Growth",
@@ -1424,7 +1424,7 @@ export default function App() {
       name: "Charles Harrison",
       meta: "Senior Tech Consultant",
       rating: 5,
-      img: "/student_avatar_man.png"
+      img: "https://placehold.co/150x150/170105/D4AF37/png?text=CH"
     },
     {
       heading: "Industry Success",
@@ -1432,7 +1432,7 @@ export default function App() {
       name: "Aravind Sharma",
       meta: "Co-Founder, Fintech Solutions",
       rating: 5,
-      img: "/student_avatar_young.png"
+      img: "https://placehold.co/150x150/170105/D4AF37/png?text=AS"
     }
   ];
 
@@ -1454,30 +1454,6 @@ export default function App() {
       window.addEventListener('load', handleLoadComplete);
       return () => window.removeEventListener('load', handleLoadComplete);
     }
-  }, []);
-
-  // 1. Live Market Candlestick Fluctuations (8 Candles wiggles)
-  useEffect(() => {
-    let frameId;
-    let time = 0;
-    
-    const updateMarket = () => {
-      time += 0.04;
-      setCandleOffsets([
-        Math.sin(time) * 1.2 + (Math.sin(time * 0.7) * 0.3),
-        Math.cos(time * 0.8) * 1.0 + (Math.sin(time * 0.5) * 0.2),
-        Math.sin(time * 1.2) * 1.5 + (Math.cos(time * 0.6) * 0.3),
-        Math.cos(time * 0.5) * 1.3 + (Math.sin(time * 0.9) * 0.2),
-        Math.sin(time * 0.9) * 1.1 + (Math.cos(time * 0.4) * 0.4),
-        Math.cos(time * 1.1) * 1.4 + (Math.sin(time * 0.7) * 0.3),
-        Math.sin(time * 0.7) * 1.2 + (Math.cos(time * 1.0) * 0.2),
-        Math.cos(time * 1.3) * 1.0 + (Math.sin(time * 0.5) * 0.3)
-      ]);
-      frameId = requestAnimationFrame(updateMarket);
-    };
-    
-    frameId = requestAnimationFrame(updateMarket);
-    return () => cancelAnimationFrame(frameId);
   }, []);
 
   // Hash Change SPA Routing
@@ -1845,37 +1821,50 @@ export default function App() {
   const renderWhyChooseUs = () => (
     <section id="why-choose-us" className="py-20 md:py-32 bg-white text-center">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
-        <div className="mb-20">
+        <div className="mb-16">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Heritage of Distinction
           </span>
           <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
             Why Choose Beever Academy?
           </h2>
-          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
+          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-8"></div>
+          <p className="text-sm md:text-base text-text-secondary max-w-[900px] mx-auto leading-relaxed text-justify md:text-center">
+            At Beever Academy, we are committed to delivering an educational experience that goes beyond the classroom. Our focus is on providing premium financial education through practical learning, experienced professionals, and a student-first approach. Every aspect of our academy is designed to help learners build knowledge, confidence, and the skills required to succeed in an ever-evolving financial landscape.
+          </p>
         </div>
 
-        <div className="features-grid-el grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+        <div className="features-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[
             {
-              icon: <BookOpen className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
-              title: "Industry-Focused Training",
-              desc: "Learn practical skills through real-world projects, case studies, and hands-on learning experiences."
+              icon: <GraduationCap className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
+              title: "Premium Financial Education",
+              desc: "Experience high-quality learning designed to meet professional standards while remaining accessible through affordable pricing."
+            },
+            {
+              icon: <TrendingUp className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
+              title: "Practical Learning",
+              desc: "Our training approach emphasizes real-world understanding, helping learners develop practical knowledge that can be applied with confidence."
             },
             {
               icon: <Award className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
-              title: "10+ Years of Combined Experience",
-              desc: "Gain knowledge from professionals with over a decade of industry expertise."
+              title: "20+ Years of Collective Expertise",
+              desc: "Benefit from the combined knowledge and experience of professionals from different corners of the financial industry."
+            },
+            {
+              icon: <Shield className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
+              title: "Affordable Excellence",
+              desc: "We believe that premium financial education should be accessible without compromising quality, ensuring exceptional value for every learner."
             },
             {
               icon: <Users className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
-              title: "Expert-Led Learning",
-              desc: "Learn directly from specialists from diverse industry backgrounds and domains."
+              title: "Student-Centered Learning",
+              desc: "Every learner's journey matters. We are committed to creating a supportive environment that encourages continuous learning and personal growth."
             },
             {
-              icon: <Briefcase className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
-              title: "Career-Oriented Approach",
-              desc: "Bridge the gap between theory and application with training designed for professional success."
+              icon: <Trophy className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
+              title: "A Commitment to Excellence",
+              desc: "Our goal is to empower individuals with the knowledge, discipline, and mindset needed to build a strong foundation for lifelong learning and professional success."
             }
           ].map((feat, i) => (
             <div key={i} className="feature-card-el bg-white p-10 border border-black/5 rounded-2xl shadow-sm hover:-translate-y-[5px] hover:shadow-xl hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
@@ -1888,6 +1877,12 @@ export default function App() {
             </div>
           ))}
         </div>
+
+        <div className="mt-16 text-center">
+          <p className="font-serif text-2xl md:text-3xl text-burgundy italic font-semibold">
+            "Learn Today. Lead Tomorrow."
+          </p>
+        </div>
       </div>
     </section>
   );
@@ -1898,7 +1893,7 @@ export default function App() {
         <div className="about-grid-el grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           {/* Visual Column */}
           <div className="about-img-box-el relative border border-burgundy/10 p-[15px] bg-white shadow-md rounded-2xl">
-            <img src="/hero_building.png" alt="Grand Academy Facade" className="w-full h-[280px] sm:h-[380px] lg:h-[480px] object-cover rounded-xl" />
+            <img src="https://placehold.co/800x600/170105/D4AF37/png?text=About+Beever+Academy" alt="Grand Academy Facade" className="w-full h-[280px] sm:h-[380px] lg:h-[480px] object-cover rounded-xl" />
             
             {/* Overlay Glass Card */}
             <div className="about-glass-card-el absolute -bottom-10 right-4 lg:-right-10 w-[280px] bg-burgundy/90 backdrop-blur-[12px] border border-gold/30 p-8 shadow-2xl text-white rounded-2xl hidden sm:block">
@@ -1915,43 +1910,49 @@ export default function App() {
             <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
               Since 2016
             </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6 font-medium">
+            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-4 font-medium">
               About Beever Academy
             </h2>
+            <h3 className="text-lg md:text-xl font-serif text-gold-dark mb-6 font-medium italic">
+              Premium Financial Education. Affordable for Everyone.
+            </h3>
             <div className="w-[80px] h-[2px] bg-gold-gradient mb-8"></div>
             
             <div className="text-sm text-text-secondary leading-relaxed flex flex-col gap-6 mb-10 text-justify">
               <p>
-                At Beever Academy, we are committed to transforming knowledge into success. Backed by a team of professionals with over 10 years of combined industry experience, we deliver practical, industry-focused training designed to equip individuals with the skills needed to thrive in a rapidly evolving world.
+                At Beever Academy, we believe that quality financial education should be accessible to everyone. Our vision is to deliver premium, industry-focused learning at an affordable price, empowering individuals with the knowledge, confidence, and practical skills needed to succeed in today's dynamic financial world.
               </p>
               <p>
-                Our team consists of specialists from different areas of the industry, bringing diverse expertise, real-world experience, and valuable insights into every training program we offer.
+                Founded by a team of professionals from different corners of the financial industry, Beever Academy brings together more than 20 years of collective expertise across financial markets, trading, wealth management, leadership, sales, and professional development. This diverse experience enables us to deliver practical, relevant, and career-focused education that reflects real industry standards.
               </p>
               <p>
-                We focus on bridging the gap between learning and application, ensuring that our students gain not only knowledge but also the confidence to apply it effectively.
+                Our programs are designed to bridge the gap between theory and real-world application. Through expert mentorship, interactive learning, and a modern training environment, we equip our students with the skills, discipline, and mindset required to make informed decisions, seize new opportunities, and build successful careers.
               </p>
               <p>
-                Whether you are starting your journey or advancing your professional career, Beever Academy provides the guidance, expertise, and learning environment needed to help you achieve your goals.
+                At Beever Academy, we don't just teach financial concepts. We inspire confidence, develop future professionals, and empower individuals to achieve lasting success.
+              </p>
+              <p className="font-serif text-lg md:text-xl text-burgundy italic font-semibold mt-2">
+                "Learn Today. Lead Tomorrow."
               </p>
             </div>
 
             {/* Stats Highlights Grid */}
-            <div className="grid grid-cols-2 gap-6 border-t border-burgundy/10 pt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 border-t border-burgundy/10 pt-8">
               <div>
-                <div className="font-serif text-4xl font-bold text-burgundy mb-1">10+ Years</div>
-                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Combined Experience</div>
+                <div className="font-serif text-2xl font-bold text-burgundy mb-1">20+ Years</div>
+                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Collective Industry Expertise</div>
               </div>
               <div>
-                <div className="font-serif text-4xl font-bold text-burgundy mb-1">100%</div>
-                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Industry Experts</div>
+                <div className="font-serif text-2xl font-bold text-burgundy mb-1">Premium Education</div>
+                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">World-Class Learning at Affordable Pricing</div>
               </div>
               <div>
-                <div className="font-serif text-4xl font-bold text-burgundy mb-1">Hands-On</div>
-                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Practical Training</div>
+                <div className="font-serif text-2xl font-bold text-burgundy mb-1">Practical Learning</div>
+                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Industry-Focused Training with Real-World Application</div>
               </div>
               <div>
-                <div className="font-serif text-4xl font-bold text-burgundy mb-1">Success</div>
-                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Career-Focused Learning</div>
+                <div className="font-serif text-2xl font-bold text-burgundy mb-1">Career Growth</div>
+                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Building Skills for Long-Term Success</div>
               </div>
             </div>
           </div>
@@ -1990,67 +1991,76 @@ export default function App() {
   const renderStrengths = () => (
     <section id="programs" className="py-20 md:py-32 bg-white text-center">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
-        <div className="mb-20">
+        <div className="mb-16">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-            Elite Competencies
+            Where Knowledge Meets Opportunity
           </span>
-          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
-            Our Strengths
+          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6 font-medium">
+            Our Program
           </h2>
-          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
+          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-8"></div>
+          <p className="text-sm md:text-base text-text-secondary max-w-[900px] mx-auto leading-relaxed text-justify md:text-center">
+            The journey to success in the financial markets begins with a strong foundation. At Beever Academy, we believe that lasting success is built through knowledge, discipline, and practical understanding. Our program is carefully designed to help learners develop the confidence, skills, and mindset required to navigate today's financial markets with clarity and purpose.
+          </p>
         </div>
 
-        <div className="strengths-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-16">
-          {[
-            {
-              title: "Practical Learning",
-              desc: "Industry-relevant knowledge that can be applied immediately.",
-              img: "/campus_classroom.png"
-            },
-            {
-              title: "Diverse Expertise",
-              desc: "Training delivered by specialists from multiple sectors and disciplines.",
-              img: "/library_students.png"
-            },
-            {
-              title: "Real-World Insights",
-              desc: "Learn from actual industry experiences, challenges, and solutions.",
-              img: "/campus_innovation.png"
-            },
-            {
-              title: "Professional Growth",
-              desc: "Develop confidence, leadership, and career-ready skills.",
-              img: "/campus_sports.png"
-            },
-            {
-              title: "Future-Ready Skills",
-              desc: "Stay ahead in a rapidly evolving professional landscape.",
-              img: "/campus_events.png"
-            }
-          ].map((strength, i) => (
-            <div key={i} className="strength-card-el bg-white border border-black/5 rounded-2xl overflow-hidden shadow-sm hover:-translate-y-2 hover:shadow-xl hover:border-gold/30 transition-all duration-300 flex flex-col justify-between group">
-              <div className="relative overflow-hidden h-[180px]">
-                <img src={strength.img} alt={strength.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        {/* FMMTA Program Card Layout */}
+        <div className="strengths-grid-el grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch text-left bg-ivory/40 p-6 md:p-12 rounded-3xl border border-burgundy/10 shadow-lg mt-12">
+          {/* Visual Column */}
+          <div className="strength-card-el lg:col-span-5 relative group overflow-hidden rounded-2xl border border-gold/20 shadow-md">
+            <img 
+              src="https://placehold.co/800x600/170105/D4AF37/png?text=FMMTA+Program" 
+              alt="FMMTA Classroom Training" 
+              className="w-full h-full min-h-[320px] md:min-h-[400px] object-cover transition-transform duration-700 group-hover:scale-105" 
+            />
+            {/* Dark gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-burgundy-dark/95 via-burgundy-dark/30 to-transparent"></div>
+            {/* Badge overlay */}
+            <span className="absolute top-4 left-4 bg-gold text-burgundy-dark font-sans text-[10px] uppercase font-bold tracking-widest px-3 py-1.5 rounded-full shadow-lg">
+              Primary Program
+            </span>
+            <div className="absolute bottom-6 left-6 right-6 text-white">
+              <h4 className="font-serif text-xl text-gold mb-2">Build the Foundation.</h4>
+              <p className="text-xs text-white/80 leading-relaxed font-sans">Learn key market mechanics and technical analytical strategies.</p>
+            </div>
+          </div>
+
+          {/* Details Column */}
+          <div className="strength-card-el lg:col-span-7 flex flex-col justify-between h-full py-2">
+            <div>
+              <span className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-bold mb-2 block">
+                FMMTA Course
+              </span>
+              <h3 className="text-2xl md:text-3xl font-serif text-burgundy mb-6 leading-tight">
+                Foundation Market Mechanics & Technical Analysis (FMMTA)
+              </h3>
+              
+              <div className="text-sm text-text-secondary leading-relaxed flex flex-col gap-6 text-justify">
+                <p>
+                  The Foundation Market Mechanics & Technical Analysis (FMMTA) program is the first step toward understanding how financial markets truly operate. Designed with a practical and structured approach, the program introduces learners to the core principles of market mechanics and technical analysis, helping them build a solid foundation before advancing to higher levels of financial education.
+                </p>
+                <p>
+                  Whether you are taking your first step into the world of financial markets or looking to strengthen your understanding of market behavior, FMMTA provides the essential knowledge required to begin your learning journey with confidence.
+                </p>
               </div>
-              <div className="p-6 text-left flex-grow flex flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-serif text-burgundy mb-2 font-semibold">{strength.title}</h3>
-                  <p className="text-xs text-text-secondary leading-relaxed mb-6">{strength.desc}</p>
-                </div>
-                <a href="#contact" className="inline-flex items-center gap-2 font-sans text-[11px] uppercase tracking-wider font-semibold text-burgundy hover:text-gold-dark transition-colors duration-200 mt-auto">
-                  <span>Explore More</span>
-                  <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+            </div>
+
+            <div className="mt-10 pt-8 border-t border-burgundy/10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div>
+                <p className="font-serif text-xl md:text-2xl text-burgundy italic font-semibold">
+                  "Build the Foundation. Master the Markets."
+                </p>
+              </div>
+              <div className="self-start sm:self-center">
+                <a 
+                  href="#contact" 
+                  className="btn btn-gold gold-gradient-bg text-burgundy-dark px-8 py-3.5 font-semibold uppercase tracking-widest text-xs shadow-md hover:shadow-lg hover:-translate-y-[2px] transition-all duration-300 inline-block text-center whitespace-nowrap"
+                >
+                  Enquire Now
                 </a>
               </div>
             </div>
-          ))}
-        </div>
-
-        <div className="flex justify-center">
-          <a href="#contact" className="btn btn-gold gold-gradient-bg text-burgundy-dark px-12 py-4 font-semibold uppercase tracking-widest shadow-md hover:shadow-lg hover:-translate-y-[2px] transition-all duration-300">
-            View All Programs
-          </a>
+          </div>
         </div>
       </div>
     </section>
@@ -2123,27 +2133,27 @@ export default function App() {
           {[
             {
               title: "Interactive Learning Sessions",
-              img: "/campus_classroom.png",
+              img: "https://placehold.co/600x400/170105/D4AF37/png?text=Interactive+Learning",
               desc: "Engage in collaborative workshops using modern educational technology and collaborative teaching setups."
             },
             {
               title: "Expert-Led Workshops",
-              img: "/campus_innovation.png",
+              img: "https://placehold.co/600x400/170105/D4AF37/png?text=Expert+Workshops",
               desc: "Gain hands-on problem solving insights led directly by top industry practitioners."
             },
             {
               title: "Collaborative Learning Environment",
-              img: "/library_students.png",
+              img: "https://placehold.co/600x400/170105/D4AF37/png?text=Collaborative+Study",
               desc: "Modern study environments built to nurture teamwork, cooperation, and group study projects."
             },
             {
               title: "Professional Mentorship",
-              img: "/campus_events.png",
+              img: "https://placehold.co/600x400/170105/D4AF37/png?text=Mentorship",
               desc: "One-on-one professional counseling guidance to layout clear long-term career growth plans."
             },
             {
               title: "Career Development Programs",
-              img: "/campus_sports.png",
+              img: "https://placehold.co/600x400/170105/D4AF37/png?text=Career+Development",
               desc: "Rigorous physical and strategic preparation designed to cultivate confidence and leadership."
             }
           ].map((card, i) => (
@@ -2448,50 +2458,37 @@ export default function App() {
   const renderContact = () => (
     <section id="contact" className="py-20 md:py-32 bg-white">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
-        <div className="text-center mb-20">
+        <div className="text-center mb-16">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-            Reach Out
+            Contact Us
           </span>
-          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
-            Schedule A Visit & Inquiry
+          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6 font-medium">
+            Learn Today. Lead Tomorrow.
           </h2>
-          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
+          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-8"></div>
+          <p className="text-sm md:text-base text-text-secondary max-w-[850px] mx-auto leading-relaxed text-justify md:text-center">
+            Ready to begin your learning journey with Beever Academy? Our team is here to assist you with program details, admissions support, and general enquiries. We welcome you to connect with us and take the first step toward premium financial education.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
           {/* Form Wrap */}
           <div className="lg:col-span-7 bg-ivory p-10 sm:p-14 border border-black/5 rounded-2xl shadow-sm text-left">
-            <form onSubmit={handleInquirySubmit} className="flex flex-col gap-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="name" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Full Name</label>
-                  <input type="text" id="name" placeholder="John Doe" required className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="email" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Email Address</label>
-                  <input type="email" id="email" placeholder="john@example.com" required className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="program" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Program of Interest</label>
-                  <select id="program" className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200">
-                    <option value="undergraduate">Undergraduate Studies</option>
-                    <option value="postgraduate">Postgraduate Programs</option>
-                    <option value="executive">Executive Education</option>
-                    <option value="other">Other / General Inquiry</option>
-                  </select>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="date" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Preferred Visit Date</label>
-                  <input type="date" id="date" className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
-                </div>
+            <h3 className="text-2xl font-serif text-burgundy mb-8 font-semibold">Contact Form</h3>
+            <form onSubmit={handleInquirySubmit} className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="name" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Full Name</label>
+                <input type="text" id="name" placeholder="John Doe" required className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
               </div>
 
               <div className="flex flex-col gap-2">
-                <label htmlFor="msg" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Your Message</label>
-                <textarea id="msg" rows="5" placeholder="Tell us about your academic goals..." required className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200"></textarea>
+                <label htmlFor="phone" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Phone Number</label>
+                <input type="tel" id="phone" placeholder="+971 50 000 0000" required className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="msg" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Message</label>
+                <textarea id="msg" rows="5" placeholder="Your enquiry details..." required className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200"></textarea>
               </div>
 
               <button 
@@ -2499,7 +2496,7 @@ export default function App() {
                 disabled={formStatus.loading}
                 className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white font-semibold uppercase tracking-widest py-4 w-full cursor-pointer rounded-xl disabled:opacity-75 hover:-translate-y-[2px] shadow-sm hover:shadow-md transition-all duration-300"
               >
-                {formStatus.loading ? 'PROCESSING INQUIRY...' : 'SUBMIT INQUIRY'}
+                {formStatus.loading ? 'PROCESSING...' : 'Submit Enquiry'}
               </button>
             </form>
           </div>
@@ -2507,9 +2504,38 @@ export default function App() {
           {/* Info Cards Wrap */}
           <div className="lg:col-span-5 flex flex-col gap-8 text-left">
             {[
-              { icon: <MapPin className="w-5.5 h-5.5" />, title: "Academy Campus", desc: "100 Academic Circle, Royal Estates, NY 10021" },
-              { icon: <Phone className="w-5.5 h-5.5" />, title: "Admissions Office", desc: "+1 (800) 555-BEEV • +1 (212) 555-0198" },
-              { icon: <Mail className="w-5.5 h-5.5" />, title: "Electronic Mail", desc: "admissions@beeveracademy.edu • info@beeveracademy.edu" }
+              { 
+                icon: <MapPin className="w-5.5 h-5.5" />, 
+                title: "Visit Us", 
+                desc: (
+                  <>
+                    Office No. 4904<br />
+                    Aspin Commercial Tower<br />
+                    Sheikh Zayed Road<br />
+                    Dubai, United Arab Emirates
+                  </>
+                )
+              },
+              { 
+                icon: <Phone className="w-5.5 h-5.5" />, 
+                title: "Call Us", 
+                desc: "+971 4 892 3151" 
+              },
+              { 
+                icon: <MessageSquare className="w-5.5 h-5.5" />, 
+                title: "WhatsApp", 
+                desc: "+971 50 702 1275" 
+              },
+              { 
+                icon: <Clock className="w-5.5 h-5.5" />, 
+                title: "Business Hours", 
+                desc: (
+                  <>
+                    Monday to Sunday<br />
+                    10:00 AM to 10:00 PM
+                  </>
+                )
+              }
             ].map((card, i) => (
               <div key={i} className="flex gap-6 items-start bg-white p-8 border border-black/3 rounded-2xl shadow-sm">
                 <div className="w-[48px] h-[48px] bg-ivory border border-burgundy/5 rounded-full flex justify-center items-center text-burgundy flex-shrink-0">
@@ -2522,7 +2548,7 @@ export default function App() {
               </div>
             ))}
 
-            <div className="h-[220px] bg-cover bg-center border border-black/5 rounded-2xl shadow-sm relative overflow-hidden" style={{ backgroundImage: "url('/hero_building.png')" }}>
+            <div className="h-[220px] bg-cover bg-center border border-black/5 rounded-2xl shadow-sm relative overflow-hidden" style={{ backgroundImage: "url('https://placehold.co/800x400/170105/D4AF37/png?text=Aspin+Tower%2C+Dubai')" }}>
               <div className="absolute inset-0 bg-burgundy/30 flex justify-center items-center">
                 <a href="https://maps.google.com" target="_blank" rel="noreferrer" className="btn btn-gold text-[10px] font-semibold tracking-wider gold-gradient-bg text-burgundy-dark px-5 py-3 rounded-xl uppercase flex items-center gap-2">
                   <Globe className="w-4 h-4" /> View Map
@@ -2728,19 +2754,19 @@ export default function App() {
             <ul className="flex flex-col gap-5 text-xs text-text-light">
               <li className="flex gap-4 items-start">
                 <MapPin className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
-                <span>100 Academic Circle, Royal Estates, NY 10021</span>
+                <span>Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai, UAE</span>
               </li>
               <li className="flex gap-4 items-start">
                 <Phone className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
-                <span>+1 (800) 555-BEEV</span>
+                <span>+971 4 892 3151</span>
               </li>
               <li className="flex gap-4 items-start">
-                <Mail className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
-                <span>admissions@beeveracademy.edu</span>
+                <MessageSquare className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
+                <span>WhatsApp: +971 50 702 1275</span>
               </li>
               <li className="flex gap-4 items-start">
-                <Globe className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
-                <span>www.beeveracademy.edu</span>
+                <Clock className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
+                <span>Mon - Sun: 10:00 AM - 10:00 PM</span>
               </li>
             </ul>
           </div>
