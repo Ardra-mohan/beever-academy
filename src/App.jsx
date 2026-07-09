@@ -1703,11 +1703,18 @@ export default function App() {
     e.preventDefault();
     setFormStatus({ loading: true, submitted: false });
     
+    const name = e.target.querySelector('#name')?.value || '';
+    const phone = e.target.querySelector('#phone')?.value || '';
+    const msg = e.target.querySelector('#msg')?.value || '';
+    
+    const formattedText = `Hello Beever Academy,\n\nI would like to submit an enquiry:\n\n*Name:* ${name}\n*Phone:* ${phone}\n*Message:* ${msg}`;
+    const whatsappUrl = `https://wa.me/971507021275?text=${encodeURIComponent(formattedText)}`;
+    
     setTimeout(() => {
       setFormStatus({ loading: false, submitted: true });
-      alert('Thank you for your interest in Beever Academy. A senior admissions advisor will contact you within 24 business hours.');
       e.target.reset();
-    }, 1500);
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    }, 1000);
   };
 
   // ==========================================
