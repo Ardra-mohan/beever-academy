@@ -2514,17 +2514,20 @@ export default function App() {
                     Sheikh Zayed Road<br />
                     Dubai, United Arab Emirates
                   </>
-                )
+                ),
+                link: "https://maps.google.com/?q=Aspin+Commercial+Tower+Dubai"
               },
               { 
                 icon: <Phone className="w-5.5 h-5.5" />, 
                 title: "Call Us", 
-                desc: "+971 4 892 3151" 
+                desc: "+971 4 892 3151",
+                link: "tel:+97148923151"
               },
               { 
                 icon: <MessageSquare className="w-5.5 h-5.5" />, 
                 title: "WhatsApp", 
-                desc: "+971 50 702 1275" 
+                desc: "+971 50 702 1275",
+                link: "https://wa.me/971507021275"
               },
               { 
                 icon: <Clock className="w-5.5 h-5.5" />, 
@@ -2536,17 +2539,39 @@ export default function App() {
                   </>
                 )
               }
-            ].map((card, i) => (
-              <div key={i} className="flex gap-6 items-start bg-white p-8 border border-black/3 rounded-2xl shadow-sm">
-                <div className="w-[48px] h-[48px] bg-ivory border border-burgundy/5 rounded-full flex justify-center items-center text-burgundy flex-shrink-0">
-                  {card.icon}
+            ].map((card, i) => {
+              const CardContent = (
+                <>
+                  <div className="w-[48px] h-[48px] bg-ivory border border-burgundy/5 rounded-full flex justify-center items-center text-burgundy flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                    {card.icon}
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-serif text-burgundy font-bold mb-1 group-hover:text-gold transition-colors duration-300">{card.title}</h4>
+                    <p className="text-sm text-text-secondary leading-relaxed">{card.desc}</p>
+                  </div>
+                </>
+              );
+
+              if (card.link) {
+                return (
+                  <a 
+                    key={i} 
+                    href={card.link}
+                    target={card.link.startsWith('http') ? "_blank" : undefined}
+                    rel={card.link.startsWith('http') ? "noopener noreferrer" : undefined}
+                    className="flex gap-6 items-start bg-white p-8 border border-black/3 rounded-2xl shadow-sm hover:shadow-md hover:border-gold/30 hover:-translate-y-[2px] transition-all duration-300 group cursor-pointer"
+                  >
+                    {CardContent}
+                  </a>
+                );
+              }
+
+              return (
+                <div key={i} className="flex gap-6 items-start bg-white p-8 border border-black/3 rounded-2xl shadow-sm">
+                  {CardContent}
                 </div>
-                <div>
-                  <h4 className="text-lg font-serif text-burgundy font-bold mb-1">{card.title}</h4>
-                  <p className="text-sm text-text-secondary leading-relaxed">{card.desc}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
 
             <div className="h-[220px] bg-cover bg-center border border-black/5 rounded-2xl shadow-sm relative overflow-hidden" style={{ backgroundImage: "url('https://placehold.co/800x400/170105/D4AF37/png?text=Aspin+Tower%2C+Dubai')" }}>
               <div className="absolute inset-0 bg-burgundy/30 flex justify-center items-center">
@@ -2754,15 +2779,21 @@ export default function App() {
             <ul className="flex flex-col gap-5 text-xs text-text-light">
               <li className="flex gap-4 items-start">
                 <MapPin className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
-                <span>Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai, UAE</span>
+                <a href="https://maps.google.com/?q=Aspin+Commercial+Tower+Dubai" target="_blank" rel="noopener noreferrer" className="hover:text-gold-light transition-colors duration-200">
+                  Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai, UAE
+                </a>
               </li>
               <li className="flex gap-4 items-start">
                 <Phone className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
-                <span>+971 4 892 3151</span>
+                <a href="tel:+97148923151" className="hover:text-gold-light transition-colors duration-200">
+                  +971 4 892 3151
+                </a>
               </li>
               <li className="flex gap-4 items-start">
                 <MessageSquare className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
-                <span>WhatsApp: +971 50 702 1275</span>
+                <a href="https://wa.me/971507021275" target="_blank" rel="noopener noreferrer" className="hover:text-gold-light transition-colors duration-200">
+                  WhatsApp: +971 50 702 1275
+                </a>
               </li>
               <li className="flex gap-4 items-start">
                 <Clock className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
