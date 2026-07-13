@@ -23,6 +23,7 @@
   --animate-logo-spin-reverse: logo-subtle-spin-reverse 20s infinite linear;
   --animate-mouse-scroll: mouse-scroll 1.6s infinite ease-in-out;
   --animate-grid-fade: grid-fade-in 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  --animate-chatbot-slide: chatbot-slide 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
   
   @keyframes logo-pulse {
     0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(201, 162, 77, 0.45)); }
@@ -51,6 +52,10 @@
   @keyframes grid-fade-in {
     0% { transform: scale(0.9); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes chatbot-slide {
+    0% { transform: translateY(30px) scale(0.96); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
   }
 }
 

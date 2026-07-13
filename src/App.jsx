@@ -6,7 +6,7 @@ import {
   Monitor, Briefcase, ChevronLeft, ChevronRight, 
   MapPin, Phone, Mail, Facebook, Instagram, Linkedin, Youtube, 
   Quote, Sparkles, Menu, X, ArrowRight, CheckCircle2,
-  Star, TrendingUp, Trophy, Clock, Compass, MessageSquare
+  Star, TrendingUp, Trophy, Clock, Compass, MessageSquare, Send
 } from 'lucide-react';
 
 // Import local logo from assets
@@ -295,12 +295,8 @@ function GlobalNetworkCanvas() {
 
     // CITIES
     const DESTINATIONS = [
-      { name: "London", xPct: 0.50, yPct: 0.24 },
-      { name: "New York", xPct: 0.25, yPct: 0.35 },
-      { name: "Tokyo", xPct: 0.85, yPct: 0.32 },
-      { name: "Singapore", xPct: 0.76, yPct: 0.54 },
-      { name: "Sydney", xPct: 0.86, yPct: 0.76 },
-      { name: "Johannesburg", xPct: 0.54, yPct: 0.70 }
+      { name: "USA", xPct: 0.23, yPct: 0.34 },
+      { name: "INDIA", xPct: 0.66, yPct: 0.39 }
     ];
 
     const dxP = 0.58; // Dubai
@@ -308,8 +304,8 @@ function GlobalNetworkCanvas() {
 
     // GENERATE MAP PARTICLES
     const points = [];
-    const cols = 120;
-    const rows = 60;
+    const cols = 160;
+    const rows = 80;
     for (let c = 0; c < cols; c++) {
       for (let r = 0; r < rows; r++) {
         const xPct = c / cols;
@@ -329,7 +325,7 @@ function GlobalNetworkCanvas() {
             yPct,
             jitterX: (Math.random() - 0.5) * 0.15,
             jitterY: (Math.random() - 0.5) * 0.15,
-            size: Math.random() * 0.6 + 0.8,
+            size: Math.random() * 0.4 + 0.65,
             phaseOffset: Math.random() * Math.PI * 2
           });
         }
@@ -581,14 +577,17 @@ function GlobalNetworkCanvas() {
 
           if (loopTime >= 7.2) {
             ctx.save();
-            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = '#F2DFA2';
             ctx.beginPath();
-            ctx.arc(dDrawX, dDrawY, 3, 0, Math.PI * 2);
+            ctx.arc(dDrawX, dDrawY, 5, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.fillStyle = 'rgba(242, 223, 162, 0.9)';
-            ctx.font = '8px monospace';
-            ctx.fillText(dest.name.toUpperCase(), dDrawX + 6, dDrawY + 3);
+            ctx.shadowBlur = 4;
+            ctx.fillStyle = '#F2DFA2';
+            ctx.font = 'bold 20px sans-serif';
+            ctx.fillText(dest.name.toUpperCase(), dDrawX + 12, dDrawY + 7);
             ctx.restore();
           }
 
@@ -619,7 +618,7 @@ function GlobalNetworkCanvas() {
       ctx.fillText(`ROT_ANGLE: ${(rotY * 180 / Math.PI).toFixed(0)}°`, 20, 60);
 
       ctx.fillStyle = 'rgba(242, 223, 162, 0.7)';
-      ctx.fillText(`ACTIVE GATEWAYS: ${loopTime >= 7.2 ? '6 / 6 ESTABLISHED' : 'CONNECTING...'}`, width - 180, 30);
+      ctx.fillText(`ACTIVE GATEWAYS: ${loopTime >= 7.2 ? '2 / 2 ESTABLISHED' : 'CONNECTING...'}`, width - 180, 30);
       ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
       ctx.fillText(`SYSTEM LOAD: ${(45.2 + Math.sin(loopTime * 1.5) * 2.3).toFixed(1)} GB/S`, width - 180, 45);
       ctx.fillText(`LATENCY: ${(34 + Math.sin(loopTime * 4) * 2).toFixed(0)}MS (EXCELLENT)`, width - 180, 60);
@@ -1403,6 +1402,22 @@ export default function App() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [careerFormStatus, setCareerFormStatus] = useState({ loading: false, submitted: false });
 
+  // Chatbot AI widget states
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [chatbotMessages, setChatbotMessages] = useState([]);
+  const [chatbotInput, setChatbotInput] = useState('');
+  const [isAiTyping, setIsAiTyping] = useState(false);
+  const [chatUser, setChatUser] = useState({ name: '', phone: '' });
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatbotMessages, isAiTyping]);
+
+
+
   // Futuristic Dashboard States (Removed in favor of embedded PremiumTradingTerminal)
 
   // Testimonial Autoplay Ref
@@ -1707,14 +1722,222 @@ export default function App() {
     const phone = e.target.querySelector('#phone')?.value || '';
     const msg = e.target.querySelector('#msg')?.value || '';
     
-    const formattedText = `Hello Beever Academy,\n\nI would like to submit an enquiry:\n\n*Name:* ${name}\n*Phone:* ${phone}\n*Message:* ${msg}`;
-    const whatsappUrl = `https://wa.me/971507021275?text=${encodeURIComponent(formattedText)}`;
-    
     setTimeout(() => {
       setFormStatus({ loading: false, submitted: true });
       e.target.reset();
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      
+      setChatUser({ name, phone });
+      const initialHasEmoji = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g.test(msg);
+      
+      setChatbotMessages([
+        { sender: 'bot', text: `Hello! I am Bee, the official AI assistant for Beever Academy. I have successfully received your enquiry. Our admissions team has been notified, and I am here to help you instantly in the meantime.`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
+        { sender: 'user', text: `Name: ${name}\nPhone: ${phone}\nMessage: ${msg}`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+      ]);
+      setIsChatbotOpen(true);
+      setIsAiTyping(true);
+      
+      setTimeout(() => {
+        setIsAiTyping(false);
+        let botFollowUpText = `Hi ${name}, based on your message, I would love to answer any questions you have about Beever Academy. Are you looking to learn more about our trading courses, tuition details, mentorship, or enrollment? I encourage you to book a consultation with our team for the best guidance.`;
+        if (initialHasEmoji) {
+          botFollowUpText += " ✨";
+        }
+        setChatbotMessages(prev => [...prev, {
+          sender: 'bot',
+          text: botFollowUpText,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }]);
+      }, 1500);
     }, 1000);
+  };
+
+  const handleChatbotSend = (e) => {
+    e.preventDefault();
+    if (!chatbotInput.trim()) return;
+    
+    const userMessage = {
+      sender: 'user',
+      text: chatbotInput,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    
+    // Check if user has ever typed an emoji in the current input or the historical log
+    const currentHasEmoji = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g.test(chatbotInput);
+    const logHasEmoji = chatbotMessages.some(m => m.sender === 'user' && /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g.test(m.text));
+    const anyHasEmoji = currentHasEmoji || logHasEmoji;
+
+    setChatbotMessages(prev => [...prev, userMessage]);
+    setChatbotInput('');
+    setIsAiTyping(true);
+    
+    // Simulate AI thinking and response
+    setTimeout(() => {
+      let botResponseText = "";
+      const textLower = userMessage.text.toLowerCase();
+      
+      const allowedKeywords = [
+        'course', 'program', 'fmmta', 'learn', 'syllabus', 'duration', 'time', 'how long',
+        'beginner', 'start', 'guide', 'introduction', 'basics', 'trading', 'market',
+        'enroll', 'join', 'register', 'apply', 'admission',
+        'mentor', 'coach', 'teacher', 'instructor', 'advisor',
+        'fee', 'price', 'cost', 'pay', 'tuition',
+        'live', 'class', 'session', 'cohort',
+        'certif', 'diploma', 'exam',
+        'contact', 'number', 'phone', 'address', 'location', 'where', 'office', 'dubai',
+        'demo', 'trial'
+      ];
+      
+      const unrelatedKeywords = [
+        'politic', 'government', 'president', 'election', 'movie', 'film', 'actor', 'cinema',
+        'sport', 'football', 'soccer', 'cricket', 'basketball', 'olympic', 'coding', 'programming',
+        'javascript', 'python', 'react', 'code', 'medical', 'medicine', 'doctor', 'disease',
+        'health', 'general knowledge', 'who is', 'what is the capital', 'recipe', 'cooking'
+      ];
+      
+      const isAllowed = allowedKeywords.some(kw => textLower.includes(kw));
+      const isUnrelated = unrelatedKeywords.some(kw => textLower.includes(kw));
+      
+      if (isUnrelated || (!isAllowed && textLower.split(' ').length > 4)) {
+        botResponseText = "I'm here to assist only with Beever Academy and our trading programs. Feel free to ask anything about our courses, enrollment, mentorship, or trading education.";
+      } else if (textLower.includes('course') || textLower.includes('program') || textLower.includes('fmmta') || textLower.includes('learn') || textLower.includes('syllabus')) {
+        botResponseText = "Beever Academy's signature curriculum is the Foundation Market Mechanics & Technical Analysis (FMMTA) course. It is an intensive program covering macroeconomics, order flow, technical charting, and institutional risk management. We host live, practical trading sessions. I highly recommend booking a consultation with our advisor to review the curriculum.";
+      } else if (textLower.includes('duration') || textLower.includes('how long') || textLower.includes('time')) {
+        botResponseText = "Our flagship FMMTA program spans 8 weeks of intensive study, combining theoretical models with live market application. You can complete it in weekend batches or weekday evenings. Please let me know if you would like to book a consultation to review timings.";
+      } else if (textLower.includes('beginner') || textLower.includes('basics') || textLower.includes('trading') || textLower.includes('market') || textLower.includes('start') || textLower.includes('guide')) {
+        botResponseText = "We offer absolute beginner guidance to build solid foundations. The FMMTA course starts with core principles of economics and market mechanics, making it suitable for both beginners and intermediate traders. I suggest scheduling a demo session or booking a free consultation to start.";
+      } else if (textLower.includes('enroll') || textLower.includes('join') || textLower.includes('register') || textLower.includes('apply') || textLower.includes('admission')) {
+        botResponseText = "Enrollment for the upcoming FMMTA cohort is currently open. The process involves a brief candidate profile review. I would be happy to schedule a consultation with our admissions desk to secure your seat.";
+      } else if (textLower.includes('mentor') || textLower.includes('coach') || textLower.includes('mentorship')) {
+        botResponseText = "Mentorship is at the core of Beever Academy. You will receive 1-on-1 feedback sessions, group review calls, and direct access to professional traders who monitor your progress. Let me connect you with an advisor to discuss mentorship packages.";
+      } else if (textLower.includes('fee') || textLower.includes('price') || textLower.includes('cost') || textLower.includes('pay') || textLower.includes('tuition')) {
+        botResponseText = "Tuition at Beever Academy depends on the program format (Executive Cohort, Weekend Intensive, or Professional Module). We offer customizable payment plan installations. I'd be happy to connect you with our admissions team for the most accurate information.";
+      } else if (textLower.includes('live') || textLower.includes('class')) {
+        botResponseText = "Yes, classes are conducted live on-site at our Dubai facility and streamed for hybrid students. You get to interact directly with the instructor and perform live market exercises. Would you like to schedule a consultation to view class slots?";
+      } else if (textLower.includes('certif')) {
+        botResponseText = "Upon successful completion of the FMMTA course and passing the final architectural risk assessment, you will receive the Beever Academy Financial Markets Certification, recognized by our institutional network.";
+      } else if (textLower.includes('demo') || textLower.includes('trial')) {
+        botResponseText = "Yes, we host weekly interactive demo sessions at our Dubai campus. You can experience a live class environment and meet our instructors. I can book a consultation slot for you to register for the next demo.";
+      } else if (textLower.includes('contact') || textLower.includes('number') || textLower.includes('phone') || textLower.includes('address') || textLower.includes('location') || textLower.includes('where') || textLower.includes('office') || textLower.includes('dubai')) {
+        botResponseText = "Beever Academy is located at Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai. You can call us directly at +971 4 892 3151 or email admissions@beeveracademy.com. I encourage you to book an on-site consultation to visit us.";
+      } else {
+        botResponseText = "I'd be happy to connect you with our admissions team for the most accurate information. Would you like me to schedule a consultation with an advisor?";
+      }
+      
+      // Emoji check: if user used emojis, add premium sparkle icon, otherwise strictly omit all emojis
+      if (anyHasEmoji) {
+        botResponseText += " ✨";
+      }
+
+      setIsAiTyping(false);
+      setChatbotMessages(prev => [...prev, {
+        sender: 'bot',
+        text: botResponseText,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
+    }, 1800);
+  };
+
+  const renderChatbot = () => {
+    if (!isChatbotOpen) return null;
+    
+    return (
+      <div className="fixed bottom-6 right-6 w-[390px] h-[540px] bg-[#170105] border border-gold/30 rounded-2xl shadow-2xl z-[9999] flex flex-col overflow-hidden font-sans transition-all duration-300 animate-chatbot-slide">
+        {/* Chatbot Header */}
+        <div className="bg-[#120002] px-5 py-4 flex justify-between items-center border-b border-gold/15">
+          <div className="flex items-center gap-3">
+            <div className="w-[42px] h-[42px] bg-gold-gradient rounded-full flex-shrink-0 relative overflow-hidden flex justify-center items-center p-[2px]">
+              <div className="w-full h-full bg-[#170105] rounded-full flex justify-center items-center">
+                <Sparkles className="w-5 h-5 text-gold animate-pulse" />
+              </div>
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-[#170105] animate-pulse"></span>
+            </div>
+            <div className="text-left">
+              <h4 className="text-sm font-semibold text-white font-serif tracking-wider flex items-center gap-1.5">
+                BEE <span className="text-[9px] px-1.5 py-0.5 rounded bg-gold/15 text-gold-light border border-gold/25 font-sans font-bold">AI</span>
+              </h4>
+              <p className="text-[10px] text-white/50 tracking-wider">Official AI Assistant</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => setIsChatbotOpen(false)}
+            className="text-white/70 hover:text-gold cursor-pointer transition-colors duration-200"
+            aria-label="Close Chat"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Chat Messages Body */}
+        <div className="flex-grow p-4 overflow-y-auto bg-[#1f0208] flex flex-col gap-4 scrollbar-thin">
+          {chatbotMessages.map((msg, idx) => (
+            <div 
+              key={idx} 
+              className={`flex flex-col max-w-[82%] ${
+                msg.sender === 'user' ? 'self-end items-end' : 'self-start items-start'
+              }`}
+            >
+              <div 
+                className={`p-3.5 rounded-2xl text-[12px] leading-relaxed whitespace-pre-line text-left shadow-md ${
+                  msg.sender === 'user' 
+                    ? 'bg-gold-gradient text-burgundy-dark font-semibold rounded-tr-none' 
+                    : 'bg-[#29050d] border border-gold/10 text-white rounded-tl-none'
+                }`}
+              >
+                {msg.text}
+                
+                {/* Direct escalation widget if AI prompts WhatsApp link */}
+                {msg.sender === 'bot' && (msg.text.includes('admissions team') || msg.text.includes('WhatsApp') || msg.text.includes('advisor')) && (
+                  <div className="mt-3 pt-3 border-t border-gold/10">
+                    <a 
+                      href="#contact" 
+                      onClick={() => setIsChatbotOpen(false)}
+                      className="inline-flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider gold-gradient-bg text-burgundy-dark px-3 py-2 rounded-lg hover:scale-105 transition-transform duration-200"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" /> Book Consultation
+                    </a>
+                  </div>
+                )}
+              </div>
+              <span className="text-[9px] text-white/30 mt-1 px-1">
+                {msg.time}
+              </span>
+            </div>
+          ))}
+          
+          {/* AI Typing Animation Bubble */}
+          {isAiTyping && (
+            <div className="flex flex-col items-start self-start max-w-[82%]">
+              <div className="flex gap-1.5 items-center bg-[#29050d] border border-gold/10 p-4 rounded-2xl rounded-tl-none shadow-md">
+                <span className="w-1.5 h-1.5 bg-gold rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-gold rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-gold rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+              </div>
+              <span className="text-[8px] text-white/30 mt-1 px-1 tracking-wider uppercase">Bee is formulating response...</span>
+            </div>
+          )}
+          
+          <div ref={chatEndRef} />
+        </div>
+
+        {/* Chat Input Form */}
+        <form onSubmit={handleChatbotSend} className="p-3 bg-[#120002] border-t border-gold/10 flex gap-2 items-center">
+          <input 
+            type="text" 
+            value={chatbotInput}
+            onChange={(e) => setChatbotInput(e.target.value)}
+            placeholder="Ask Beever AI a question..." 
+            className="flex-grow text-xs p-3.5 border border-gold/15 bg-[#1a0206] text-white placeholder-white/40 rounded-xl focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/20 transition-all duration-200"
+          />
+          <button 
+            type="submit" 
+            className="w-[42px] h-[42px] bg-gold-gradient text-burgundy-dark flex justify-center items-center rounded-xl cursor-pointer hover:scale-105 transition-all duration-200 shadow-md font-bold"
+            aria-label="Send Message"
+          >
+            <Send className="w-4.5 h-4.5" />
+          </button>
+        </form>
+      </div>
+    );
   };
 
   // ==========================================
@@ -1979,7 +2202,7 @@ export default function App() {
             Global Connectivity Hub
           </span>
           <h2 className="text-4xl md:text-5xl font-serif text-white mb-6 font-bold">
-            Beever Academy Network
+            Beever Certifications Network
           </h2>
           <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-4"></div>
           <p className="text-sm text-white/70 max-w-[650px] mx-auto leading-relaxed">
@@ -2482,6 +2705,25 @@ export default function App() {
           {/* Form Wrap */}
           <div className="lg:col-span-7 bg-ivory p-10 sm:p-14 border border-black/5 rounded-2xl shadow-sm text-left">
             <h3 className="text-2xl font-serif text-burgundy mb-8 font-semibold">Contact Form</h3>
+            
+            {formStatus.submitted && (
+              <div className="bg-[#e6fffa] border border-[#319795] text-[#234e52] p-5 rounded-xl flex flex-col gap-2 mb-8 animate-chatbot-slide text-left">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-[#319795]" />
+                  <span className="font-bold text-sm">Enquiry Received Successfully!</span>
+                </div>
+                <p className="text-xs leading-relaxed">
+                  Thank you for reaching out. We have opened our AI assistant Bee at the bottom-right corner to answer any questions you have instantly.
+                </p>
+                <button 
+                  onClick={() => setFormStatus(prev => ({ ...prev, submitted: false }))} 
+                  className="text-xs text-[#319795] hover:text-[#234e52] font-semibold underline self-start cursor-pointer border-none bg-transparent p-0"
+                >
+                  Send another enquiry
+                </button>
+              </div>
+            )}
+            
             <form onSubmit={handleInquirySubmit} className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
                 <label htmlFor="name" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Full Name</label>
@@ -2518,6 +2760,7 @@ export default function App() {
                   <>
                     Office No. 4904<br />
                     Aspin Commercial Tower<br />
+                    Near financial center metro exit 2<br />
                     Sheikh Zayed Road<br />
                     Dubai, United Arab Emirates
                   </>
@@ -2650,12 +2893,14 @@ export default function App() {
           </ul>
 
           <div className="flex items-center gap-6">
-            <a 
-              href="#admissions" 
-              className="hidden sm:inline-flex btn text-xs px-6 py-3 font-semibold shadow-sm transition-all duration-300 uppercase tracking-widest gold-gradient-bg text-burgundy-dark hover:shadow-md hover:-translate-y-[2px]"
-            >
-              Enroll Now
-            </a>
+            <div className="hidden sm:flex flex-col text-right text-xs tracking-wider">
+              <a href="tel:048923151" className="text-gold-light hover:text-white transition-colors duration-200 font-semibold font-mono text-[14px]">
+                Landline : 048923151
+              </a>
+              <a href="mailto:info@beeveracademy.com" className="text-white/70 hover:text-gold-light transition-colors duration-200 text-[10px] font-sans mt-0.5">
+                Email : info@beeveracademy.com
+              </a>
+            </div>
             {/* Mobile Hamburger toggle */}
             <button 
               className="lg:hidden flex flex-col gap-[6px] cursor-pointer z-[1100] text-white"
@@ -2687,9 +2932,12 @@ export default function App() {
                 </a>
               </li>
             ))}
-            <li onClick={() => setMobileMenuOpen(false)} className="mt-4">
-              <a href="#admissions" className="btn btn-gold text-sm px-10 py-4 shadow-gold gold-gradient-bg text-burgundy-dark uppercase tracking-widest font-semibold block text-center">
-                Enroll Now
+            <li onClick={() => setMobileMenuOpen(false)} className="mt-6 flex flex-col items-center gap-2">
+              <a href="tel:048923151" className="font-serif text-gold-light text-2xl tracking-wide font-semibold">
+                Landline : 048923151
+              </a>
+              <a href="mailto:info@beeveracademy.com" className="font-sans text-white/75 text-base hover:text-gold-light transition-colors duration-200">
+                Email : info@beeveracademy.com
               </a>
             </li>
           </ul>
@@ -2787,7 +3035,7 @@ export default function App() {
               <li className="flex gap-4 items-start">
                 <MapPin className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
                 <a href="https://maps.google.com/?q=Aspin+Commercial+Tower+Dubai" target="_blank" rel="noopener noreferrer" className="hover:text-gold-light transition-colors duration-200">
-                  Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai, UAE
+                  Office No. 4904, Aspin Commercial Tower, Near financial center metro exit 2, Sheikh Zayed Road, Dubai, UAE
                 </a>
               </li>
               <li className="flex gap-4 items-start">
@@ -2822,6 +3070,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+      {renderChatbot()}
     </div>
   );
 }
