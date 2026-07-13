@@ -2010,6 +2010,10 @@ export default function App() {
               <span>Book a Consultation</span>
             </a>
           </div>
+          <p className="hero-schedule-info text-xs md:text-sm font-sans tracking-wide text-white/70 mt-6 flex items-center gap-2.5">
+            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse"></span>
+            Your Learning Never Stops • Beever Academy is Open 7 Days a Week • 10:00 AM – 10:00 PM
+          </p>
         </div>
       </div>
 
@@ -2921,7 +2925,7 @@ export default function App() {
           </ul>
 
           <div className="flex items-center gap-6">
-            <div className="hidden sm:flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-6">
               <a 
                 href="https://wa.me/971507021275" 
                 target="_blank" 
@@ -2934,7 +2938,7 @@ export default function App() {
                 </svg>
               </a>
               <div className="flex flex-col text-right text-xs tracking-wider">
-                <a href="tel:048923151" className="flex items-center justify-end gap-1.5 text-gold-light hover:text-white transition-colors duration-200 font-semibold font-mono text-[16px]">
+                <a href="tel:048923151" className="flex items-center justify-end gap-1.5 text-gold-light hover:text-white transition-colors duration-200 font-semibold font-mono text-[19px] tracking-[0.3em] mr-[-0.3em]">
                   <Phone className="w-4 h-4 text-gold/80" />
                   048923151
                 </a>
