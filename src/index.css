@@ -77,6 +77,11 @@ body {
   }
 }
 
+body.show-native-cursor,
+body.show-native-cursor * {
+  cursor: auto !important;
+}
+
 .custom-cursor-dot {
   position: fixed;
   top: 0;
