@@ -2010,10 +2010,15 @@ export default function App() {
               <span>Book a Consultation</span>
             </a>
           </div>
-          <p className="hero-schedule-info text-xs md:text-sm font-sans tracking-wide text-white/70 mt-6 flex items-center gap-2.5">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse"></span>
-            Your Learning Never Stops • Beever Academy is Open 7 Days a Week • 10:00 AM – 10:00 PM
-          </p>
+          <div className="hero-schedule-info mt-8 overflow-hidden flex items-center gap-3 text-sm md:text-base font-sans tracking-wide text-white/80 w-full">
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse flex-shrink-0"></span>
+            <div className="overflow-hidden w-full relative">
+              <div className="animate-marquee whitespace-nowrap flex">
+                <span className="flex-shrink-0 pr-8">Your Learning Never Stops <span className="text-gold mx-2">•</span> Beever Academy is Open 7 Days a Week <span className="text-gold mx-2">•</span> 10:00 AM – 10:00 PM <span className="text-gold mx-4">•</span></span>
+                <span className="flex-shrink-0 pr-8">Your Learning Never Stops <span className="text-gold mx-2">•</span> Beever Academy is Open 7 Days a Week <span className="text-gold mx-2">•</span> 10:00 AM – 10:00 PM <span className="text-gold mx-4">•</span></span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2925,13 +2930,17 @@ export default function App() {
           </ul>
 
           <div className="flex items-center gap-6">
-            <div className="hidden sm:flex flex-col text-right text-xs tracking-wider">
-              <a href="tel:048923151" className="flex items-center justify-end gap-1.5 text-gold-light hover:text-white transition-colors duration-200 font-bold font-mono text-[19px] tracking-[0.3em] mr-[-0.3em]">
-                <Phone className="w-4 h-4 text-gold/80" />
+            <div className="hidden sm:grid grid-cols-[20px_1fr] items-center gap-x-2 gap-y-1 text-left text-xs tracking-wider">
+              <div className="flex justify-center text-gold/80">
+                <Phone className="w-4 h-4" />
+              </div>
+              <a href="tel:048923151" className="text-gold-light hover:text-white transition-colors duration-200 font-bold font-mono text-[19px] tracking-[0.1em] mr-[-0.1em] leading-none">
                 04 892 3151
               </a>
-              <a href="mailto:info@beeveracademy.com" className="flex items-center justify-end gap-1.5 text-white/70 hover:text-gold-light transition-colors duration-200 text-[12px] font-sans mt-0.5">
-                <Mail className="w-3.5 h-3.5 text-white/60" />
+              <div className="flex justify-center text-white/60">
+                <Mail className="w-3.5 h-3.5" />
+              </div>
+              <a href="mailto:info@beeveracademy.com" className="text-white/70 hover:text-gold-light transition-colors duration-200 text-[12px] font-sans leading-none">
                 info@beeveracademy.com
               </a>
             </div>
@@ -3006,8 +3015,8 @@ export default function App() {
               <div className="gold-glass-logo-frame w-[64px] h-[64px] flex-shrink-0">
                 <img src={logo} alt="Beever Academy Logo" className="w-full h-full object-contain" />
               </div>
-              <span className="font-serif text-white text-xl font-semibold tracking-wider">
-                BEEVER ACADEMY
+              <span className="font-serif text-white text-[15px] sm:text-base font-semibold tracking-wider leading-snug max-w-[280px]">
+                Beever Professional And Management Development Training LLC
               </span>
             </a>
             <p className="font-sans text-[10px] font-semibold text-gold uppercase tracking-wider">
@@ -3094,10 +3103,11 @@ export default function App() {
           </div>
         </div>
 
+
         {/* Bottom Bar */}
         <div className="bg-[#240000] border-t border-white/5 py-8">
           <div className="max-w-[1440px] mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/40">
-            <p>&copy; 2026 Beever Academy. All Rights Reserved. Designed for Luxury Educational Institutions.</p>
+            <p>&copy; 2026 Beever Professional And Management Development Training LLC. All Rights Reserved. Designed for Luxury Educational Institutions.</p>
             <div className="flex items-center gap-8">
               <a href="#" className="hover:text-white">Privacy Policy</a>
               <a href="#" className="hover:text-white">Terms of Service</a>

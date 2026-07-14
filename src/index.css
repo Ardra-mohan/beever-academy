@@ -24,6 +24,12 @@
   --animate-mouse-scroll: mouse-scroll 1.6s infinite ease-in-out;
   --animate-grid-fade: grid-fade-in 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
   --animate-chatbot-slide: chatbot-slide 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  --animate-marquee: marquee 25s linear infinite;
+  
+  @keyframes marquee {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
+  }
   
   @keyframes logo-pulse {
     0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(201, 162, 77, 0.45)); }
