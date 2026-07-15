@@ -2791,20 +2791,6 @@ export default function App() {
           <div className="lg:col-span-5 flex flex-col gap-8 text-left">
             {[
               { 
-                icon: <MapPin className="w-5.5 h-5.5" />, 
-                title: "Visit Us", 
-                desc: (
-                  <>
-                    Office No. 4904<br />
-                    Aspin Commercial Tower<br />
-                    Near financial center metro exit 2<br />
-                    Sheikh Zayed Road<br />
-                    Dubai, United Arab Emirates
-                  </>
-                ),
-                link: "https://maps.google.com/?q=Aspin+Commercial+Tower+Dubai"
-              },
-              { 
                 icon: <Phone className="w-5.5 h-5.5" />, 
                 title: "Call Us", 
                 desc: "+971 4 892 3151",
@@ -2815,16 +2801,6 @@ export default function App() {
                 title: "WhatsApp", 
                 desc: "+971 50 702 1275",
                 link: "https://wa.me/971507021275"
-              },
-              { 
-                icon: <Clock className="w-5.5 h-5.5" />, 
-                title: "Business Hours", 
-                desc: (
-                  <>
-                    Monday to Sunday<br />
-                    10:00 AM to 10:00 PM
-                  </>
-                )
               }
             ].map((card, i) => {
               const CardContent = (
