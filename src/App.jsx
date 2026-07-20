@@ -1846,7 +1846,7 @@ export default function App() {
       } else if (textLower.includes('demo') || textLower.includes('trial')) {
         botResponseText = "Yes, we host weekly interactive demo sessions at our Dubai campus. You can experience a live class environment and meet our instructors. I can book a consultation slot for you to register for the next demo.";
       } else if (textLower.includes('contact') || textLower.includes('number') || textLower.includes('phone') || textLower.includes('address') || textLower.includes('location') || textLower.includes('where') || textLower.includes('office') || textLower.includes('dubai')) {
-        botResponseText = "Beever Academy is located at Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai. You can call us directly at +971 4 892 3151 or email admissions@beeveracademy.com. I encourage you to book an on-site consultation to visit us.";
+        botResponseText = "Beever Academy is located at Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai. You can call us directly at +971 4 892 3151 or 042266388, or email admissions@beeveracademy.com. I encourage you to book an on-site consultation to visit us.";
       } else {
         botResponseText = "I'd be happy to connect you with our admissions team for the most accurate information. Would you like me to schedule a consultation with an advisor?";
       }
@@ -2738,49 +2738,56 @@ export default function App() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-stretch">
           {/* Form Wrap */}
-          <div className="lg:col-span-7 bg-ivory p-10 sm:p-14 border border-black/5 rounded-2xl shadow-sm text-left">
-            <h3 className="text-2xl font-serif text-burgundy mb-8 font-semibold">Contact Form</h3>
-            
-            {formStatus.submitted && (
-              <div className="bg-[#e6fffa] border border-[#319795] text-[#234e52] p-5 rounded-xl flex flex-col gap-2 mb-8 animate-chatbot-slide text-left">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-[#319795]" />
-                  <span className="font-bold text-sm">Enquiry Received Successfully!</span>
+          <div className="lg:col-span-7 bg-[#F2ECE1] p-10 sm:p-14 border border-burgundy/15 rounded-2xl shadow-md text-left flex flex-col justify-between">
+            <div>
+              <h3 className="text-2xl font-serif text-burgundy mb-8 font-bold flex items-center justify-between">
+                <span>Contact Form</span>
+                <span className="text-[10px] font-sans text-burgundy/70 font-bold tracking-wider uppercase border border-burgundy/20 px-3 py-1 rounded-full bg-white/60">Priority Support</span>
+              </h3>
+              
+              {formStatus.submitted && (
+                <div className="bg-[#e6fffa] border border-[#319795] text-[#234e52] p-5 rounded-xl flex flex-col gap-2 mb-8 animate-chatbot-slide text-left">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-[#319795]" />
+                    <span className="font-bold text-sm">Enquiry Received Successfully!</span>
+                  </div>
+                  <p className="text-xs leading-relaxed">
+                    Thank you for reaching out. We have opened our AI assistant Bee at the bottom-right corner to answer any questions you have instantly.
+                  </p>
+                  <button 
+                    onClick={() => setFormStatus(prev => ({ ...prev, submitted: false }))} 
+                    className="text-xs text-[#319795] hover:text-[#234e52] font-semibold underline self-start cursor-pointer border-none bg-transparent p-0"
+                  >
+                    Send another enquiry
+                  </button>
                 </div>
-                <p className="text-xs leading-relaxed">
-                  Thank you for reaching out. We have opened our AI assistant Bee at the bottom-right corner to answer any questions you have instantly.
-                </p>
-                <button 
-                  onClick={() => setFormStatus(prev => ({ ...prev, submitted: false }))} 
-                  className="text-xs text-[#319795] hover:text-[#234e52] font-semibold underline self-start cursor-pointer border-none bg-transparent p-0"
-                >
-                  Send another enquiry
-                </button>
-              </div>
-            )}
+              )}
+            </div>
             
-            <form onSubmit={handleInquirySubmit} className="flex flex-col gap-6">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="name" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Full Name</label>
-                <input type="text" id="name" placeholder="John Doe" required className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
-              </div>
+            <form onSubmit={handleInquirySubmit} className="flex flex-col gap-6 flex-1 justify-between mt-2">
+              <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="name" className="font-sans text-[11px] font-bold uppercase tracking-wider text-burgundy-dark">Full Name</label>
+                  <input type="text" id="name" placeholder="John Doe" required className="font-sans text-sm p-4 border border-burgundy/15 bg-white text-burgundy-dark placeholder:text-gray-400 font-medium rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/20 transition-all duration-200 shadow-sm" />
+                </div>
 
-              <div className="flex flex-col gap-2">
-                <label htmlFor="phone" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Phone Number</label>
-                <input type="tel" id="phone" placeholder="+971 50 000 0000" required className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200" />
-              </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="phone" className="font-sans text-[11px] font-bold uppercase tracking-wider text-burgundy-dark">Phone Number</label>
+                  <input type="tel" id="phone" placeholder="+971 50 000 0000" required className="font-sans text-sm p-4 border border-burgundy/15 bg-white text-burgundy-dark placeholder:text-gray-400 font-medium rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/20 transition-all duration-200 shadow-sm" />
+                </div>
 
-              <div className="flex flex-col gap-2">
-                <label htmlFor="msg" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Message</label>
-                <textarea id="msg" rows="5" placeholder="Your enquiry details..." required className="font-sans text-sm p-4 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/15 transition-all duration-200"></textarea>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="msg" className="font-sans text-[11px] font-bold uppercase tracking-wider text-burgundy-dark">Message</label>
+                  <textarea id="msg" rows="5" placeholder="Your enquiry details..." required className="font-sans text-sm p-4 border border-burgundy/15 bg-white text-burgundy-dark placeholder:text-gray-400 font-medium rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/20 transition-all duration-200 shadow-sm"></textarea>
+                </div>
               </div>
 
               <button 
                 type="submit" 
                 disabled={formStatus.loading}
-                className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white font-semibold uppercase tracking-widest py-4 w-full cursor-pointer rounded-xl disabled:opacity-75 hover:-translate-y-[2px] shadow-sm hover:shadow-md transition-all duration-300"
+                className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white font-bold uppercase tracking-widest py-4 w-full cursor-pointer rounded-xl disabled:opacity-75 hover:-translate-y-[2px] shadow-md hover:shadow-lg transition-all duration-300 mt-2"
               >
                 {formStatus.loading ? 'PROCESSING...' : 'Submit Enquiry'}
               </button>
@@ -2788,13 +2795,15 @@ export default function App() {
           </div>
 
           {/* Info Cards Wrap */}
-          <div className="lg:col-span-5 flex flex-col gap-8 text-left">
+          <div className="lg:col-span-5 flex flex-col gap-6 text-left h-full">
             {[
               { 
                 icon: <Phone className="w-5.5 h-5.5" />, 
                 title: "Call Us", 
-                desc: "+971 4 892 3151",
-                link: "tel:+97148923151"
+                phones: [
+                  { label: "+971 4 892 3151", link: "tel:+97148923151" },
+                  { label: "042266388", link: "tel:042266388" }
+                ]
               },
               { 
                 icon: <MessageSquare className="w-5.5 h-5.5" />, 
@@ -2803,8 +2812,38 @@ export default function App() {
                 link: "https://wa.me/971507021275"
               }
             ].map((card, i) => {
-              const CardContent = (
-                <>
+              if (card.phones) {
+                return (
+                  <div key={i} className="flex gap-6 items-start bg-white p-7 border border-black/3 rounded-2xl shadow-sm hover:shadow-md hover:border-gold/30 transition-all duration-300 group">
+                    <div className="w-[48px] h-[48px] bg-ivory border border-burgundy/5 rounded-full flex justify-center items-center text-burgundy flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                      {card.icon}
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-serif text-burgundy font-bold mb-1 group-hover:text-gold transition-colors duration-300">{card.title}</h4>
+                      <div className="flex flex-col gap-1 text-sm font-semibold">
+                        {card.phones.map((phone, pIdx) => (
+                          <a 
+                            key={pIdx} 
+                            href={phone.link} 
+                            className="text-text-secondary hover:text-burgundy transition-colors duration-200"
+                          >
+                            {phone.label}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <a 
+                  key={i} 
+                  href={card.link}
+                  target={card.link.startsWith('http') ? "_blank" : undefined}
+                  rel={card.link.startsWith('http') ? "noopener noreferrer" : undefined}
+                  className="flex gap-6 items-start bg-white p-7 border border-black/3 rounded-2xl shadow-sm hover:shadow-md hover:border-gold/30 hover:-translate-y-[2px] transition-all duration-300 group cursor-pointer"
+                >
                   <div className="w-[48px] h-[48px] bg-ivory border border-burgundy/5 rounded-full flex justify-center items-center text-burgundy flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                     {card.icon}
                   </div>
@@ -2812,31 +2851,11 @@ export default function App() {
                     <h4 className="text-lg font-serif text-burgundy font-bold mb-1 group-hover:text-gold transition-colors duration-300">{card.title}</h4>
                     <p className="text-sm text-text-secondary leading-relaxed">{card.desc}</p>
                   </div>
-                </>
-              );
-
-              if (card.link) {
-                return (
-                  <a 
-                    key={i} 
-                    href={card.link}
-                    target={card.link.startsWith('http') ? "_blank" : undefined}
-                    rel={card.link.startsWith('http') ? "noopener noreferrer" : undefined}
-                    className="flex gap-6 items-start bg-white p-8 border border-black/3 rounded-2xl shadow-sm hover:shadow-md hover:border-gold/30 hover:-translate-y-[2px] transition-all duration-300 group cursor-pointer"
-                  >
-                    {CardContent}
-                  </a>
-                );
-              }
-
-              return (
-                <div key={i} className="flex gap-6 items-start bg-white p-8 border border-black/3 rounded-2xl shadow-sm">
-                  {CardContent}
-                </div>
+                </a>
               );
             })}
 
-            <div className="h-[220px] bg-cover bg-center border border-black/5 rounded-2xl shadow-sm relative overflow-hidden" style={{ backgroundImage: "url('https://placehold.co/800x400/170105/D4AF37/png?text=Aspin+Tower%2C+Dubai')" }}>
+            <div className="flex-1 min-h-[180px] bg-cover bg-center border border-black/5 rounded-2xl shadow-sm relative overflow-hidden" style={{ backgroundImage: "url('https://placehold.co/800x400/170105/D4AF37/png?text=Aspin+Tower%2C+Dubai')" }}>
               <div className="absolute inset-0 bg-burgundy/30 flex justify-center items-center">
                 <a href="https://maps.google.com" target="_blank" rel="noreferrer" className="btn btn-gold text-[10px] font-semibold tracking-wider gold-gradient-bg text-burgundy-dark px-5 py-3 rounded-xl uppercase flex items-center gap-2">
                   <Globe className="w-4 h-4" /> View Map
@@ -3061,9 +3080,14 @@ export default function App() {
               </li>
               <li className="flex gap-4 items-start">
                 <Phone className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
-                <a href="tel:+97148923151" className="hover:text-gold-light transition-colors duration-200 font-bold">
-                  +971 4 892 3151
-                </a>
+                <div className="flex flex-col gap-0.5 font-bold">
+                  <a href="tel:+97148923151" className="hover:text-gold-light transition-colors duration-200">
+                    +971 4 892 3151
+                  </a>
+                  <a href="tel:042266388" className="hover:text-gold-light transition-colors duration-200">
+                    042266388
+                  </a>
+                </div>
               </li>
               <li className="flex gap-4 items-start">
                 <MessageSquare className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
