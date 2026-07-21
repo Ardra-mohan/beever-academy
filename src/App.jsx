@@ -1846,7 +1846,7 @@ export default function App() {
       } else if (textLower.includes('demo') || textLower.includes('trial')) {
         botResponseText = "Yes, we host weekly interactive demo sessions at our Dubai campus. You can experience a live class environment and meet our instructors. I can book a consultation slot for you to register for the next demo.";
       } else if (textLower.includes('contact') || textLower.includes('number') || textLower.includes('phone') || textLower.includes('address') || textLower.includes('location') || textLower.includes('where') || textLower.includes('office') || textLower.includes('dubai')) {
-        botResponseText = "Beever Academy is located at Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai. You can call us directly at +971 4 892 3151 or 042266388, or email admissions@beeveracademy.com. I encourage you to book an on-site consultation to visit us.";
+        botResponseText = "Beever Academy is located at Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai. You can call us directly at +971 4 892 3151 or +971 4 226 6388, or email admissions@beeveracademy.com. I encourage you to book an on-site consultation to visit us.";
       } else {
         botResponseText = "I'd be happy to connect you with our admissions team for the most accurate information. Would you like me to schedule a consultation with an advisor?";
       }
@@ -2802,7 +2802,7 @@ export default function App() {
                 title: "Call Us", 
                 phones: [
                   { label: "+971 4 892 3151", link: "tel:+97148923151" },
-                  { label: "042266388", link: "tel:042266388" }
+                  { label: "+971 4 226 6388", link: "tel:+97142266388" }
                 ]
               },
               { 
@@ -3084,8 +3084,8 @@ export default function App() {
                   <a href="tel:+97148923151" className="hover:text-gold-light transition-colors duration-200">
                     +971 4 892 3151
                   </a>
-                  <a href="tel:042266388" className="hover:text-gold-light transition-colors duration-200">
-                    042266388
+                  <a href="tel:+97142266388" className="hover:text-gold-light transition-colors duration-200">
+                    +971 4 226 6388
                   </a>
                 </div>
               </li>
