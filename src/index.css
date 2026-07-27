@@ -389,7 +389,8 @@ body.show-native-cursor * {
   transition: stroke-dashoffset 1.8s ease-out;
 }
 
-
-
-
-
+/* Vertical text alignment for collapsed panels */
+.writing-vertical {
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+}

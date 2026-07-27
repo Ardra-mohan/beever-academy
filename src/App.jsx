@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { 
-  Award, Users, Shield, Globe, BookOpen, GraduationCap, 
-  Monitor, Briefcase, ChevronLeft, ChevronRight, 
-  MapPin, Phone, Mail, Facebook, Instagram, Linkedin, Youtube, 
+import {
+  Award, Users, Shield, Globe, GraduationCap,
+  Monitor, ChevronLeft, ChevronRight,
+  MapPin, Phone, Mail, Facebook, Instagram, Linkedin, Youtube,
   Quote, Sparkles, Menu, X, ArrowRight, CheckCircle2,
-  Star, TrendingUp, Trophy, Clock, Compass, MessageSquare, Send
+  Star, TrendingUp, Trophy, Clock, MessageSquare, Send
 } from 'lucide-react';
 
 // Import local logo from assets
 import logo from './assets/logo.png';
 import homeImg from './assets/homee.jpeg';
+import officeImg from './assets/office.jpeg';
+import ladyImg from './assets/lady.jpeg';
+import classImg from './assets/class.jpeg';
+import classroomImg from './assets/classroom.jpeg';
 
 // Register GSAP ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -42,7 +46,7 @@ function GoldenSprinkleCursor() {
     if (!dot || !ring || !canvas) return;
 
     const ctx = canvas.getContext('2d');
-    
+
     // Set canvas sizes
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -152,7 +156,7 @@ function GoldenSprinkleCursor() {
 
     const handleTelClick = () => {
       document.body.classList.add('show-native-cursor');
-      
+
       // Auto-revert after 4 seconds as a fallback
       setTimeout(() => {
         document.body.classList.remove('show-native-cursor');
@@ -167,7 +171,7 @@ function GoldenSprinkleCursor() {
         node.removeEventListener('mouseleave', handleMouseLeaveLink);
         node.addEventListener('mouseenter', handleMouseEnterLink);
         node.addEventListener('mouseleave', handleMouseLeaveLink);
-        
+
         if (node.tagName === 'A' && node.getAttribute('href')?.startsWith('tel:')) {
           node.removeEventListener('click', handleTelClick);
           node.addEventListener('click', handleTelClick);
@@ -210,7 +214,7 @@ function GoldenSprinkleCursor() {
         ctx.lineTo(-p.size, 0);
         ctx.closePath();
         ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha})`;
-        
+
         // Add subtle bloom glow shadow
         ctx.shadowBlur = 4;
         ctx.shadowColor = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha})`;
@@ -524,7 +528,7 @@ function GlobalNetworkCanvas() {
       if (progress > 0.95 && loopTime >= 6.2 && loopTime < 14) {
         const dropDur = 0.6;
         const dropProg = Math.min(1.0, (loopTime - 6.2) / dropDur);
-        
+
         if (loopTime >= 6.6) {
           const rippleProg = ((loopTime - 6.6) % 1.8) / 1.8;
           ctx.strokeStyle = `rgba(201, 162, 77, ${1 - rippleProg})`;
@@ -587,7 +591,7 @@ function GlobalNetworkCanvas() {
           const lineGrad = ctx.createLinearGradient(dxbDrawX, dxbDrawY, dDrawX, dDrawY);
           lineGrad.addColorStop(0, 'rgba(201, 162, 77, 0.7)');
           lineGrad.addColorStop(1, 'rgba(255, 255, 255, 0.15)');
-          
+
           ctx.strokeStyle = lineGrad;
           ctx.lineWidth = 1.2;
           ctx.beginPath();
@@ -681,8 +685,8 @@ function GlobalNetworkCanvas() {
   }, []);
 
   return (
-    <canvas 
-      ref={canvasRef} 
+    <canvas
+      ref={canvasRef}
       className="w-full block select-none cursor-crosshair relative z-20"
       style={{ minHeight: '520px' }}
     />
@@ -728,7 +732,7 @@ function AdmissionsBackgroundParticles() {
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       particles.forEach(p => {
         p.y += p.speedY;
         p.x += p.speedX;
@@ -764,8 +768,8 @@ function AdmissionsBackgroundParticles() {
   }, []);
 
   return (
-    <canvas 
-      ref={canvasRef} 
+    <canvas
+      ref={canvasRef}
       className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-70"
     />
   );
@@ -798,18 +802,18 @@ function PremiumTradingTerminal() {
     let currentPrice = 75100;
     const initialCandles = [];
     const now = new Date();
-    
+
     for (let i = 24; i >= 0; i--) {
       const candleTime = new Date(now.getTime() - i * 60000);
       const timeStr = `${String(candleTime.getHours()).padStart(2, '0')}:${String(candleTime.getMinutes()).padStart(2, '0')}:${String(candleTime.getSeconds()).padStart(2, '0')}`;
-      
+
       const openPrice = currentPrice;
       const change = (Math.random() - 0.47) * 220; // slight positive drift
       const closePrice = openPrice + change;
       const highPrice = Math.max(openPrice, closePrice) + Math.random() * 80;
       const lowPrice = Math.min(openPrice, closePrice) - Math.random() * 80;
       const volumeVal = Math.floor(Math.random() * 600) + 150;
-      
+
       // Random Buy/Sell markers on historical candles
       let markerType = null;
       if (i > 2 && Math.random() < 0.12) {
@@ -825,10 +829,10 @@ function PremiumTradingTerminal() {
         volume: volumeVal,
         marker: markerType
       });
-      
+
       currentPrice = closePrice;
     }
-    
+
     setCandles(initialCandles);
     setTicker(prev => ({
       ...prev,
@@ -846,11 +850,11 @@ function PremiumTradingTerminal() {
     const tickInterval = setInterval(() => {
       setCandles(prevCandles => {
         if (prevCandles.length === 0) return prevCandles;
-        
+
         const nextCandles = [...prevCandles];
         const latestIdx = nextCandles.length - 1;
         const current = nextCandles[latestIdx];
-        
+
         // Fluctuate close price
         const priceTick = (Math.random() - 0.5) * 35;
         const newClose = current.close + priceTick;
@@ -869,7 +873,7 @@ function PremiumTradingTerminal() {
         // Update ticker values
         const firstOpen = nextCandles[0].open;
         const percentageChange = ((newClose - firstOpen) / firstOpen) * 100;
-        
+
         setTicker(prev => ({
           ...prev,
           price: newClose,
@@ -887,14 +891,14 @@ function PremiumTradingTerminal() {
     const candleInterval = setInterval(() => {
       setCandles(prevCandles => {
         if (prevCandles.length === 0) return prevCandles;
-        
+
         const nextCandles = [...prevCandles];
         const lastCandle = nextCandles[nextCandles.length - 1];
 
         // Format timestamp
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-        
+
         // Randomly place a buy/sell execution flash on the chart
         const rand = Math.random();
         let marker = null;
@@ -929,7 +933,7 @@ function PremiumTradingTerminal() {
         };
 
         nextCandles.push(newCandle);
-        
+
         // Shift out oldest candle to pan chart left
         if (nextCandles.length > 25) {
           nextCandles.shift();
@@ -1029,11 +1033,11 @@ function PremiumTradingTerminal() {
   const handleMouseMove = (e) => {
     const svg = e.currentTarget;
     const rect = svg.getBoundingClientRect();
-    
+
     // Scale client coordinate to SVG viewBox
     const clientX = e.clientX - rect.left;
     const clientY = e.clientY - rect.top;
-    
+
     const svgX = (clientX / rect.width) * 1000;
     const svgY = (clientY / rect.height) * 450;
 
@@ -1041,7 +1045,7 @@ function PremiumTradingTerminal() {
     if (svgX >= CHART_LEFT && svgX <= CHART_RIGHT && svgY >= CHART_TOP && svgY <= CHART_BOTTOM) {
       const activeCandle = getCandleFromX(svgX);
       const hoveredPrice = getPriceFromY(svgY);
-      
+
       setCrosshair({
         x: svgX,
         y: svgY,
@@ -1067,10 +1071,10 @@ function PremiumTradingTerminal() {
 
   return (
     <div className="w-full flex flex-col bg-[#080102] text-white select-none font-sans leading-none relative">
-      
+
       {/* Tickers Tape/Data Header */}
       <div className="bg-[#0e0204] border-b border-gold/15 py-3 px-6 flex flex-wrap items-center justify-between gap-4 select-none relative z-10 text-[10px] tracking-wider uppercase font-semibold text-white/60">
-        
+
         {/* Symbol and Pulse indicator */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5 font-bold text-white tracking-widest text-[11px]">
@@ -1103,13 +1107,13 @@ function PremiumTradingTerminal() {
 
       {/* Main SVG Viewport */}
       <div className="relative w-full overflow-hidden">
-        <svg 
-          viewBox="0 0 1000 450" 
+        <svg
+          viewBox="0 0 1000 450"
           className="w-full h-auto cursor-crosshair overflow-visible"
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
         >
-          
+
           {/* Subtle Grid Lines */}
           <g className="grid-lines opacity-10">
             {/* Horizontal lines */}
@@ -1142,7 +1146,7 @@ function PremiumTradingTerminal() {
               const y = CHART_BOTTOM - barHeight;
               const isUp = candle.close >= candle.open;
               return (
-                <rect 
+                <rect
                   key={`vol-${i}`}
                   x={x}
                   y={y}
@@ -1163,18 +1167,18 @@ function PremiumTradingTerminal() {
               const closeY = getY(candle.close);
               const highY = getY(candle.high);
               const lowY = getY(candle.low);
-              
+
               const isBullish = candle.close >= candle.open;
               const bodyY = Math.min(openY, closeY);
               const bodyHeight = Math.max(1.5, Math.abs(openY - closeY));
-              
+
               const strokeColor = isBullish ? "#10B981" : "#EF4444";
               const fillColor = isBullish ? "#10B981" : "#EF4444";
 
               return (
                 <g key={`candle-${i}`}>
                   {/* Wicks (High to Low line) */}
-                  <line 
+                  <line
                     x1={x}
                     y1={highY}
                     x2={x}
@@ -1183,7 +1187,7 @@ function PremiumTradingTerminal() {
                     strokeWidth="1.25"
                   />
                   {/* Candle Body */}
-                  <rect 
+                  <rect
                     x={x - 6}
                     y={bodyY}
                     width="12"
@@ -1199,9 +1203,9 @@ function PremiumTradingTerminal() {
                   {candle.marker === 'buy' && (
                     <g className="animate-pulse">
                       {/* Triangle pointing up */}
-                      <polygon 
-                        points={`${x},${lowY + 12} ${x - 5.5},${lowY + 21} ${x + 5.5},${lowY + 21}`} 
-                        fill="#10B981" 
+                      <polygon
+                        points={`${x},${lowY + 12} ${x - 5.5},${lowY + 21} ${x + 5.5},${lowY + 21}`}
+                        fill="#10B981"
                         stroke="#ffffff"
                         strokeWidth="0.5"
                       />
@@ -1211,9 +1215,9 @@ function PremiumTradingTerminal() {
                   {candle.marker === 'sell' && (
                     <g className="animate-pulse">
                       {/* Triangle pointing down */}
-                      <polygon 
-                        points={`${x},${highY - 12} ${x - 5.5},${highY - 21} ${x + 5.5},${highY - 21}`} 
-                        fill="#EF4444" 
+                      <polygon
+                        points={`${x},${highY - 12} ${x - 5.5},${highY - 21} ${x + 5.5},${highY - 21}`}
+                        fill="#EF4444"
                         stroke="#ffffff"
                         strokeWidth="0.5"
                       />
@@ -1229,31 +1233,31 @@ function PremiumTradingTerminal() {
           {candles.length > 0 && (
             <g className="latest-price-tag">
               {/* Horizontal price line indicator */}
-              <line 
-                x1={CHART_LEFT} 
-                y1={getY(ticker.price)} 
-                x2={CHART_RIGHT} 
-                y2={getY(ticker.price)} 
-                stroke={isUpSession ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"} 
-                strokeDasharray="2 2" 
-                strokeWidth="0.75" 
+              <line
+                x1={CHART_LEFT}
+                y1={getY(ticker.price)}
+                x2={CHART_RIGHT}
+                y2={getY(ticker.price)}
+                stroke={isUpSession ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}
+                strokeDasharray="2 2"
+                strokeWidth="0.75"
               />
               {/* Price scale tag block */}
-              <rect 
-                x={CHART_RIGHT + 2} 
-                y={getY(ticker.price) - 8} 
-                width="84" 
-                height="16" 
-                fill={isUpSession ? "#10B981" : "#EF4444"} 
-                rx="3" 
+              <rect
+                x={CHART_RIGHT + 2}
+                y={getY(ticker.price) - 8}
+                width="84"
+                height="16"
+                fill={isUpSession ? "#10B981" : "#EF4444"}
+                rx="3"
               />
-              <text 
-                x={CHART_RIGHT + 44} 
-                y={getY(ticker.price) + 4} 
-                fill="#ffffff" 
-                fontSize="8.5" 
-                fontFamily="monospace" 
-                fontWeight="bold" 
+              <text
+                x={CHART_RIGHT + 44}
+                y={getY(ticker.price) + 4}
+                fill="#ffffff"
+                fontSize="8.5"
+                fontFamily="monospace"
+                fontWeight="bold"
                 textAnchor="middle"
               >
                 ${ticker.price.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
@@ -1264,30 +1268,30 @@ function PremiumTradingTerminal() {
           {/* Trade Executions Flashing Dots overlay */}
           {executions.map(exec => (
             <g key={exec.id} className="trade-execution-flash">
-              <circle 
-                cx={exec.x} 
-                cy={getY(exec.price)} 
-                r="18" 
-                fill="none" 
-                stroke={exec.type === 'buy' ? "#10B981" : "#EF4444"} 
-                strokeWidth="1.5" 
-                className="animate-ping opacity-60" 
+              <circle
+                cx={exec.x}
+                cy={getY(exec.price)}
+                r="18"
+                fill="none"
+                stroke={exec.type === 'buy' ? "#10B981" : "#EF4444"}
+                strokeWidth="1.5"
+                className="animate-ping opacity-60"
               />
-              <circle 
-                cx={exec.x} 
-                cy={getY(exec.price)} 
-                r="6" 
-                fill={exec.type === 'buy' ? "#10B981" : "#EF4444"} 
-                stroke="#ffffff" 
-                strokeWidth="1" 
+              <circle
+                cx={exec.x}
+                cy={getY(exec.price)}
+                r="6"
+                fill={exec.type === 'buy' ? "#10B981" : "#EF4444"}
+                stroke="#ffffff"
+                strokeWidth="1"
               />
-              <text 
-                x={exec.x} 
-                y={getY(exec.price) - 14} 
-                fill={exec.type === 'buy' ? "#10B981" : "#EF4444"} 
-                fontSize="8" 
-                fontFamily="monospace" 
-                fontWeight="bold" 
+              <text
+                x={exec.x}
+                y={getY(exec.price) - 14}
+                fill={exec.type === 'buy' ? "#10B981" : "#EF4444"}
+                fontSize="8"
+                fontFamily="monospace"
+                fontWeight="bold"
                 textAnchor="middle"
                 className="animate-pulse"
               >
@@ -1300,44 +1304,44 @@ function PremiumTradingTerminal() {
           {crosshair.active && (
             <g className="crosshair-interactive-group">
               {/* Horizontal line */}
-              <line 
-                x1={CHART_LEFT} 
-                y1={crosshair.y} 
-                x2={CHART_RIGHT} 
-                y2={crosshair.y} 
-                stroke="#ffffff" 
-                strokeDasharray="4 4" 
-                strokeWidth="0.75" 
-                strokeOpacity="0.5" 
+              <line
+                x1={CHART_LEFT}
+                y1={crosshair.y}
+                x2={CHART_RIGHT}
+                y2={crosshair.y}
+                stroke="#ffffff"
+                strokeDasharray="4 4"
+                strokeWidth="0.75"
+                strokeOpacity="0.5"
               />
               {/* Vertical line */}
-              <line 
-                x1={crosshair.x} 
-                y1={CHART_TOP} 
-                x2={crosshair.x} 
-                y2={CHART_BOTTOM} 
-                stroke="#ffffff" 
-                strokeDasharray="4 4" 
-                strokeWidth="0.75" 
-                strokeOpacity="0.5" 
+              <line
+                x1={crosshair.x}
+                y1={CHART_TOP}
+                x2={crosshair.x}
+                y2={CHART_BOTTOM}
+                stroke="#ffffff"
+                strokeDasharray="4 4"
+                strokeWidth="0.75"
+                strokeOpacity="0.5"
               />
-              
+
               {/* Price axis label tooltip */}
-              <rect 
-                x={CHART_RIGHT + 2} 
-                y={crosshair.y - 8} 
-                width="84" 
-                height="16" 
-                fill="#D4AF37" 
-                rx="3" 
+              <rect
+                x={CHART_RIGHT + 2}
+                y={crosshair.y - 8}
+                width="84"
+                height="16"
+                fill="#D4AF37"
+                rx="3"
               />
-              <text 
-                x={CHART_RIGHT + 44} 
-                y={crosshair.y + 4} 
-                fill="#0c0103" 
-                fontSize="8.5" 
-                fontFamily="monospace" 
-                fontWeight="bold" 
+              <text
+                x={CHART_RIGHT + 44}
+                y={crosshair.y + 4}
+                fill="#0c0103"
+                fontSize="8.5"
+                fontFamily="monospace"
+                fontWeight="bold"
                 textAnchor="middle"
               >
                 ${crosshair.price.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
@@ -1346,21 +1350,21 @@ function PremiumTradingTerminal() {
               {/* Time axis label tooltip */}
               {crosshair.time && (
                 <g>
-                  <rect 
-                    x={crosshair.x - 30} 
-                    y={CHART_BOTTOM + 2} 
-                    width="60" 
-                    height="15" 
-                    fill="#D4AF37" 
-                    rx="3" 
+                  <rect
+                    x={crosshair.x - 30}
+                    y={CHART_BOTTOM + 2}
+                    width="60"
+                    height="15"
+                    fill="#D4AF37"
+                    rx="3"
                   />
-                  <text 
-                    x={crosshair.x} 
-                    y={CHART_BOTTOM + 12} 
-                    fill="#0c0103" 
-                    fontSize="8.5" 
-                    fontFamily="monospace" 
-                    fontWeight="bold" 
+                  <text
+                    x={crosshair.x}
+                    y={CHART_BOTTOM + 12}
+                    fill="#0c0103"
+                    fontSize="8.5"
+                    fontFamily="monospace"
+                    fontWeight="bold"
                     textAnchor="middle"
                   >
                     {crosshair.time}
@@ -1425,10 +1429,9 @@ export default function App() {
   const [isTestimonialHovered, setIsTestimonialHovered] = useState(false);
   const [formStatus, setFormStatus] = useState({ loading: false, submitted: false });
   const [activeNavSection, setActiveNavSection] = useState('home');
-  const [allowScrollHome, setAllowScrollHome] = useState(false);
-  const [activeJourneyStep, setActiveJourneyStep] = useState(0);
   const [selectedJob, setSelectedJob] = useState(null);
   const [careerFormStatus, setCareerFormStatus] = useState({ loading: false, submitted: false });
+  const [expandedCard, setExpandedCard] = useState(0);
 
   // Chatbot AI widget states
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
@@ -1536,11 +1539,11 @@ export default function App() {
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
-      
+
       // Track active section for navbar highlighting
       const sections = ['home', 'about', 'programs', 'admissions', 'blog', 'careers', 'contact'];
       const scrollY = window.pageYOffset;
-      
+
       for (const sectionId of sections) {
         const current = document.getElementById(sectionId);
         if (current) {
@@ -1565,21 +1568,21 @@ export default function App() {
       ScrollTrigger.getAll().forEach(t => t.kill());
 
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      
+
       // 1. Hero Load Animations (Only if on Home page)
       if (currentPage === 'home') {
         const heroTl = gsap.timeline();
         if (prefersReducedMotion) {
           heroTl.fromTo('.hero-heading', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut', overwrite: 'auto' })
-                .fromTo('.hero-desc', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35')
-                .fromTo('.hero-btn', { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35')
-                .fromTo('.hero-feature-item', { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35');
+            .fromTo('.hero-desc', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35')
+            .fromTo('.hero-btn', { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35')
+            .fromTo('.hero-feature-item', { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.35');
         } else {
           heroTl.fromTo('.hero-heading', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' })
-                .fromTo('.hero-desc', { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.4')
-                .fromTo('.hero-btn', { y: 5, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.15, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.4')
-                .fromTo('.hero-feature-item', { y: 15, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.3');
-                
+            .fromTo('.hero-desc', { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.4')
+            .fromTo('.hero-btn', { y: 5, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.15, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.4')
+            .fromTo('.hero-feature-item', { y: 15, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power1.inOut', overwrite: 'auto' }, '-=0.3');
+
           // Subtle background zoom
           gsap.to('.hero-bg-img', { scale: 1.02, duration: 6, ease: 'power1.inOut' });
         }
@@ -1587,7 +1590,7 @@ export default function App() {
 
       // 2. Features entrance
       if (document.querySelector('.features-grid-el')) {
-        gsap.fromTo('.feature-card-el', 
+        gsap.fromTo('.feature-card-el',
           { y: prefersReducedMotion ? 0 : 20, opacity: 0 },
           {
             scrollTrigger: { trigger: '.features-grid-el', start: 'top 85%' },
@@ -1603,7 +1606,7 @@ export default function App() {
 
       // 3. Strengths Cards Stagger
       if (document.querySelector('.strengths-grid-el')) {
-        gsap.fromTo('.strength-card-el', 
+        gsap.fromTo('.strength-card-el',
           { y: prefersReducedMotion ? 0 : 25, opacity: 0 },
           {
             scrollTrigger: { trigger: '.strengths-grid-el', start: 'top 85%' },
@@ -1641,7 +1644,7 @@ export default function App() {
 
       // 5. Inside Gallery Cards
       if (document.querySelector('.inside-grid-el')) {
-        gsap.fromTo('.inside-card-el', 
+        gsap.fromTo('.inside-card-el',
           { y: prefersReducedMotion ? 0 : 20, opacity: 0 },
           {
             scrollTrigger: { trigger: '.inside-grid-el', start: 'top 85%' },
@@ -1657,7 +1660,7 @@ export default function App() {
 
       // 5.5. Careers Cards (Slide in towards the left)
       if (document.querySelector('.careers-grid-el')) {
-        gsap.fromTo('.career-card-el', 
+        gsap.fromTo('.career-card-el',
           { x: prefersReducedMotion ? 0 : 80, opacity: 0 },
           {
             scrollTrigger: { trigger: '.careers-grid-el', start: 'top 85%' },
@@ -1673,7 +1676,7 @@ export default function App() {
 
       // 6. About animations
       if (document.querySelector('.about-grid-el')) {
-        gsap.fromTo('.about-img-box-el', 
+        gsap.fromTo('.about-img-box-el',
           { x: prefersReducedMotion ? 0 : -30, opacity: 0 },
           {
             scrollTrigger: { trigger: '.about-grid-el', start: 'top 80%', once: true },
@@ -1684,7 +1687,7 @@ export default function App() {
             overwrite: 'auto'
           }
         );
-        gsap.fromTo('.about-text-el', 
+        gsap.fromTo('.about-text-el',
           { x: prefersReducedMotion ? 0 : 30, opacity: 0 },
           {
             scrollTrigger: { trigger: '.about-grid-el', start: 'top 80%', once: true },
@@ -1698,7 +1701,7 @@ export default function App() {
       }
 
       // 7. Footer fade-in
-      gsap.fromTo('footer', 
+      gsap.fromTo('footer',
         { opacity: 0 },
         {
           scrollTrigger: { trigger: 'footer', start: 'top 95%' },
@@ -1745,25 +1748,25 @@ export default function App() {
   const handleInquirySubmit = (e) => {
     e.preventDefault();
     setFormStatus({ loading: true, submitted: false });
-    
+
     const name = e.target.querySelector('#name')?.value || '';
     const phone = e.target.querySelector('#phone')?.value || '';
     const msg = e.target.querySelector('#msg')?.value || '';
-    
+
     setTimeout(() => {
       setFormStatus({ loading: false, submitted: true });
       e.target.reset();
-      
+
       setChatUser({ name, phone });
       const initialHasEmoji = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g.test(msg);
-      
+
       setChatbotMessages([
         { sender: 'bot', text: `Hello! I am Bee, the official AI assistant for Beever Academy. I have successfully received your enquiry. Our admissions team has been notified, and I am here to help you instantly in the meantime.`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
         { sender: 'user', text: `Name: ${name}\nPhone: ${phone}\nMessage: ${msg}`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
       ]);
       setIsChatbotOpen(true);
       setIsAiTyping(true);
-      
+
       setTimeout(() => {
         setIsAiTyping(false);
         let botFollowUpText = `Hi ${name}, based on your message, I would love to answer any questions you have about Beever Academy. Are you looking to learn more about our trading courses, tuition details, mentorship, or enrollment? I encourage you to book a consultation with our team for the best guidance.`;
@@ -1782,13 +1785,13 @@ export default function App() {
   const handleChatbotSend = (e) => {
     e.preventDefault();
     if (!chatbotInput.trim()) return;
-    
+
     const userMessage = {
       sender: 'user',
       text: chatbotInput,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
-    
+
     // Check if user has ever typed an emoji in the current input or the historical log
     const currentHasEmoji = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g.test(chatbotInput);
     const logHasEmoji = chatbotMessages.some(m => m.sender === 'user' && /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g.test(m.text));
@@ -1797,12 +1800,12 @@ export default function App() {
     setChatbotMessages(prev => [...prev, userMessage]);
     setChatbotInput('');
     setIsAiTyping(true);
-    
+
     // Simulate AI thinking and response
     setTimeout(() => {
       let botResponseText = "";
       const textLower = userMessage.text.toLowerCase();
-      
+
       const allowedKeywords = [
         'course', 'program', 'fmmta', 'learn', 'syllabus', 'duration', 'time', 'how long',
         'beginner', 'start', 'guide', 'introduction', 'basics', 'trading', 'market',
@@ -1814,17 +1817,17 @@ export default function App() {
         'contact', 'number', 'phone', 'address', 'location', 'where', 'office', 'dubai',
         'demo', 'trial'
       ];
-      
+
       const unrelatedKeywords = [
         'politic', 'government', 'president', 'election', 'movie', 'film', 'actor', 'cinema',
         'sport', 'football', 'soccer', 'cricket', 'basketball', 'olympic', 'coding', 'programming',
         'javascript', 'python', 'react', 'code', 'medical', 'medicine', 'doctor', 'disease',
         'health', 'general knowledge', 'who is', 'what is the capital', 'recipe', 'cooking'
       ];
-      
+
       const isAllowed = allowedKeywords.some(kw => textLower.includes(kw));
       const isUnrelated = unrelatedKeywords.some(kw => textLower.includes(kw));
-      
+
       if (isUnrelated || (!isAllowed && textLower.split(' ').length > 4)) {
         botResponseText = "I'm here to assist only with Beever Academy and our trading programs. Feel free to ask anything about our courses, enrollment, mentorship, or trading education.";
       } else if (textLower.includes('course') || textLower.includes('program') || textLower.includes('fmmta') || textLower.includes('learn') || textLower.includes('syllabus')) {
@@ -1850,7 +1853,7 @@ export default function App() {
       } else {
         botResponseText = "I'd be happy to connect you with our admissions team for the most accurate information. Would you like me to schedule a consultation with an advisor?";
       }
-      
+
       // Emoji check: if user used emojis, add premium sparkle icon, otherwise strictly omit all emojis
       if (anyHasEmoji) {
         botResponseText += " ✨";
@@ -1867,7 +1870,7 @@ export default function App() {
 
   const renderChatbot = () => {
     if (!isChatbotOpen) return null;
-    
+
     return (
       <div className="fixed bottom-6 right-6 w-[390px] h-[540px] bg-[#170105] border border-gold/30 rounded-2xl shadow-2xl z-[9999] flex flex-col overflow-hidden font-sans transition-all duration-300 animate-chatbot-slide">
         {/* Chatbot Header */}
@@ -1886,7 +1889,7 @@ export default function App() {
               <p className="text-[10px] text-white/50 tracking-wider">Official AI Assistant</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={() => setIsChatbotOpen(false)}
             className="text-white/70 hover:text-gold cursor-pointer transition-colors duration-200"
             aria-label="Close Chat"
@@ -1898,26 +1901,24 @@ export default function App() {
         {/* Chat Messages Body */}
         <div className="flex-grow p-4 overflow-y-auto bg-[#1f0208] flex flex-col gap-4 scrollbar-thin">
           {chatbotMessages.map((msg, idx) => (
-            <div 
-              key={idx} 
-              className={`flex flex-col max-w-[82%] ${
-                msg.sender === 'user' ? 'self-end items-end' : 'self-start items-start'
-              }`}
-            >
-              <div 
-                className={`p-3.5 rounded-2xl text-[12px] leading-relaxed whitespace-pre-line text-left shadow-md ${
-                  msg.sender === 'user' 
-                    ? 'bg-gold-gradient text-burgundy-dark font-semibold rounded-tr-none' 
-                    : 'bg-[#29050d] border border-gold/10 text-white rounded-tl-none'
+            <div
+              key={idx}
+              className={`flex flex-col max-w-[82%] ${msg.sender === 'user' ? 'self-end items-end' : 'self-start items-start'
                 }`}
+            >
+              <div
+                className={`p-3.5 rounded-2xl text-[12px] leading-relaxed whitespace-pre-line text-left shadow-md ${msg.sender === 'user'
+                    ? 'bg-gold-gradient text-burgundy-dark font-semibold rounded-tr-none'
+                    : 'bg-[#29050d] border border-gold/10 text-white rounded-tl-none'
+                  }`}
               >
                 {msg.text}
-                
+
                 {/* Direct escalation widget if AI prompts WhatsApp link */}
                 {msg.sender === 'bot' && (msg.text.includes('admissions team') || msg.text.includes('WhatsApp') || msg.text.includes('advisor')) && (
                   <div className="mt-3 pt-3 border-t border-gold/10">
-                    <a 
-                      href="#contact" 
+                    <a
+                      href="#contact"
                       onClick={() => setIsChatbotOpen(false)}
                       className="inline-flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider gold-gradient-bg text-burgundy-dark px-3 py-2 rounded-lg hover:scale-105 transition-transform duration-200"
                     >
@@ -1931,7 +1932,7 @@ export default function App() {
               </span>
             </div>
           ))}
-          
+
           {/* AI Typing Animation Bubble */}
           {isAiTyping && (
             <div className="flex flex-col items-start self-start max-w-[82%]">
@@ -1943,21 +1944,21 @@ export default function App() {
               <span className="text-[8px] text-white/30 mt-1 px-1 tracking-wider uppercase">Bee is formulating response...</span>
             </div>
           )}
-          
+
           <div ref={chatEndRef} />
         </div>
 
         {/* Chat Input Form */}
         <form onSubmit={handleChatbotSend} className="p-3 bg-[#120002] border-t border-gold/10 flex gap-2 items-center">
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={chatbotInput}
             onChange={(e) => setChatbotInput(e.target.value)}
-            placeholder="Ask Beever AI a question..." 
+            placeholder="Ask Beever AI a question..."
             className="flex-grow text-xs p-3.5 border border-gold/15 bg-[#1a0206] text-white placeholder-white/40 rounded-xl focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/20 transition-all duration-200"
           />
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="w-[42px] h-[42px] bg-gold-gradient text-burgundy-dark flex justify-center items-center rounded-xl cursor-pointer hover:scale-105 transition-all duration-200 shadow-md font-bold"
             aria-label="Send Message"
           >
@@ -1971,12 +1972,12 @@ export default function App() {
   // ==========================================
   // SECTION RENDER FUNCTIONS
   // ==========================================
-  
+
   const renderHero = () => (
     <section id="home" className="relative min-h-screen bg-[#1a0206] flex flex-col justify-between overflow-hidden pt-32 pb-6 text-white">
       {/* Background Image & Overlays */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div 
+        <div
           className="hero-bg-img absolute top-24 md:top-28 inset-x-0 bottom-0 bg-cover bg-[position:75%_15%] md:bg-cover bg-no-repeat opacity-95 scale-100 z-0"
           style={{ backgroundImage: `url(${homeImg})`, filter: 'brightness(0.70) contrast(1.12) saturate(1.18)' }}
         ></div>
@@ -1984,12 +1985,12 @@ export default function App() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a0206_0%,rgba(26,2,6,0.8)_15%,rgba(26,2,6,0.15)_35%,transparent_60%)] z-10"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-[#1a0206] via-transparent to-[#1a0206]/20 z-10"></div>
       </div>
-      
+
       {/* Main Copy Area */}
       <div className="relative w-full px-4 sm:px-6 md:px-10 z-20 flex-grow flex flex-col justify-center">
         <div className="max-w-[700px] text-left mt-6 md:mt-12">
           <h1 className="hero-heading text-5xl md:text-7xl lg:text-[76px] font-serif leading-[1.1] mb-8 font-medium">
-            LEARN TODAY,<br/>
+            LEARN TODAY,<br />
             <span className="text-white font-bold">LEAD TOMORROW.</span>
           </h1>
           <p className="hero-desc text-base md:text-lg font-light text-text-light/90 mb-10 max-w-[580px] leading-relaxed">
@@ -2085,74 +2086,159 @@ export default function App() {
     </section>
   );
 
-  const renderWhyChooseUs = () => (
-    <section id="why-choose-us" className="py-20 md:py-32 bg-white text-center">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
-        <div className="mb-16">
-          <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-            Heritage of Distinction
-          </span>
-          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
-            Why Choose Beever Academy?
-          </h2>
-          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-8"></div>
-          <p className="text-sm md:text-base text-text-secondary max-w-[900px] mx-auto leading-relaxed text-justify md:text-center">
-            At Beever Academy, we are committed to delivering an educational experience that goes beyond the classroom. Our focus is on providing premium financial education through practical learning, experienced professionals, and a student-first approach. Every aspect of our academy is designed to help learners build knowledge, confidence, and the skills required to succeed in an ever-evolving financial landscape.
-          </p>
-        </div>
+  const renderWhyChooseUs = () => {
+    const cardsData = [
+      {
+        title: "Premium Education",
+        desc: "Elite modules combining institutional theory with practical trading floor applications.",
+        icon: <GraduationCap className="w-5 h-5" />,
+        benefits: ["Ivy League Academy Standards", "Professional Market Insights"]
+      },
+      {
+        title: "Practical Learning",
+        desc: "Ditch textbooks. Master order flows and macro trends on real-time simulators.",
+        icon: <TrendingUp className="w-5 h-5" />,
+        benefits: ["Real-time Simulator Access", "Live Trade Reviews"]
+      },
+      {
+        title: "20+ Years Expertise",
+        desc: "Learn directly from veteran asset managers and professional risk officers.",
+        icon: <Award className="w-5 h-5" />,
+        benefits: ["Direct Mentorship", "Proven Risk Frameworks"]
+      },
+      {
+        title: "Affordable Excellence",
+        desc: "Elite education structured to be accessible without compromising quality.",
+        icon: <Shield className="w-5 h-5" />,
+        benefits: ["Flexible Payments", "Exceptional Value Ratio"]
+      },
+      {
+        title: "Student-Centered",
+        desc: "Your journey is unique. We adapt training to your goals and pace.",
+        icon: <Users className="w-5 h-5" />,
+        benefits: ["Personalized Roadmaps", "Flexible Scheduling"]
+      },
+      {
+        title: "Commitment to Excellence",
+        desc: "Cultivating high-performing habits, risk discipline, and mental consistency.",
+        icon: <Trophy className="w-5 h-5" />,
+        benefits: ["Risk Management Discipline", "Psychological Coaching"]
+      }
+    ];
 
-        <div className="features-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[
-            {
-              icon: <GraduationCap className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
-              title: "Premium Financial Education",
-              desc: "Experience high-quality learning designed to meet professional standards while remaining accessible through affordable pricing."
-            },
-            {
-              icon: <TrendingUp className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
-              title: "Practical Learning",
-              desc: "Our training approach emphasizes real-world understanding, helping learners develop practical knowledge that can be applied with confidence."
-            },
-            {
-              icon: <Award className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
-              title: "20+ Years of Collective Expertise",
-              desc: "Benefit from the combined knowledge and experience of professionals from different corners of the financial industry."
-            },
-            {
-              icon: <Shield className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
-              title: "Affordable Excellence",
-              desc: "We believe that premium financial education should be accessible without compromising quality, ensuring exceptional value for every learner."
-            },
-            {
-              icon: <Users className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
-              title: "Student-Centered Learning",
-              desc: "Every learner's journey matters. We are committed to creating a supportive environment that encourages continuous learning and personal growth."
-            },
-            {
-              icon: <Trophy className="w-[28px] h-[28px] text-burgundy group-hover:text-gold group-hover:scale-105 transition-all duration-300" />,
-              title: "A Commitment to Excellence",
-              desc: "Our goal is to empower individuals with the knowledge, discipline, and mindset needed to build a strong foundation for lifelong learning and professional success."
-            }
-          ].map((feat, i) => (
-            <div key={i} className="feature-card-el bg-white p-10 border border-black/5 rounded-2xl shadow-sm hover:-translate-y-[5px] hover:shadow-xl hover:border-gold/30 transition-all duration-300 group relative overflow-hidden z-10">
-              <div className="w-[65px] h-[65px] bg-ivory rounded-full border border-burgundy/8 flex justify-center items-center mb-8 mx-auto group-hover:bg-burgundy group-hover:border-burgundy transition-all duration-300">
-                {feat.icon}
-              </div>
-              <h3 className="text-xl font-serif text-burgundy mb-4">{feat.title}</h3>
-              <p className="text-sm text-text-secondary leading-relaxed">{feat.desc}</p>
-              <div className="absolute inset-0 border border-gold opacity-0 group-hover:opacity-40 rounded-2xl shadow-[inset_0_0_15px_rgba(201,162,77,0.1)] transition-all duration-300 z-[-1]"></div>
-            </div>
-          ))}
-        </div>
+    return (
+      <section id="why-choose-us" className="py-12 md:py-20 bg-white text-center">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+          <div className="mb-10">
+            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-2">
+              Heritage of Distinction
+            </span>
+            <h2 className="text-3xl md:text-4xl font-serif text-burgundy mb-4 font-medium">
+              Why Choose Beever Academy?
+            </h2>
+            <div className="w-[60px] h-[2px] bg-gold-gradient mx-auto mb-4"></div>
+            <p className="text-xs md:text-sm text-text-secondary max-w-[800px] mx-auto leading-relaxed">
+              At Beever Academy, we are committed to delivering an educational experience that goes beyond the classroom. Our focus is on providing premium financial education through practical learning, experienced professionals, and a student-first approach.
+            </p>
+          </div>
 
-        <div className="mt-16 text-center">
-          <p className="font-serif text-2xl md:text-3xl text-burgundy italic font-semibold">
-            "Learn Today. Lead Tomorrow."
-          </p>
+          {/* Flex Expanding Cards Container */}
+          <div className="flex flex-col lg:flex-row gap-3 items-stretch justify-center w-full min-h-[300px] lg:h-[300px] mt-8">
+            {cardsData.map((card, i) => {
+              const isExpanded = expandedCard === i;
+              return (
+                <div
+                  key={i}
+                  onMouseEnter={() => setExpandedCard(i)}
+                  onClick={() => setExpandedCard(i)}
+                  className={`relative flex-shrink-0 flex-grow-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] select-none overflow-hidden rounded-2xl group ${isExpanded
+                      ? "w-full lg:w-[45%] bg-burgundy-dark text-white shadow-xl border-none p-6 lg:p-7 cursor-default"
+                      : "w-full lg:w-[11%] bg-ivory/50 border border-burgundy/10 text-burgundy hover:border-gold/30 hover:bg-white hover:shadow-md cursor-pointer p-4"
+                    }`}
+                >
+                  {isExpanded ? (
+                    /* EXPANDED STATE LAYOUT */
+                    <div className="flex flex-col justify-between h-full text-left animate-grid-fade">
+                      <div>
+                        {/* Badge with Icon */}
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-8 h-8 rounded-lg bg-gold-gradient flex justify-center items-center text-burgundy-dark shadow-sm">
+                            {card.icon}
+                          </div>
+                          <span className="text-[10px] uppercase font-mono tracking-widest text-gold-light font-bold">
+                            0{i + 1} • Details
+                          </span>
+                        </div>
+                        
+                        {/* Title */}
+                        <h3 className="text-lg md:text-xl font-serif text-gold font-bold mb-2 leading-tight">
+                          {card.title}
+                        </h3>
+                        
+                        {/* Detailed description */}
+                        <p className="text-xs lg:text-[13px] text-white/90 leading-relaxed mb-4 font-light max-w-[95%]">
+                          {card.desc}
+                        </p>
+
+                        {/* Bulleted Benefits list */}
+                        <ul className="flex flex-col gap-1.5 mb-4 text-xs lg:text-[13px] text-white/80 font-sans">
+                          {card.benefits.map((benefit, idx) => (
+                            <li key={idx} className="flex items-center gap-2">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-gold flex-shrink-0" />
+                              <span className="font-light">{benefit}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* CTA button */}
+                      <div className="mt-auto">
+                        <a
+                          href="#contact"
+                          className="inline-flex btn bg-gold-gradient text-burgundy-dark px-5 py-2.5 font-semibold uppercase tracking-widest text-[10px] rounded-lg hover:scale-102 hover:shadow-md transition-all duration-300"
+                        >
+                          Enquire Now
+                        </a>
+                      </div>
+                    </div>
+                  ) : (
+                    /* COLLAPSED STATE LAYOUT */
+                    <div className="flex flex-row lg:flex-col justify-between items-center h-full w-full">
+                      {/* Top (or Left on Mobile): Number & Icon */}
+                      <div className="flex flex-row lg:flex-col items-center gap-3 lg:gap-4">
+                        <span className="text-xs font-mono font-bold text-gold-dark tracking-wider">
+                          0{i + 1}
+                        </span>
+                        <div className="w-9 h-9 rounded-lg bg-ivory border border-burgundy/10 flex justify-center items-center text-burgundy group-hover:text-gold transition-colors">
+                          {card.icon}
+                        </div>
+                      </div>
+                      
+                      {/* Center: rotated vertical text on desktop / horizontal text on mobile */}
+                      <div className="flex-grow lg:flex-grow-0 lg:my-3 text-left lg:text-center w-full px-2 lg:px-0">
+                        <h3 className="text-sm font-serif font-bold text-burgundy leading-tight lg:writing-vertical tracking-wide lg:whitespace-nowrap lg:py-2 text-left lg:text-center lg:mx-auto">
+                          {card.title}
+                        </h3>
+                      </div>
+
+                      {/* Bottom indicator dot */}
+                      <div className="w-1 h-1 rounded-full bg-burgundy/20 group-hover:bg-gold transition-colors hidden lg:block"></div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-12 text-center">
+            <p className="font-serif text-xl md:text-2xl text-burgundy italic font-semibold">
+              "Learn Today. Lead Tomorrow."
+            </p>
+          </div>
         </div>
-      </div>
-    </section>
-  );
+      </section>
+    );
+  };
 
   const renderAbout = () => (
     <section id="about" className="py-20 md:py-32 bg-ivory">
@@ -2160,8 +2246,14 @@ export default function App() {
         <div className="about-grid-el grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           {/* Visual Column */}
           <div className="about-img-box-el relative border border-burgundy/10 p-[15px] bg-white shadow-md rounded-2xl">
-            <img src="https://placehold.co/800x600/170105/D4AF37/png?text=About+Beever+Academy" alt="Grand Academy Facade" className="w-full h-[280px] sm:h-[380px] lg:h-[480px] object-cover rounded-xl" />
-            
+            <div className="overflow-hidden rounded-xl">
+              <img
+                src={officeImg}
+                alt="Grand Academy Facade"
+                className="w-full h-[280px] sm:h-[380px] lg:h-[480px] object-cover rounded-xl transition-transform duration-700 ease-out hover:scale-105"
+              />
+            </div>
+
             {/* Overlay Glass Card */}
             <div className="about-glass-card-el absolute -bottom-10 right-4 lg:-right-10 w-[280px] bg-burgundy/90 backdrop-blur-[12px] border border-gold/30 p-8 shadow-2xl text-white rounded-2xl hidden sm:block">
               <div className="relative">
@@ -2184,19 +2276,16 @@ export default function App() {
               Premium Financial Education. Affordable for Everyone.
             </h3>
             <div className="w-[80px] h-[2px] bg-gold-gradient mb-8"></div>
-            
+
             <div className="text-sm text-text-secondary leading-relaxed flex flex-col gap-6 mb-10 text-justify">
               <p>
-                At Beever Academy, we believe that quality financial education should be accessible to everyone. Our vision is to deliver premium, industry-focused learning at an affordable price, empowering individuals with the knowledge, confidence, and practical skills needed to succeed in today's dynamic financial world.
+                At <strong>Beever Academy</strong>, we believe quality financial education should be accessible to everyone. Our mission is to deliver premium, industry-focused learning at an affordable price, empowering individuals with the knowledge, confidence, and practical skills to succeed in today's dynamic financial world.
               </p>
               <p>
-                Founded by a team of professionals from different corners of the financial industry, Beever Academy brings together more than 20 years of collective expertise across financial markets, trading, wealth management, leadership, sales, and professional development. This diverse experience enables us to deliver practical, relevant, and career-focused education that reflects real industry standards.
+                Founded by professionals with over <strong>20 years of combined industry experience</strong>, Beever Academy brings expertise across financial markets, trading, wealth management, leadership, and professional development. Our programs combine real-world insights with practical training to bridge the gap between theory and application.
               </p>
               <p>
-                Our programs are designed to bridge the gap between theory and real-world application. Through expert mentorship, interactive learning, and a modern training environment, we equip our students with the skills, discipline, and mindset required to make informed decisions, seize new opportunities, and build successful careers.
-              </p>
-              <p>
-                At Beever Academy, we don't just teach financial concepts. We inspire confidence, develop future professionals, and empower individuals to achieve lasting success.
+                Through expert mentorship, interactive learning, and a career-focused approach, we equip our students with the skills, discipline, and mindset needed to make informed decisions, seize new opportunities, and achieve long-term success in the financial industry.
               </p>
               <p className="font-serif text-lg md:text-xl text-burgundy italic font-semibold mt-2">
                 "Learn Today. Lead Tomorrow."
@@ -2232,7 +2321,7 @@ export default function App() {
     <section id="global-network" className="py-20 md:py-32 bg-[#170105] text-center text-white relative overflow-hidden">
       {/* Decorative gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#1a0206] via-transparent to-[#1a0206] pointer-events-none z-10"></div>
-      
+
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-20">
         <div className="mb-16">
           <span className="font-sans uppercase text-gold-light text-[11px] tracking-[0.2em] font-semibold block mb-3">
@@ -2275,10 +2364,10 @@ export default function App() {
         <div className="strengths-grid-el grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch text-left bg-ivory/40 p-6 md:p-12 rounded-3xl border border-burgundy/10 shadow-lg mt-12">
           {/* Visual Column */}
           <div className="strength-card-el lg:col-span-5 relative group overflow-hidden rounded-2xl border border-gold/20 shadow-md">
-            <img 
-              src="https://placehold.co/800x600/170105/D4AF37/png?text=FMMTA+Program" 
-              alt="FMMTA Classroom Training" 
-              className="w-full h-full min-h-[320px] md:min-h-[400px] object-cover transition-transform duration-700 group-hover:scale-105" 
+            <img
+              src="https://placehold.co/800x600/170105/D4AF37/png?text=FMMTA+Program"
+              alt="FMMTA Classroom Training"
+              className="w-full h-full min-h-[320px] md:min-h-[400px] object-cover transition-transform duration-700 group-hover:scale-105"
             />
             {/* Dark gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-burgundy-dark/95 via-burgundy-dark/30 to-transparent"></div>
@@ -2301,7 +2390,7 @@ export default function App() {
               <h3 className="text-2xl md:text-3xl font-serif text-burgundy mb-6 leading-tight">
                 Foundation Market Mechanics & Technical Analysis (FMMTA)
               </h3>
-              
+
               <div className="text-sm text-text-secondary leading-relaxed flex flex-col gap-6 text-justify">
                 <p>
                   The Foundation Market Mechanics & Technical Analysis (FMMTA) program is the first step toward understanding how financial markets truly operate. Designed with a practical and structured approach, the program introduces learners to the core principles of market mechanics and technical analysis, helping them build a solid foundation before advancing to higher levels of financial education.
@@ -2319,8 +2408,8 @@ export default function App() {
                 </p>
               </div>
               <div className="self-start sm:self-center">
-                <a 
-                  href="#contact" 
+                <a
+                  href="#contact"
                   className="btn btn-gold gold-gradient-bg text-burgundy-dark px-8 py-3.5 font-semibold uppercase tracking-widest text-xs shadow-md hover:shadow-lg hover:-translate-y-[2px] transition-all duration-300 inline-block text-center whitespace-nowrap"
                 >
                   Enquire Now
@@ -2349,21 +2438,21 @@ export default function App() {
 
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
+
             {/* LEFT COLUMN: Text Copy */}
             <div className="lg:col-span-5 flex flex-col justify-center select-none z-10 text-white pr-0 lg:pr-8 admissions-left-content">
               <span className="font-sans uppercase text-gold text-[11px] tracking-[0.2em] font-semibold block mb-4 animate-pulse">
                 ADMISSIONS & ENROLLMENT
               </span>
               <h2 className="text-4xl md:text-5xl lg:text-[52px] font-serif leading-[1.1] text-white mb-6 font-bold tracking-wide">
-                Master the Markets<br/>
+                Master the Markets<br />
                 <span className="text-gold">with Confidence.</span>
               </h2>
               <div className="w-[80px] h-[2px] bg-gold mb-6 opacity-60"></div>
               <p className="text-sm md:text-base text-white/70 font-light leading-relaxed mb-8 max-w-[520px]">
                 Beever Academy offers Dubai's premier environment for high-end financial markets training and strategic wealth development. Gain access to expert instruction, institutional-grade tools, and real-time market simulators. Join a cohort of high-performing leaders, master liquidity dynamics, and advance your trading journey today.
               </p>
-              
+
               <div className="admission-action-btn relative z-10">
                 <a href="#contact" className="inline-flex btn px-8 py-4 font-semibold uppercase tracking-widest shadow-lg hover:shadow-xl hover:-translate-y-[2px] transition-all duration-300 items-center gap-2 gold-gradient-bg text-burgundy-dark font-sans text-xs">
                   <span>Start Your Trading Journey</span>
@@ -2405,12 +2494,12 @@ export default function App() {
             },
             {
               title: "Expert-Led Workshops",
-              img: "https://placehold.co/600x400/170105/D4AF37/png?text=Expert+Workshops",
+              img: classImg,
               desc: "Gain hands-on problem solving insights led directly by top industry practitioners."
             },
             {
               title: "Collaborative Learning Environment",
-              img: "https://placehold.co/600x400/170105/D4AF37/png?text=Collaborative+Study",
+              img: classroomImg,
               desc: "Modern study environments built to nurture teamwork, cooperation, and group study projects."
             },
             {
@@ -2420,12 +2509,12 @@ export default function App() {
             },
             {
               title: "Career Development Programs",
-              img: "https://placehold.co/600x400/170105/D4AF37/png?text=Career+Development",
+              img: ladyImg,
               desc: "Rigorous physical and strategic preparation designed to cultivate confidence and leadership."
             }
           ].map((card, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className={`inside-card-el bg-white border border-black/5 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-gold/30 transition-all duration-300 flex flex-col justify-between group ${i === 3 || i === 4 ? 'lg:col-span-1 lg:max-w-md mx-auto w-full' : ''}`}
             >
               <div className="relative overflow-hidden h-[240px]">
@@ -2480,7 +2569,7 @@ export default function App() {
     const handleCareerSubmit = (e) => {
       e.preventDefault();
       setCareerFormStatus({ loading: true, submitted: false });
-      
+
       setTimeout(() => {
         setCareerFormStatus({ loading: false, submitted: true });
         alert(`Application for ${selectedJob} submitted successfully. Our talent acquisition team will review your resume and contact you soon.`);
@@ -2508,8 +2597,8 @@ export default function App() {
 
           <div className="careers-grid-el flex flex-col gap-8 max-w-[1000px] mx-auto text-left">
             {openings.map((job) => (
-              <div 
-                key={job.id} 
+              <div
+                key={job.id}
                 className="career-card-el bg-white border border-black/5 rounded-2xl p-8 shadow-sm hover:shadow-xl hover:border-gold/30 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6 group relative overflow-hidden"
               >
                 <div className="flex-grow">
@@ -2533,9 +2622,9 @@ export default function App() {
                     {job.desc}
                   </p>
                 </div>
-                
+
                 <div className="flex-shrink-0 w-full md:w-auto">
-                  <button 
+                  <button
                     onClick={() => handleApplyClick(job.title)}
                     className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white text-[11px] px-8 py-4 font-bold uppercase tracking-widest rounded-xl transition-all duration-300 w-full md:w-auto hover:-translate-y-[2px] shadow-sm hover:shadow-md cursor-pointer block text-center"
                   >
@@ -2551,7 +2640,7 @@ export default function App() {
         {selectedJob && (
           <div className="fixed inset-0 bg-burgundy-dark/65 backdrop-blur-[6px] flex justify-center items-center z-[10000] px-4">
             <div className="bg-white border border-gold/30 rounded-2xl w-full max-w-[550px] p-8 sm:p-10 shadow-2xl relative animate-grid-fade text-left text-charcoal">
-              <button 
+              <button
                 onClick={() => setSelectedJob(null)}
                 className="absolute top-6 right-6 text-burgundy/65 hover:text-burgundy transition-colors cursor-pointer"
                 aria-label="Close Modal"
@@ -2571,50 +2660,50 @@ export default function App() {
               <form onSubmit={handleCareerSubmit} className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="appl-name" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Full Name</label>
-                  <input 
-                    type="text" 
-                    id="appl-name" 
-                    placeholder="Enter your full name" 
-                    required 
-                    className="font-sans text-sm p-3.5 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold focus:ring-4 focus:ring-gold/15 transition-all duration-200" 
+                  <input
+                    type="text"
+                    id="appl-name"
+                    placeholder="Enter your full name"
+                    required
+                    className="font-sans text-sm p-3.5 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold focus:ring-4 focus:ring-gold/15 transition-all duration-200"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="appl-email" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Email Address</label>
-                  <input 
-                    type="email" 
-                    id="appl-email" 
-                    placeholder="Enter your email address" 
-                    required 
-                    className="font-sans text-sm p-3.5 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold focus:ring-4 focus:ring-gold/15 transition-all duration-200" 
+                  <input
+                    type="email"
+                    id="appl-email"
+                    placeholder="Enter your email address"
+                    required
+                    className="font-sans text-sm p-3.5 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold focus:ring-4 focus:ring-gold/15 transition-all duration-200"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="appl-resume" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Resume / Portfolio Link</label>
-                  <input 
-                    type="url" 
-                    id="appl-resume" 
-                    placeholder="https://linkedin.com/in/username or drive link" 
-                    required 
-                    className="font-sans text-sm p-3.5 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold focus:ring-4 focus:ring-gold/15 transition-all duration-200" 
+                  <input
+                    type="url"
+                    id="appl-resume"
+                    placeholder="https://linkedin.com/in/username or drive link"
+                    required
+                    className="font-sans text-sm p-3.5 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold focus:ring-4 focus:ring-gold/15 transition-all duration-200"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="appl-msg" className="font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-dark">Cover Letter Summary</label>
-                  <textarea 
-                    id="appl-msg" 
-                    rows="4" 
-                    placeholder="Tell us why you are a great fit for Beever Academy..." 
-                    required 
+                  <textarea
+                    id="appl-msg"
+                    rows="4"
+                    placeholder="Tell us why you are a great fit for Beever Academy..."
+                    required
                     className="font-sans text-sm p-3.5 border border-burgundy/10 bg-white rounded-xl focus:outline-none focus:border-gold focus:ring-4 focus:ring-gold/15 transition-all duration-200"
                   ></textarea>
                 </div>
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={careerFormStatus.loading}
                   className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white font-bold uppercase tracking-widest py-4 w-full cursor-pointer rounded-xl disabled:opacity-75 hover:-translate-y-[2px] shadow-sm hover:shadow-md transition-all duration-300 text-xs mt-2"
                 >
@@ -2642,14 +2731,14 @@ export default function App() {
         </div>
 
         <div className="max-w-[850px] mx-auto relative px-4 sm:px-16">
-          <div 
+          <div
             className="relative h-[480px] sm:h-[380px] overflow-hidden"
             onMouseEnter={() => setIsTestimonialHovered(true)}
             onMouseLeave={() => setIsTestimonialHovered(false)}
           >
             {testimonials.map((test, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`absolute inset-0 flex flex-col justify-center items-center text-center transition-all duration-500 ease-in-out ${index === currentTestimonial ? 'opacity-100 visible translate-y-0 scale-100' : 'opacity-0 invisible translate-y-5 scale-95'}`}
               >
                 <div className="bg-white border border-black/5 rounded-2xl p-8 sm:p-10 shadow-md relative max-w-[750px] mx-auto">
@@ -2673,9 +2762,9 @@ export default function App() {
                   </div>
 
                   <div className="flex items-center justify-center gap-4 border-t border-burgundy/10 pt-6 mt-4">
-                    <img 
-                      src={test.img} 
-                      alt={test.name} 
+                    <img
+                      src={test.img}
+                      alt={test.name}
                       className="w-14 h-14 rounded-full object-cover border-2 border-gold shadow-sm"
                     />
                     <div className="text-left">
@@ -2691,15 +2780,15 @@ export default function App() {
           </div>
 
           {/* Slider Arrow Buttons */}
-          <button 
-            onClick={() => handleTestimonialNav(-1)} 
+          <button
+            onClick={() => handleTestimonialNav(-1)}
             className="absolute left-0 top-1/2 -translate-y-1/2 border border-burgundy/15 rounded-full w-12 h-12 flex justify-center items-center bg-white text-burgundy hover:bg-burgundy hover:text-white hover:border-burgundy hover:shadow-lg transition-all duration-300 cursor-pointer hidden md:flex z-20"
             aria-label="Previous Testimonial"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <button 
-            onClick={() => handleTestimonialNav(1)} 
+          <button
+            onClick={() => handleTestimonialNav(1)}
             className="absolute right-0 top-1/2 -translate-y-1/2 border border-burgundy/15 rounded-full w-12 h-12 flex justify-center items-center bg-white text-burgundy hover:bg-burgundy hover:text-white hover:border-burgundy hover:shadow-lg transition-all duration-300 cursor-pointer hidden md:flex z-20"
             aria-label="Next Testimonial"
           >
@@ -2709,9 +2798,9 @@ export default function App() {
           {/* Dots */}
           <div className="flex justify-center gap-3 mt-8">
             {testimonials.map((_, index) => (
-              <button 
-                key={index} 
-                onClick={() => setCurrentTestimonial(index)} 
+              <button
+                key={index}
+                onClick={() => setCurrentTestimonial(index)}
                 className={`border-none h-2 cursor-pointer transition-all duration-300 rounded-full ${index === currentTestimonial ? 'bg-gold-dark w-6' : 'bg-burgundy/15 w-2'}`}
                 aria-label={`Slide ${index + 1}`}
               />
@@ -2746,7 +2835,7 @@ export default function App() {
                 <span>Contact Form</span>
                 <span className="text-[10px] font-sans text-burgundy/70 font-bold tracking-wider uppercase border border-burgundy/20 px-3 py-1 rounded-full bg-white/60">Priority Support</span>
               </h3>
-              
+
               {formStatus.submitted && (
                 <div className="bg-[#e6fffa] border border-[#319795] text-[#234e52] p-5 rounded-xl flex flex-col gap-2 mb-8 animate-chatbot-slide text-left">
                   <div className="flex items-center gap-2">
@@ -2756,8 +2845,8 @@ export default function App() {
                   <p className="text-xs leading-relaxed">
                     Thank you for reaching out. We have opened our AI assistant Bee at the bottom-right corner to answer any questions you have instantly.
                   </p>
-                  <button 
-                    onClick={() => setFormStatus(prev => ({ ...prev, submitted: false }))} 
+                  <button
+                    onClick={() => setFormStatus(prev => ({ ...prev, submitted: false }))}
                     className="text-xs text-[#319795] hover:text-[#234e52] font-semibold underline self-start cursor-pointer border-none bg-transparent p-0"
                   >
                     Send another enquiry
@@ -2765,7 +2854,7 @@ export default function App() {
                 </div>
               )}
             </div>
-            
+
             <form onSubmit={handleInquirySubmit} className="flex flex-col gap-6 flex-1 justify-between mt-2">
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
@@ -2784,8 +2873,8 @@ export default function App() {
                 </div>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={formStatus.loading}
                 className="btn btn-burgundy bg-burgundy hover:bg-burgundy-light text-white font-bold uppercase tracking-widest py-4 w-full cursor-pointer rounded-xl disabled:opacity-75 hover:-translate-y-[2px] shadow-md hover:shadow-lg transition-all duration-300 mt-2"
               >
@@ -2797,17 +2886,17 @@ export default function App() {
           {/* Info Cards Wrap */}
           <div className="lg:col-span-5 flex flex-col gap-6 text-left h-full">
             {[
-              { 
-                icon: <Phone className="w-5.5 h-5.5" />, 
-                title: "Call Us", 
+              {
+                icon: <Phone className="w-5.5 h-5.5" />,
+                title: "Call Us",
                 phones: [
                   { label: "+971 4 892 3151", link: "tel:+97148923151" },
                   { label: "+971 4 226 6388", link: "tel:+97142266388" }
                 ]
               },
-              { 
-                icon: <MessageSquare className="w-5.5 h-5.5" />, 
-                title: "WhatsApp", 
+              {
+                icon: <MessageSquare className="w-5.5 h-5.5" />,
+                title: "WhatsApp",
                 desc: "+971 50 702 1275",
                 link: "https://wa.me/971507021275"
               }
@@ -2822,9 +2911,9 @@ export default function App() {
                       <h4 className="text-lg font-serif text-burgundy font-bold mb-1 group-hover:text-gold transition-colors duration-300">{card.title}</h4>
                       <div className="flex flex-col gap-1 text-sm font-semibold">
                         {card.phones.map((phone, pIdx) => (
-                          <a 
-                            key={pIdx} 
-                            href={phone.link} 
+                          <a
+                            key={pIdx}
+                            href={phone.link}
                             className="text-text-secondary hover:text-burgundy transition-colors duration-200"
                           >
                             {phone.label}
@@ -2837,8 +2926,8 @@ export default function App() {
               }
 
               return (
-                <a 
-                  key={i} 
+                <a
+                  key={i}
                   href={card.link}
                   target={card.link.startsWith('http') ? "_blank" : undefined}
                   rel={card.link.startsWith('http') ? "noopener noreferrer" : undefined}
@@ -2910,13 +2999,12 @@ export default function App() {
           <ul className="hidden lg:flex gap-7">
             {['home', 'about', 'programs', 'admissions', 'blog', 'careers', 'contact'].map(sec => (
               <li key={sec}>
-                <a 
-                  href={`#${sec}`} 
-                  className={`font-sans text-sm uppercase tracking-wider font-bold transition-all duration-200 relative py-2 ${
-                    activeNavSection === sec 
-                      ? 'text-gold-light after:w-full' 
+                <a
+                  href={`#${sec}`}
+                  className={`font-sans text-sm uppercase tracking-wider font-bold transition-all duration-200 relative py-2 ${activeNavSection === sec
+                      ? 'text-gold-light after:w-full'
                       : 'text-white/80 hover:text-gold-light after:w-0'
-                  } after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1px] after:bg-gold hover:after:w-full after:transition-all after:duration-300`}
+                    } after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1px] after:bg-gold hover:after:w-full after:transition-all after:duration-300`}
                 >
                   {sec.replace('-', ' ')}
                 </a>
@@ -2940,7 +3028,7 @@ export default function App() {
               </a>
             </div>
             {/* Mobile Hamburger toggle */}
-            <button 
+            <button
               className="lg:hidden flex flex-col gap-[6px] cursor-pointer z-[1100] text-white"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle Menu"
@@ -3002,7 +3090,7 @@ export default function App() {
          ========================================== */}
       <footer className="bg-burgundy-dark text-white border-t-2 border-gold">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 py-20 md:py-28 text-left">
-          
+
           {/* Brand Col */}
           <div className="flex flex-col gap-6">
             <a href="#home" className="flex items-center gap-3">
@@ -3112,10 +3200,10 @@ export default function App() {
               <a href="#" className="hover:text-white">Privacy Policy</a>
               <a href="#" className="hover:text-white">Terms of Service</a>
               <a href="#" className="hover:text-white">Sitemap</a>
-              <a 
-                href="https://www.instagram.com/intellex.web?igsh=MWZyenU0bWc3M2RxOQ==" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href="https://www.instagram.com/intellex.web?igsh=MWZyenU0bWc3M2RxOQ=="
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hover:text-white transition-colors duration-200 flex items-center gap-1.5"
               >
                 <Instagram className="w-3.5 h-3.5" />
@@ -3127,15 +3215,15 @@ export default function App() {
       </footer>
       {renderChatbot()}
       {/* Floating authentic green WhatsApp Button */}
-      <a 
-        href="https://wa.me/971507021275" 
-        target="_blank" 
+      <a
+        href="https://wa.me/971507021275"
+        target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-[900] w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white flex justify-center items-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 group"
         aria-label="Chat on WhatsApp"
       >
         <svg viewBox="0 0 24 24" className="w-8 h-8 fill-white">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.705 1.459h.008c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.705 1.459h.008c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
         </svg>
         <span className="absolute right-16 scale-0 group-hover:scale-100 transition-all duration-200 bg-burgundy px-3 py-1.5 rounded-lg text-xs tracking-wider text-white font-semibold shadow-md whitespace-nowrap">
           Chat on WhatsApp
