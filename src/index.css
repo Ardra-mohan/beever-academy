@@ -78,13 +78,17 @@ body {
 
 /* Custom Cursor Styles */
 @media (min-width: 1024px) {
-  body, a, button, select, input, textarea, [role="button"], [onClick] {
+  *:not(input):not(textarea):not(select):not(iframe), 
+  *:not(input):not(textarea):not(select):not(iframe)::before, 
+  *:not(input):not(textarea):not(select):not(iframe)::after {
     cursor: none !important;
   }
 }
 
 body.show-native-cursor,
-body.show-native-cursor * {
+body.show-native-cursor *,
+body.show-native-cursor *::before,
+body.show-native-cursor *::after {
   cursor: auto !important;
 }
 
@@ -113,7 +117,7 @@ body.show-native-cursor * {
   pointer-events: none;
   z-index: 9999;
   box-shadow: 0 0 10px rgba(201, 162, 77, 0.2);
-  will-change: transform, width, height, background-color, border-color;
+  will-change: transform, background-color, border-color;
 }
 
 

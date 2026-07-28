@@ -21,6 +21,82 @@ import classroomImg from './assets/classroom.jpeg';
 gsap.registerPlugin(ScrollTrigger);
 
 // ==========================================
+// LIGHTWEIGHT THROTTLE UTILITY
+// ==========================================
+function throttle(func, limit) {
+  let inThrottle;
+  return function(...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+
+// ==========================================
+// MEMOIZED BLOG/CAMPUS LIFE CARDS COMPONENT
+// ==========================================
+const InsideGalleryCards = React.memo(() => {
+  const cards = [
+    {
+      title: "Interactive Learning Sessions",
+      img: "https://placehold.co/600x400/170105/D4AF37/png?text=Interactive+Learning",
+      desc: "Engage in collaborative workshops using modern educational technology and collaborative teaching setups."
+    },
+    {
+      title: "Expert-Led Workshops",
+      img: classImg,
+      desc: "Gain hands-on problem solving insights led directly by top industry practitioners."
+    },
+    {
+      title: "Collaborative Learning Environment",
+      img: classroomImg,
+      desc: "Modern study environments built to nurture teamwork, cooperation, and group study projects."
+    },
+    {
+      title: "Professional Mentorship",
+      img: "https://placehold.co/600x400/170105/D4AF37/png?text=Mentorship",
+      desc: "One-on-one professional counseling guidance to layout clear long-term career growth plans."
+    },
+    {
+      title: "Career Development Programs",
+      img: ladyImg,
+      desc: "Rigorous physical and strategic preparation designed to cultivate confidence and leadership."
+    }
+  ];
+
+  return (
+    <div className="inside-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
+      {cards.map((card, i) => (
+        <div
+          key={i}
+          className={`inside-card-el bg-white border border-black/5 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-gold/30 transition-all duration-300 flex flex-col justify-between group ${i === 3 || i === 4 ? 'lg:col-span-1 lg:max-w-md mx-auto w-full' : ''}`}
+        >
+          <div className="relative overflow-hidden h-[240px]">
+            <img 
+              src={card.img} 
+              alt={card.title} 
+              className="w-full h-full object-cover" 
+              loading="lazy" 
+              width="600" 
+              height="400" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-burgundy-dark/75 via-transparent to-transparent opacity-90"></div>
+            <div className="absolute bottom-4 left-6 right-6">
+              <h3 className="font-serif text-xl text-white font-medium drop-shadow-sm">{card.title}</h3>
+            </div>
+          </div>
+          <div className="p-6">
+            <p className="text-xs text-text-secondary leading-relaxed">{card.desc}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+});
+
+// ==========================================
 // CUSTOM GOLDEN SPRINKLE CURSOR COMPONENT
 // ==========================================
 function GoldenSprinkleCursor() {
@@ -58,23 +134,39 @@ function GoldenSprinkleCursor() {
     // Mouse coordinates tracking
     let mouse = { x: -100, y: -100 };
     let lastMouse = { x: -100, y: -100 };
+    let hasMoved = false;
 
     // Set initial custom cursor positioning
     gsap.set(dot, { xPercent: -50, yPercent: -50 });
     gsap.set(ring, { xPercent: -50, yPercent: -50 });
 
+    // Use fast GSAP quickTo setters for buttery smooth cursor tracking
+    const setDotX = gsap.quickTo(dot, "x", { duration: 0.05, ease: "power3.out" });
+    const setDotY = gsap.quickTo(dot, "y", { duration: 0.05, ease: "power3.out" });
+    const setRingX = gsap.quickTo(ring, "x", { duration: 0.22, ease: "power3.out" });
+    const setRingY = gsap.quickTo(ring, "y", { duration: 0.22, ease: "power3.out" });
+
     const handleMouseMove = (e) => {
       // Revert native cursor if it was temporarily shown
       if (document.body.classList.contains('show-native-cursor')) {
         document.body.classList.remove('show-native-cursor');
+        gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
       }
 
       mouse.x = e.clientX;
       mouse.y = e.clientY;
 
-      // Move custom dot (fast lag) and ring (slower lag for smooth drag follow feel)
-      gsap.to(dot, { x: mouse.x, y: mouse.y, duration: 0.05, ease: "power2.out" });
-      gsap.to(ring, { x: mouse.x, y: mouse.y, duration: 0.22, ease: "power2.out" });
+      if (!hasMoved) {
+        // First move: snap to cursor instantly
+        gsap.set(dot, { x: mouse.x, y: mouse.y });
+        gsap.set(ring, { x: mouse.x, y: mouse.y });
+        hasMoved = true;
+      } else {
+        setDotX(mouse.x);
+        setDotY(mouse.y);
+        setRingX(mouse.x);
+        setRingY(mouse.y);
+      }
 
       // Generate golden sprinkle particles based on cursor speed
       const distance = Math.hypot(mouse.x - lastMouse.x, mouse.y - lastMouse.y);
@@ -82,6 +174,11 @@ function GoldenSprinkleCursor() {
         const spawnCount = Math.min(3, Math.floor(distance / 5) + 1);
         for (let i = 0; i < spawnCount; i++) {
           particlesRef.current.push(createParticle(mouse.x, mouse.y));
+        }
+
+        // Cap active particles to prevent memory bloom
+        if (particlesRef.current.length > 80) {
+          particlesRef.current.splice(0, particlesRef.current.length - 80);
         }
       }
 
@@ -116,39 +213,44 @@ function GoldenSprinkleCursor() {
       };
     };
 
-    // Hover scales the cursor ring & adds translucent gold fill
+    // Hover updates scale to leverage GPU acceleration
     const handleMouseEnterLink = () => {
       gsap.to(ring, {
         scale: 1.5,
         backgroundColor: 'rgba(201, 162, 77, 0.15)',
         borderColor: '#F2DFA2',
         boxShadow: '0 0 15px rgba(201, 162, 77, 0.4)',
-        duration: 0.25
+        duration: 0.25,
+        overwrite: 'auto'
       });
       gsap.to(dot, {
         scale: 0.5,
         backgroundColor: '#F2DFA2',
-        duration: 0.2
+        duration: 0.2,
+        overwrite: 'auto'
       });
     };
 
     const handleMouseLeaveLink = () => {
       gsap.to(ring, {
-        scale: 1,
+        scale: 1.0,
         backgroundColor: 'transparent',
         borderColor: 'rgba(201, 162, 77, 0.6)',
         boxShadow: '0 0 10px rgba(201, 162, 77, 0.2)',
-        duration: 0.25
+        duration: 0.25,
+        overwrite: 'auto'
       });
       gsap.to(dot, {
-        scale: 1,
+        scale: 1.0,
         backgroundColor: '#C9A24D',
-        duration: 0.2
+        duration: 0.2,
+        overwrite: 'auto'
       });
     };
 
     const handleWindowFocus = () => {
       document.body.classList.remove('show-native-cursor');
+      gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -156,34 +258,73 @@ function GoldenSprinkleCursor() {
 
     const handleTelClick = () => {
       document.body.classList.add('show-native-cursor');
+      gsap.to([dot, ring, canvas], { opacity: 0, duration: 0.15, overwrite: 'auto' });
 
       // Auto-revert after 4 seconds as a fallback
       setTimeout(() => {
-        document.body.classList.remove('show-native-cursor');
+        if (document.body.classList.contains('show-native-cursor')) {
+          document.body.classList.remove('show-native-cursor');
+          gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
+        }
       }, 4000);
     };
 
-    // Apply custom cursor interactions to all interactive nodes
-    const bindLinkListeners = () => {
-      const nodes = document.querySelectorAll('a, button, select, input, textarea, [role="button"], .cursor-pointer');
-      nodes.forEach(node => {
-        node.removeEventListener('mouseenter', handleMouseEnterLink);
-        node.removeEventListener('mouseleave', handleMouseLeaveLink);
-        node.addEventListener('mouseenter', handleMouseEnterLink);
-        node.addEventListener('mouseleave', handleMouseLeaveLink);
+    // Track active hover state to avoid redundant GSAP tween creations
+    let isHovered = false;
 
-        if (node.tagName === 'A' && node.getAttribute('href')?.startsWith('tel:')) {
-          node.removeEventListener('click', handleTelClick);
-          node.addEventListener('click', handleTelClick);
+    // Event Delegation: Globally handle mouseover to hover scale
+    const handleMouseOver = (e) => {
+      const target = e.target;
+      if (!target) return;
+
+      const isInputField = target.closest('input, textarea, select, iframe') || document.body.classList.contains('show-native-cursor');
+      if (isInputField) {
+        gsap.to([dot, ring, canvas], { opacity: 0, duration: 0.15, overwrite: 'auto' });
+        return;
+      } else {
+        gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
+      }
+
+      const interactiveEl = target.closest('a, button, [role="button"], .cursor-pointer');
+      if (interactiveEl) {
+        if (!isHovered) {
+          isHovered = true;
+          handleMouseEnterLink();
         }
-      });
+      } else {
+        if (isHovered) {
+          isHovered = false;
+          handleMouseLeaveLink();
+        }
+      }
     };
 
-    bindLinkListeners();
+    // Global click handler to handle tel: links bypass
+    const handleGlobalClick = (e) => {
+      const target = e.target;
+      if (!target) return;
+      const anchor = target.closest('a');
+      if (anchor && anchor.getAttribute('href')?.startsWith('tel:')) {
+        handleTelClick();
+      }
+    };
 
-    // Auto-listen to SPA page navigation or DOM layout modifications
-    const observer = new MutationObserver(bindLinkListeners);
-    observer.observe(document.body, { childList: true, subtree: true });
+    const handleMouseLeaveWindow = () => {
+      gsap.to([dot, ring, canvas], { opacity: 0, duration: 0.15, overwrite: 'auto' });
+    };
+
+    const handleMouseEnterWindow = (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      gsap.set(dot, { x: mouse.x, y: mouse.y });
+      gsap.set(ring, { x: mouse.x, y: mouse.y });
+      gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
+    };
+
+    document.addEventListener('mouseleave', handleMouseLeaveWindow);
+    document.addEventListener('mouseenter', handleMouseEnterWindow);
+    document.addEventListener('mouseover', handleMouseOver);
+    document.addEventListener('click', handleGlobalClick);
 
     // Sparkles canvas rendering loop
     const animateParticles = () => {
@@ -207,18 +348,27 @@ function GoldenSprinkleCursor() {
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.rotation);
+
+        // Simulated glow (larger, semi-transparent diamond)
+        ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha * 0.35})`;
+        ctx.beginPath();
+        ctx.moveTo(0, -p.size * 2.2);
+        ctx.lineTo(p.size * 2.2, 0);
+        ctx.lineTo(0, p.size * 2.2);
+        ctx.lineTo(-p.size * 2.2, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        // Core diamond particle
+        ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha})`;
         ctx.beginPath();
         ctx.moveTo(0, -p.size);
         ctx.lineTo(p.size, 0);
         ctx.lineTo(0, p.size);
         ctx.lineTo(-p.size, 0);
         ctx.closePath();
-        ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha})`;
-
-        // Add subtle bloom glow shadow
-        ctx.shadowBlur = 4;
-        ctx.shadowColor = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha})`;
         ctx.fill();
+
         ctx.restore();
       }
 
@@ -231,17 +381,12 @@ function GoldenSprinkleCursor() {
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(requestRef.current);
-      observer.disconnect();
-      const nodes = document.querySelectorAll('a, button, select, input, textarea, [role="button"], .cursor-pointer');
-      nodes.forEach(node => {
-        node.removeEventListener('mouseenter', handleMouseEnterLink);
-        node.removeEventListener('mouseleave', handleMouseLeaveLink);
-        if (node.tagName === 'A' && node.getAttribute('href')?.startsWith('tel:')) {
-          node.removeEventListener('click', handleTelClick);
-        }
-      });
       window.removeEventListener('focus', handleWindowFocus);
+      document.removeEventListener('mouseleave', handleMouseLeaveWindow);
+      document.removeEventListener('mouseenter', handleMouseEnterWindow);
+      document.removeEventListener('mouseover', handleMouseOver);
+      document.removeEventListener('click', handleGlobalClick);
+      cancelAnimationFrame(requestRef.current);
     };
   }, []);
 
@@ -1537,12 +1682,20 @@ export default function App() {
 
   // Navbar Scroll Trigger
   useEffect(() => {
+    const isScrolledRef = { current: false };
+    const activeNavSectionRef = { current: 'home' };
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+      const newIsScrolled = scrollY > 50;
+      if (isScrolledRef.current !== newIsScrolled) {
+        isScrolledRef.current = newIsScrolled;
+        setIsScrolled(newIsScrolled);
+      }
 
       // Track active section for navbar highlighting
       const sections = ['home', 'about', 'programs', 'admissions', 'blog', 'careers', 'contact'];
-      const scrollY = window.pageYOffset;
 
       for (const sectionId of sections) {
         const current = document.getElementById(sectionId);
@@ -1550,15 +1703,20 @@ export default function App() {
           const sectionHeight = current.offsetHeight;
           const sectionTop = current.offsetTop - 150;
           if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-            setActiveNavSection(sectionId);
+            if (activeNavSectionRef.current !== sectionId) {
+              activeNavSectionRef.current = sectionId;
+              setActiveNavSection(sectionId);
+            }
             break;
           }
         }
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const throttledScroll = throttle(handleScroll, 100);
+
+    window.addEventListener('scroll', throttledScroll, { passive: true });
+    return () => window.removeEventListener('scroll', throttledScroll);
   }, []);
 
   // GSAP Animations once loader is gone or page changes
@@ -2251,6 +2409,9 @@ export default function App() {
                 src={officeImg}
                 alt="Grand Academy Facade"
                 className="w-full h-[280px] sm:h-[380px] lg:h-[480px] object-cover rounded-xl transition-transform duration-700 ease-out hover:scale-105"
+                loading="lazy"
+                width="800"
+                height="600"
               />
             </div>
 
@@ -2266,9 +2427,6 @@ export default function App() {
 
           {/* Content Column */}
           <div className="about-text-el">
-            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-              Since 2016
-            </span>
             <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-4 font-medium">
               About Beever Academy
             </h2>
@@ -2485,51 +2643,7 @@ export default function App() {
           <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
         </div>
 
-        <div className="inside-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
-          {[
-            {
-              title: "Interactive Learning Sessions",
-              img: "https://placehold.co/600x400/170105/D4AF37/png?text=Interactive+Learning",
-              desc: "Engage in collaborative workshops using modern educational technology and collaborative teaching setups."
-            },
-            {
-              title: "Expert-Led Workshops",
-              img: classImg,
-              desc: "Gain hands-on problem solving insights led directly by top industry practitioners."
-            },
-            {
-              title: "Collaborative Learning Environment",
-              img: classroomImg,
-              desc: "Modern study environments built to nurture teamwork, cooperation, and group study projects."
-            },
-            {
-              title: "Professional Mentorship",
-              img: "https://placehold.co/600x400/170105/D4AF37/png?text=Mentorship",
-              desc: "One-on-one professional counseling guidance to layout clear long-term career growth plans."
-            },
-            {
-              title: "Career Development Programs",
-              img: ladyImg,
-              desc: "Rigorous physical and strategic preparation designed to cultivate confidence and leadership."
-            }
-          ].map((card, i) => (
-            <div
-              key={i}
-              className={`inside-card-el bg-white border border-black/5 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-gold/30 transition-all duration-300 flex flex-col justify-between group ${i === 3 || i === 4 ? 'lg:col-span-1 lg:max-w-md mx-auto w-full' : ''}`}
-            >
-              <div className="relative overflow-hidden h-[240px]">
-                <img src={card.img} alt={card.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-burgundy-dark/75 via-transparent to-transparent opacity-90"></div>
-                <div className="absolute bottom-4 left-6 right-6">
-                  <h3 className="font-serif text-xl text-white font-medium drop-shadow-sm">{card.title}</h3>
-                </div>
-              </div>
-              <div className="p-6">
-                <p className="text-xs text-text-secondary leading-relaxed">{card.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <InsideGalleryCards />
       </div>
     </section>
   );
@@ -3144,7 +3258,7 @@ export default function App() {
               Programs
             </h4>
             <ul className="flex flex-col gap-4 text-xs text-text-light">
-              {['Undergraduate', 'Postgraduate', 'Professional Courses', 'Online Learning', 'Executive Education'].map(prog => (
+              {['Foundation Market Mechanics & Technical Analysis (FMMTA)'].map(prog => (
                 <li key={prog}>
                   <a href="#programs" className="hover:text-gold-light hover:pl-1 transition-all duration-200">
                     {prog}
