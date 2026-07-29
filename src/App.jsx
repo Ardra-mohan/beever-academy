@@ -133,18 +133,18 @@ function GoldenSprinkleCursor() {
 
     // Mouse coordinates tracking
     let mouse = { x: -100, y: -100 };
+    let dotPos = { x: -100, y: -100 };
+    let ringPos = { x: -100, y: -100 };
     let lastMouse = { x: -100, y: -100 };
     let hasMoved = false;
 
-    // Set initial custom cursor positioning
-    gsap.set(dot, { xPercent: -50, yPercent: -50 });
-    gsap.set(ring, { xPercent: -50, yPercent: -50 });
+    // Scale variables for dot/ring (animated by GSAP to avoid transform conflicts)
+    const dotScale = { value: 1.0 };
+    const ringScale = { value: 1.0 };
 
-    // Use fast GSAP quickTo setters for buttery smooth cursor tracking
-    const setDotX = gsap.quickTo(dot, "x", { duration: 0.05, ease: "power3.out" });
-    const setDotY = gsap.quickTo(dot, "y", { duration: 0.05, ease: "power3.out" });
-    const setRingX = gsap.quickTo(ring, "x", { duration: 0.22, ease: "power3.out" });
-    const setRingY = gsap.quickTo(ring, "y", { duration: 0.22, ease: "power3.out" });
+    // Set initial custom cursor positioning off-screen
+    dot.style.transform = `translate3d(-100px, -100px, 0) translate(-50%, -50%) scale(${dotScale.value})`;
+    ring.style.transform = `translate3d(-100px, -100px, 0) translate(-50%, -50%) scale(${ringScale.value})`;
 
     const handleMouseMove = (e) => {
       // Revert native cursor if it was temporarily shown
@@ -157,15 +157,13 @@ function GoldenSprinkleCursor() {
       mouse.y = e.clientY;
 
       if (!hasMoved) {
-        // First move: snap to cursor instantly
-        gsap.set(dot, { x: mouse.x, y: mouse.y });
-        gsap.set(ring, { x: mouse.x, y: mouse.y });
+        dotPos.x = mouse.x;
+        dotPos.y = mouse.y;
+        ringPos.x = mouse.x;
+        ringPos.y = mouse.y;
+        dot.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0) translate(-50%, -50%) scale(${dotScale.value})`;
+        ring.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0) translate(-50%, -50%) scale(${ringScale.value})`;
         hasMoved = true;
-      } else {
-        setDotX(mouse.x);
-        setDotY(mouse.y);
-        setRingX(mouse.x);
-        setRingY(mouse.y);
       }
 
       // Generate golden sprinkle particles based on cursor speed
@@ -215,16 +213,24 @@ function GoldenSprinkleCursor() {
 
     // Hover updates scale to leverage GPU acceleration
     const handleMouseEnterLink = () => {
+      gsap.to(ringScale, {
+        value: 1.5,
+        duration: 0.25,
+        overwrite: 'auto'
+      });
       gsap.to(ring, {
-        scale: 1.5,
         backgroundColor: 'rgba(201, 162, 77, 0.15)',
         borderColor: '#F2DFA2',
         boxShadow: '0 0 15px rgba(201, 162, 77, 0.4)',
         duration: 0.25,
         overwrite: 'auto'
       });
+      gsap.to(dotScale, {
+        value: 0.5,
+        duration: 0.2,
+        overwrite: 'auto'
+      });
       gsap.to(dot, {
-        scale: 0.5,
         backgroundColor: '#F2DFA2',
         duration: 0.2,
         overwrite: 'auto'
@@ -232,16 +238,24 @@ function GoldenSprinkleCursor() {
     };
 
     const handleMouseLeaveLink = () => {
+      gsap.to(ringScale, {
+        value: 1.0,
+        duration: 0.25,
+        overwrite: 'auto'
+      });
       gsap.to(ring, {
-        scale: 1.0,
         backgroundColor: 'transparent',
         borderColor: 'rgba(201, 162, 77, 0.6)',
         boxShadow: '0 0 10px rgba(201, 162, 77, 0.2)',
         duration: 0.25,
         overwrite: 'auto'
       });
+      gsap.to(dotScale, {
+        value: 1.0,
+        duration: 0.2,
+        overwrite: 'auto'
+      });
       gsap.to(dot, {
-        scale: 1.0,
         backgroundColor: '#C9A24D',
         duration: 0.2,
         overwrite: 'auto'
@@ -316,8 +330,13 @@ function GoldenSprinkleCursor() {
     const handleMouseEnterWindow = (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
-      gsap.set(dot, { x: mouse.x, y: mouse.y });
-      gsap.set(ring, { x: mouse.x, y: mouse.y });
+      if (!hasMoved) {
+        dotPos.x = mouse.x;
+        dotPos.y = mouse.y;
+        ringPos.x = mouse.x;
+        ringPos.y = mouse.y;
+        hasMoved = true;
+      }
       gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
     };
 
@@ -329,6 +348,21 @@ function GoldenSprinkleCursor() {
     // Sparkles canvas rendering loop
     const animateParticles = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (hasMoved) {
+        // Dot follows cursor very fast (0.35 LERP factor = ultra responsive and smooth)
+        dotPos.x += (mouse.x - dotPos.x) * 0.35;
+        dotPos.y += (mouse.y - dotPos.y) * 0.35;
+
+        // Ring follows cursor smoothly (0.15 LERP factor = smooth trails)
+        ringPos.x += (mouse.x - ringPos.x) * 0.15;
+        ringPos.y += (mouse.y - ringPos.y) * 0.15;
+
+        // Apply transformations using translate3d for hardware GPU acceleration
+        dot.style.transform = `translate3d(${dotPos.x}px, ${dotPos.y}px, 0) translate(-50%, -50%) scale(${dotScale.value})`;
+        ring.style.transform = `translate3d(${ringPos.x}px, ${ringPos.y}px, 0) translate(-50%, -50%) scale(${ringScale.value})`;
+      }
+
       const particles = particlesRef.current;
 
       for (let i = particles.length - 1; i >= 0; i--) {
@@ -472,8 +506,13 @@ function GlobalNetworkCanvas() {
 
     // CITIES
     const DESTINATIONS = [
-      { name: "USA", xPct: 0.23, yPct: 0.34 },
-      { name: "INDIA", xPct: 0.66, yPct: 0.39 }
+      { name: "USA", xPct: 0.23, yPct: 0.34, align: "right", offsetX: -10, offsetY: 4 },
+      { name: "INDIA", xPct: 0.66, yPct: 0.39, align: "left", offsetX: 10, offsetY: 4 },
+      { name: "UK", xPct: 0.475, yPct: 0.23, align: "right", offsetX: -10, offsetY: -2 },
+      { name: "MALAYSIA", xPct: 0.74, yPct: 0.48, align: "right", offsetX: -10, offsetY: -2 },
+      { name: "SINGAPORE", xPct: 0.76, yPct: 0.50, align: "left", offsetX: 10, offsetY: 8 },
+      { name: "SWITZERLAND", xPct: 0.49, yPct: 0.25, align: "left", offsetX: 10, offsetY: 8 },
+      { name: "NETHERLANDS", xPct: 0.485, yPct: 0.22, align: "left", offsetX: 10, offsetY: -1 }
     ];
 
     const dxP = 0.58; // Dubai
@@ -723,6 +762,16 @@ function GlobalNetworkCanvas() {
         const connDuration = 1.5;
         const connProg = Math.min(1.0, (loopTime - 6.8) / connDuration);
 
+        // Draw Dubai text label next to the network hub pin (reduced size and shine)
+        ctx.save();
+        ctx.shadowBlur = 1.5;
+        ctx.shadowColor = 'rgba(242, 223, 162, 0.4)';
+        ctx.fillStyle = '#F2DFA2';
+        ctx.font = 'bold 13px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText('DUBAI', dxbDrawX - 10, dxbDrawY + 4);
+        ctx.restore();
+
         DESTINATIONS.forEach((dest, i) => {
           const dFlatX = (dest.xPct - 0.5) * flatW + centerX;
           const dFlatY = (dest.yPct - 0.5) * flatH + centerY;
@@ -754,17 +803,21 @@ function GlobalNetworkCanvas() {
 
           if (loopTime >= 7.2) {
             ctx.save();
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.shadowBlur = 6;
-            ctx.shadowColor = '#F2DFA2';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.shadowBlur = 3;
+            ctx.shadowColor = 'rgba(242, 223, 162, 0.4)';
             ctx.beginPath();
-            ctx.arc(dDrawX, dDrawY, 5, 0, Math.PI * 2);
+            ctx.arc(dDrawX, dDrawY, 4, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.shadowBlur = 4;
+            ctx.shadowBlur = 1.5;
+            ctx.shadowColor = 'rgba(242, 223, 162, 0.4)';
             ctx.fillStyle = '#F2DFA2';
-            ctx.font = 'bold 20px sans-serif';
-            ctx.fillText(dest.name.toUpperCase(), dDrawX + 12, dDrawY + 7);
+            ctx.font = 'bold 13px sans-serif';
+            ctx.textAlign = dest.align || 'left';
+            const dx = dest.offsetX !== undefined ? dest.offsetX : 10;
+            const dy = dest.offsetY !== undefined ? dest.offsetY : 4;
+            ctx.fillText(dest.name.toUpperCase(), dDrawX + dx, dDrawY + dy);
             ctx.restore();
           }
 
