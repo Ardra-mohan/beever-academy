@@ -393,8 +393,143 @@ body.show-native-cursor *::after {
   transition: stroke-dashoffset 1.8s ease-out;
 }
 
-/* Vertical text alignment for collapsed panels */
-.writing-vertical {
-  writing-mode: vertical-lr;
-  transform: rotate(180deg);
+/* ==========================================================================
+   GLOBAL PRESENCE REDESIGN STYLES
+   ========================================================================== */
+
+/* Dark burgundy dashboard container */
+.global-presence-section {
+  background-color: #37060F;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
 }
+
+/* Glassmorphic panels */
+.glass-location-panel {
+  background: rgba(55, 6, 15, 0.6);
+  border: 1.5px solid rgba(126, 28, 44, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-location-panel:hover {
+  background: rgba(55, 6, 15, 0.85);
+  border-color: rgba(126, 28, 44, 0.5);
+  box-shadow: 0 20px 50px 0 rgba(126, 28, 44, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Glowing Pulsing Markers */
+.marker-glow {
+  filter: drop-shadow(0 0 4px var(--marker-color, #7E1C2C));
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.marker-ripple {
+  transform-origin: center;
+  animation: marker-ripple-anim 3s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  opacity: 0;
+}
+
+@keyframes marker-ripple-anim {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+/* self-drawing connection paths */
+.draw-path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw-path-anim 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes draw-path-anim {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Horizontal connectors */
+.connector-line {
+  stroke: rgba(126, 28, 44, 0.28);
+  stroke-dasharray: 8;
+  animation: connector-flow 25s linear infinite;
+}
+
+@keyframes connector-flow {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+/* Subtle world map breathing glow */
+.breathing-glow-map {
+  animation: map-breath 8s ease-in-out infinite;
+}
+
+@keyframes map-breath {
+  0%, 100% {
+    opacity: 0.58;
+    filter: drop-shadow(0 0 1px rgba(126, 28, 44, 0.15));
+  }
+  50% {
+    opacity: 0.82;
+    filter: drop-shadow(0 0 8px rgba(126, 28, 44, 0.45));
+  }
+}
+
+/* Premium Glass Tooltip */
+.glass-tooltip {
+  background: rgba(55, 6, 15, 0.9);
+  border: 1px solid rgba(126, 28, 44, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(126, 28, 44, 0.25);
+  border-radius: 12px;
+  color: #fff;
+  font-family: inherit;
+  pointer-events: none;
+  z-index: 100;
+  animation: tooltip-fade-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes tooltip-fade-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -20px) scale(1);
+  }
+}
+
+/* Hexagonal/Dotted Continent styling */
+.continent-dot {
+  transition: all 0.4s ease;
+}
+
+/* Active Highlight Styles */
+.line-highlight {
+  stroke-width: 2.2 !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 6px var(--line-color));
+}
+
+.marker-highlight {
+  r: 9 !important;
+  fill: #ffffff !important;
+  stroke-width: 3.5 !important;
+  filter: drop-shadow(0 0 10px var(--marker-color)) !important;
+}
+

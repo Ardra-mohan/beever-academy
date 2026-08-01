@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
-  Award, Users, Shield, Globe, GraduationCap,
+  Users, Globe,
   Monitor, ChevronLeft, ChevronRight,
   MapPin, Phone, Mail, Facebook, Instagram, Linkedin, Youtube,
   Quote, Sparkles, Menu, X, ArrowRight, CheckCircle2,
-  Star, TrendingUp, Trophy, Clock, MessageSquare, Send
+  Star, TrendingUp, Clock, MessageSquare, Send
 } from 'lucide-react';
 
 // Import local logo from assets
@@ -437,95 +437,232 @@ function GoldenSprinkleCursor() {
 // ==========================================
 // CINEMATIC GLOBAL NETWORK CANVAS COMPONENT
 // ==========================================
-function GlobalNetworkCanvas() {
+// ==========================================
+// GLOBALLY ACCESSIBLE LOCATIONS ARRAY
+// ==========================================
+const LOCATIONS = [
+  {
+    id: "dubai",
+    name: "Dubai Hub",
+    partnerName: "Beever Professional And Management Development Training LLC",
+    flag: "🇦🇪",
+    country: "United Arab Emirates",
+    regText: "KHDA Approved License No. 89231",
+    x: 580,
+    y: 210,
+    color: "#eab308", // Gold
+    labelX: 820,
+    labelY: 70,
+    side: "right",
+    mapLabel: "Dubai",
+    dx: 14,
+    dy: 4,
+    anchor: "start"
+  },
+  {
+    id: "usa",
+    name: "New York Office",
+    partnerName: "Beever Global Markets Advisory LLC",
+    flag: "🇺🇸",
+    country: "United States",
+    regText: "SEC Registered & NFA Member",
+    x: 230,
+    y: 170,
+    color: "#7E1C2C", // Burgundy
+    labelX: 80,
+    labelY: 70,
+    side: "left",
+    mapLabel: "USA",
+    dx: -14,
+    dy: 4,
+    anchor: "end"
+  },
+  {
+    id: "uk",
+    name: "London Office",
+    partnerName: "Beever Capital Partners UK Ltd",
+    flag: "🇬🇧",
+    country: "United Kingdom",
+    regText: "FCA Registered No. 492315",
+    x: 475,
+    y: 115,
+    color: "#7E1C2C", // Burgundy
+    labelX: 80,
+    labelY: 175,
+    side: "left",
+    mapLabel: "UK",
+    dx: -14,
+    dy: -2,
+    anchor: "end"
+  },
+  {
+    id: "netherlands",
+    name: "Amsterdam Office",
+    partnerName: "Beever Quantitative Trading BV",
+    flag: "🇳🇱",
+    country: "Netherlands",
+    regText: "AFM Supervised & DNB Registered",
+    x: 485,
+    y: 95,
+    color: "#7E1C2C", // Burgundy
+    labelX: 80,
+    labelY: 280,
+    side: "left",
+    mapLabel: "Netherlands",
+    dx: 14,
+    dy: -8,
+    anchor: "start"
+  },
+  {
+    id: "switzerland",
+    name: "Zurich Office",
+    partnerName: "Beever Wealth Management AG",
+    flag: "🇨🇭",
+    country: "Switzerland",
+    regText: "FINMA Regulated License",
+    x: 495,
+    y: 135,
+    color: "#7E1C2C", // Burgundy
+    labelX: 80,
+    labelY: 385,
+    side: "left",
+    mapLabel: "Switzerland",
+    dx: 14,
+    dy: 8,
+    anchor: "start"
+  },
+  {
+    id: "india",
+    name: "Mumbai Office",
+    partnerName: "Beever Academy India Pvt Ltd",
+    flag: "🇮🇳",
+    country: "India",
+    regText: "SEBI Registered RIA Advisor",
+    x: 660,
+    y: 195,
+    color: "#7E1C2C", // Burgundy
+    labelX: 820,
+    labelY: 175,
+    side: "right",
+    mapLabel: "India",
+    dx: 14,
+    dy: 4,
+    anchor: "start"
+  },
+  {
+    id: "singapore",
+    name: "Singapore Office",
+    partnerName: "Beever Asia-Pacific Pte Ltd",
+    flag: "🇸🇬",
+    country: "Singapore",
+    regText: "MAS CMS Licensed Office",
+    x: 760,
+    y: 250,
+    color: "#7E1C2C", // Burgundy
+    labelX: 820,
+    labelY: 280,
+    side: "right",
+    mapLabel: "Singapore",
+    dx: 14,
+    dy: -4,
+    anchor: "start"
+  },
+  {
+    id: "malaysia",
+    name: "Labuan Partner",
+    partnerName: "Beever Labuan Partners Ltd",
+    flag: "🇲🇾",
+    country: "Malaysia",
+    regText: "LFSA Labuan Licensed Broker",
+    x: 745,
+    y: 235,
+    color: "#7E1C2C", // Burgundy
+    labelX: 820,
+    labelY: 385,
+    side: "right",
+    mapLabel: "Malaysia",
+    dx: -14,
+    dy: 10,
+    anchor: "end"
+  }
+];
+
+// ==========================================
+// PREMIUM GLOBAL PRESENCE DASHBOARD COMPONENT
+// ==========================================
+function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
   const canvasRef = useRef(null);
+
+  const LANDMASSES = [
+    // North America
+    { cx: 12, cy: 18, rx: 6, ry: 4 },
+    { cx: 22, cy: 15, rx: 8, ry: 6 },
+    { cx: 38, cy: 12, rx: 5, ry: 6 },
+    { cx: 17, cy: 26, rx: 6, ry: 5 },
+    { cx: 25, cy: 26, rx: 6, ry: 5 },
+    { cx: 22, cy: 33, rx: 7, ry: 5 },
+    { cx: 26, cy: 35, rx: 3, ry: 4 },
+    { cx: 28, cy: 40, rx: 2, ry: 3 },
+    { cx: 18, cy: 41, rx: 4, ry: 5 },
+    { cx: 24, cy: 47, rx: 1.5, ry: 3 },
+    // South America
+    { cx: 31, cy: 56, rx: 4, ry: 6 },
+    { cx: 37, cy: 59, rx: 7, ry: 8 },
+    { cx: 33, cy: 68, rx: 5, ry: 7 },
+    { cx: 31, cy: 78, rx: 2.5, ry: 9 },
+    // Europe
+    { cx: 50, cy: 14, rx: 3, ry: 6 },
+    { cx: 47.5, cy: 23, rx: 2, ry: 3 },
+    { cx: 48, cy: 24, rx: 4, ry: 4 },
+    { cx: 54, cy: 21, rx: 6, ry: 6 },
+    { cx: 50, cy: 28, rx: 5, ry: 3 },
+    // Africa
+    { cx: 50, cy: 40, rx: 8, ry: 6 },
+    { cx: 44, cy: 46, rx: 5, ry: 5 },
+    { cx: 53, cy: 52, rx: 5, ry: 6 },
+    { cx: 58, cy: 48, rx: 4, ry: 5 },
+    { cx: 54, cy: 65, rx: 4.5, ry: 8 },
+    { cx: 60, cy: 66, rx: 1.5, ry: 4.5 },
+    // Middle East
+    { cx: 58, cy: 41, rx: 4, ry: 4.5 },
+    { cx: 61, cy: 34, rx: 5, ry: 4 },
+    // Asia
+    { cx: 72, cy: 16, rx: 15, ry: 7 },
+    { cx: 70, cy: 24, rx: 10, ry: 5 },
+    { cx: 74, cy: 30, rx: 8, ry: 6 },
+    { cx: 66, cy: 38, rx: 4, ry: 5 },
+    { cx: 75, cy: 42, rx: 3.5, ry: 4.5 },
+    { cx: 84.5, cy: 30, rx: 1.8, ry: 5 },
+    { cx: 77, cy: 51, rx: 6, ry: 4 },
+    // Australia & Oceania
+    { cx: 84, cy: 70, rx: 7, ry: 6 },
+    { cx: 86, cy: 74, rx: 3.5, ry: 3.5 },
+    { cx: 91, cy: 79, rx: 1.5, ry: 4 },
+    // Antarctica
+    { cx: 50, cy: 92, rx: 45, ry: 4 }
+  ];
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
-    let animationFrameId;
+    let animId;
 
-    // LANDMASS DEFINITIONS FOR STYLIZED MAP
-    const LANDMASSES = [
-      // North America
-      { cx: 12, cy: 18, rx: 6, ry: 4 },   // Alaska
-      { cx: 22, cy: 15, rx: 8, ry: 6 },   // Northern Canada / Islands
-      { cx: 38, cy: 12, rx: 5, ry: 6 },   // Greenland
-      { cx: 17, cy: 26, rx: 6, ry: 5 },   // Canada / US Border (West)
-      { cx: 25, cy: 26, rx: 6, ry: 5 },   // Canada / US Border (East)
-      { cx: 22, cy: 33, rx: 7, ry: 5 },   // USA Midwest/South
-      { cx: 26, cy: 35, rx: 3, ry: 4 },   // US East Coast / New York
-      { cx: 28, cy: 40, rx: 2, ry: 3 },   // Florida / Caribbean
-      { cx: 18, cy: 41, rx: 4, ry: 5 },   // Mexico
-      { cx: 24, cy: 47, rx: 1.5, ry: 3 }, // Central America
+    canvas.width = 1000;
+    canvas.height = 500;
 
-      // South America
-      { cx: 31, cy: 56, rx: 4, ry: 6 },   // North-West (Colombia/Ecuador/Peru)
-      { cx: 37, cy: 59, rx: 7, ry: 8 },   // North-East (Brazil)
-      { cx: 33, cy: 68, rx: 5, ry: 7 },   // Central South America
-      { cx: 31, cy: 78, rx: 2.5, ry: 9 }, // Southern Cone (Argentina/Chile)
+    const grid = [];
+    const cols = 125;
+    const rows = 60;
 
-      // Europe
-      { cx: 50, cy: 14, rx: 3, ry: 6 },   // Scandinavia
-      { cx: 47.5, cy: 23, rx: 2, ry: 3 }, // United Kingdom & Ireland (covers London)
-      { cx: 48, cy: 24, rx: 4, ry: 4 },   // Western Europe
-      { cx: 54, cy: 21, rx: 6, ry: 6 },   // Eastern Europe / European Russia
-      { cx: 50, cy: 28, rx: 5, ry: 3 },   // Southern Europe / Mediterranean
-
-      // Africa
-      { cx: 50, cy: 40, rx: 8, ry: 6 },   // North Africa
-      { cx: 44, cy: 46, rx: 5, ry: 5 },   // West Africa
-      { cx: 53, cy: 52, rx: 5, ry: 6 },   // Central Africa
-      { cx: 58, cy: 48, rx: 4, ry: 5 },   // East Africa / Horn of Africa
-      { cx: 54, cy: 65, rx: 4.5, ry: 8 }, // Southern Africa (covers Johannesburg)
-      { cx: 60, cy: 66, rx: 1.5, ry: 4.5 }, // Madagascar
-
-      // Middle East
-      { cx: 58, cy: 41, rx: 4, ry: 4.5 },  // Arabian Peninsula (covers Dubai)
-      { cx: 61, cy: 34, rx: 5, ry: 4 },   // Middle East / Iran / Central Asia
-
-      // Asia
-      { cx: 72, cy: 16, rx: 15, ry: 7 },  // Siberia / Northern Asia
-      { cx: 70, cy: 24, rx: 10, ry: 5 },  // Central Asia / Mongolia
-      { cx: 74, cy: 30, rx: 8, ry: 6 },   // China
-      { cx: 66, cy: 38, rx: 4, ry: 5 },   // India
-      { cx: 75, cy: 42, rx: 3.5, ry: 4.5 }, // Indochina / Southeast Asia
-      { cx: 84.5, cy: 30, rx: 1.8, ry: 5 }, // Japan (covers Tokyo)
-      { cx: 77, cy: 51, rx: 6, ry: 4 },   // Maritime Southeast Asia / Indonesia / Philippines (covers Singapore)
-
-      // Australia & Oceania
-      { cx: 84, cy: 70, rx: 7, ry: 6 },   // Australia main
-      { cx: 86, cy: 74, rx: 3.5, ry: 3.5 }, // Sydney area / South-East Australia
-      { cx: 91, cy: 79, rx: 1.5, ry: 4 }, // New Zealand
-
-      // Antarctica
-      { cx: 50, cy: 92, rx: 45, ry: 4 }   // Antarctica
-    ];
-
-    // CITIES
-    const DESTINATIONS = [
-      { name: "USA", xPct: 0.23, yPct: 0.34, align: "right", offsetX: -10, offsetY: 4 },
-      { name: "INDIA", xPct: 0.66, yPct: 0.39, align: "left", offsetX: 10, offsetY: 4 },
-      { name: "UK", xPct: 0.475, yPct: 0.23, align: "right", offsetX: -10, offsetY: -2 },
-      { name: "MALAYSIA", xPct: 0.74, yPct: 0.48, align: "right", offsetX: -10, offsetY: -2 },
-      { name: "SINGAPORE", xPct: 0.76, yPct: 0.50, align: "left", offsetX: 10, offsetY: 8 },
-      { name: "SWITZERLAND", xPct: 0.49, yPct: 0.25, align: "left", offsetX: 10, offsetY: 8 },
-      { name: "NETHERLANDS", xPct: 0.485, yPct: 0.22, align: "left", offsetX: 10, offsetY: -1 }
-    ];
-
-    const dxP = 0.58; // Dubai
-    const dyP = 0.42;
-
-    // GENERATE MAP PARTICLES
-    const points = [];
-    const cols = 160;
-    const rows = 80;
-    for (let c = 0; c < cols; c++) {
-      for (let r = 0; r < rows; r++) {
-        const xPct = c / cols;
+    // Generate grid state
+    for (let r = 0; r < rows; r++) {
+      grid[r] = [];
+      for (let c = 0; c < cols; c++) {
+        const offset = (r % 2 === 0) ? 0 : 0.5;
+        const xPct = (c + offset) / cols;
         const yPct = r / rows;
+
         let isLand = false;
         for (const lm of LANDMASSES) {
           const dx = (xPct * 100 - lm.cx) / lm.rx;
@@ -535,359 +672,341 @@ function GlobalNetworkCanvas() {
             break;
           }
         }
-        if (isLand) {
+        grid[r][c] = isLand;
+      }
+    }
+
+    const points = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (grid[r][c]) {
+          const offset = (r % 2 === 0) ? 0 : 0.5;
+          
+          // Border detection: check if neighbor is water
+          const isBorder = (
+            r === 0 || r === rows - 1 || c === 0 || c === cols - 1 ||
+            !grid[r - 1][c] || !grid[r + 1][c] || !grid[r][c - 1] || !grid[r][c + 1]
+          );
+
           points.push({
-            xPct,
-            yPct,
-            jitterX: (Math.random() - 0.5) * 0.15,
-            jitterY: (Math.random() - 0.5) * 0.15,
-            size: Math.random() * 0.4 + 0.65,
-            phaseOffset: Math.random() * Math.PI * 2
+            x: ((c + offset) / cols) * 1000,
+            y: (r / rows) * 500,
+            opacity: Math.random() * 0.45 + 0.55,
+            isBorder
           });
         }
       }
     }
 
-    const resizeCanvas = () => {
-      const parent = canvas.parentElement;
-      canvas.width = parent.clientWidth;
-      canvas.height = Math.max(500, Math.min(650, parent.clientWidth * 0.55));
-    };
+    const borderPoints = points.filter(p => p.isBorder);
 
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    // EASING
-    const easeInOutQuad = t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    const easeOutBounce = t => {
-      const n1 = 7.5625;
-      const d1 = 2.75;
-      if (t < 1 / d1) {
-        return n1 * t * t;
-      } else if (t < 2 / d1) {
-        return n1 * (t -= 1.5 / d1) * t + 0.75;
-      } else if (t < 2.5 / d1) {
-        return n1 * (t -= 2.25 / d1) * t + 0.9375;
-      } else {
-        return n1 * (t -= 2.625 / d1) * t + 0.984375;
-      }
-    };
-
-    const getControlPoint = (x1, y1, x2, y2) => {
-      const mx = (x1 + x2) / 2;
-      const my = (y1 + y2) / 2;
-      const dist = Math.hypot(x2 - x1, y2 - y1);
-      return { x: mx, y: my - dist * 0.18 };
-    };
-
-    const getBezierPoint = (t, s, c, e) => {
-      const u = 1 - t;
-      return {
-        x: u * u * s.x + 2 * u * t * c.x + t * t * e.x,
-        y: u * u * s.y + 2 * u * t * c.y + t * t * e.y
-      };
-    };
+    const bgParticles = [];
+    for (let i = 0; i < 35; i++) {
+      bgParticles.push({
+        x: Math.random() * 1000,
+        y: Math.random() * 500,
+        vx: (Math.random() - 0.5) * 0.1,
+        vy: (Math.random() - 0.5) * 0.1,
+        size: Math.random() * 1.5 + 0.6,
+        opacity: Math.random() * 0.45 + 0.15,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.001 + Math.random() * 0.002
+      });
+    }
 
     let start = null;
+    const render = (time) => {
+      if (!start) start = time;
+      const elapsed = time - start;
 
-    const animate = (timestamp) => {
-      if (!start) start = timestamp;
-      const elapsed = (timestamp - start) / 1000;
-      const loopTime = elapsed % 16.0;
+      ctx.fillStyle = "#37060F";
+      ctx.fillRect(0, 0, 1000, 500);
 
-      const width = canvas.width;
-      const height = canvas.height;
-      const centerX = width / 2;
-      const centerY = height / 2;
+      // Drifting background stars
+      bgParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
 
-      // Radial background
-      const bgGrad = ctx.createRadialGradient(centerX, centerY, 50, centerX, centerY, Math.max(width, height) / 1.5);
-      bgGrad.addColorStop(0, '#2b030b');
-      bgGrad.addColorStop(1, '#0e0103');
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, width, height);
+        if (p.x < 0) p.x = 1000;
+        if (p.x > 1000) p.x = 0;
+        if (p.y < 0) p.y = 500;
+        if (p.y > 500) p.y = 0;
 
-      // Grid lines
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
-      ctx.lineWidth = 1;
-      const gridSpacing = 40;
-      for (let x = 0; x < width; x += gridSpacing) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < height; y += gridSpacing) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-
-      let progress = 0;
-      if (loopTime < 4) {
-        progress = 0;
-      } else if (loopTime >= 4 && loopTime < 6) {
-        progress = easeInOutQuad((loopTime - 4) / 2);
-      } else if (loopTime >= 6 && loopTime < 14) {
-        progress = 1;
-      } else if (loopTime >= 14 && loopTime < 16) {
-        progress = easeInOutQuad(1 - (loopTime - 14) / 2);
-      }
-
-      const rotY = (loopTime * 0.4) % (Math.PI * 2);
-      const rotX = 0.15;
-
-      const flatW = width * 0.82;
-      const flatH = height * 0.65;
-
-      let zoom = 1.0;
-      let panX = 0;
-      let panY = 0;
-
-      const dxbFlatX = (dxP - 0.5) * flatW + centerX;
-      const dxbFlatY = (dyP - 0.5) * flatH + centerY;
-
-      if (loopTime >= 6 && loopTime < 14) {
-        const zoomProg = Math.min(1.0, (loopTime - 6) / 2.0);
-        const easedZoom = easeInOutQuad(zoomProg);
-        zoom = 1.0 + easedZoom * 0.32;
-        panX = easedZoom * (centerX - dxbFlatX) * 0.28;
-        panY = easedZoom * (centerY - dxbFlatY) * 0.28;
-      } else if (loopTime >= 14 && loopTime < 16) {
-        const zoomProg = (loopTime - 14) / 2.0;
-        const easedZoom = easeInOutQuad(zoomProg);
-        zoom = 1.32 - easedZoom * 0.32;
-        panX = (1 - easedZoom) * (centerX - dxbFlatX) * 0.28;
-        panY = (1 - easedZoom) * (centerY - dxbFlatY) * 0.28;
-      }
-
-      const R = Math.min(width, height) * 0.32;
-      const D = R * 2.5;
-
-      points.forEach(p => {
-        const theta = p.xPct * Math.PI * 2 - Math.PI;
-        const phi = p.yPct * Math.PI - Math.PI / 2;
-
-        const xSphere = R * Math.cos(phi) * Math.sin(theta);
-        const ySphere = R * Math.sin(phi);
-        const zSphere = R * Math.cos(phi) * Math.cos(theta);
-
-        const x1 = xSphere * Math.cos(rotY) - zSphere * Math.sin(rotY);
-        const z1 = xSphere * Math.sin(rotY) + zSphere * Math.cos(rotY);
-
-        const y2 = ySphere * Math.cos(rotX) - z1 * Math.sin(rotX);
-        const z2 = ySphere * Math.sin(rotX) + z1 * Math.cos(rotX);
-
-        const xProj = x1 * (D / (D + z2)) + centerX;
-        const yProj = y2 * (D / (D + z2)) + centerY;
-
-        const xFlat = (p.xPct - 0.5) * flatW + centerX + p.jitterX * 12;
-        const yFlat = (p.yPct - 0.5) * flatH + centerY + p.jitterY * 12;
-
-        let curX = (1 - progress) * xProj + progress * xFlat;
-        let curY = (1 - progress) * yProj + progress * yFlat;
-
-        const finalX = (curX - centerX) * zoom + centerX + panX;
-        const finalY = (curY - centerY) * zoom + centerY + panY;
-
-        if (progress < 0.05 && z2 > 0) return;
-
-        let opacityFactor = 1.0;
-        if (progress < 0.2) {
-          const depthRatio = (z2 + R) / (2 * R);
-          opacityFactor = 1 - Math.max(0, Math.min(1, depthRatio));
-        }
-
-        const shimmer = Math.sin(loopTime * 3.5 + p.phaseOffset) * 0.25 + 0.75;
-        ctx.fillStyle = `rgba(242, 223, 162, ${opacityFactor * shimmer * (0.35 + progress * 0.25)})`;
-        ctx.beginPath();
-        ctx.arc(finalX, finalY, p.size * (progress * 0.15 + 0.85), 0, Math.PI * 2);
-        ctx.fill();
+        const pulseOpacity = p.opacity * (0.35 + 0.65 * Math.sin(elapsed * p.speed + p.phase));
+        ctx.fillStyle = `rgba(255, 255, 255, ${pulseOpacity})`;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
       });
 
-      const dxbDrawX = (dxbFlatX - centerX) * zoom + centerX + panX;
-      const dxbDrawY = (dxbFlatY - centerY) * zoom + centerY + panY;
-
-      if (progress > 0.95 && loopTime >= 6.2 && loopTime < 14) {
-        const dropDur = 0.6;
-        const dropProg = Math.min(1.0, (loopTime - 6.2) / dropDur);
-
-        if (loopTime >= 6.6) {
-          const rippleProg = ((loopTime - 6.6) % 1.8) / 1.8;
-          ctx.strokeStyle = `rgba(201, 162, 77, ${1 - rippleProg})`;
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.arc(dxbDrawX, dxbDrawY, rippleProg * 45, 0, Math.PI * 2);
-          ctx.stroke();
-
-          if (loopTime >= 7.2) {
-            const rippleProg2 = ((loopTime - 7.2) % 1.8) / 1.8;
-            ctx.strokeStyle = `rgba(201, 162, 77, ${(1 - rippleProg2) * 0.6})`;
-            ctx.beginPath();
-            ctx.arc(dxbDrawX, dxbDrawY, rippleProg2 * 35, 0, Math.PI * 2);
-            ctx.stroke();
+      // Breathing world map
+      const mapBreath = Math.sin(elapsed * 0.001) * 0.15 + 0.7;
+      
+      // Draw dark golden honeycomb wireframe cells
+      ctx.lineWidth = 0.5;
+      points.forEach(p => {
+        ctx.strokeStyle = `rgba(166, 126, 45, ${p.opacity * mapBreath * 0.38})`;
+        ctx.beginPath();
+        const rad = 4.9; // radius to form a continuous tiling
+        for (let i = 0; i < 6; i++) {
+          const angle = (i * Math.PI) / 3;
+          const x = p.x + rad * Math.cos(angle);
+          const y = p.y + rad * Math.sin(angle);
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
           }
         }
-
-        const pinHeight = 20;
-        const bounceY = (1 - easeOutBounce(dropProg)) * -50;
-        const py = dxbDrawY + bounceY;
-
-        ctx.save();
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-        ctx.beginPath();
-        ctx.ellipse(dxbDrawX, dxbDrawY + 1.5, 5 * dropProg, 1.5 * dropProg, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#C9A24D';
-        ctx.strokeStyle = '#F2DFA2';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(dxbDrawX, py);
-        ctx.bezierCurveTo(dxbDrawX - 6, py - 10, dxbDrawX - 6, py - pinHeight, dxbDrawX, py - pinHeight);
-        ctx.bezierCurveTo(dxbDrawX + 6, py - pinHeight, dxbDrawX + 6, py - 10, dxbDrawX, py);
         ctx.closePath();
-        ctx.fill();
         ctx.stroke();
+      });
 
-        ctx.fillStyle = '#37060F';
-        ctx.beginPath();
-        ctx.arc(dxbDrawX, py - pinHeight + 6, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      if (progress > 0.95 && loopTime >= 6.8 && loopTime < 14) {
-        const connDuration = 1.5;
-        const connProg = Math.min(1.0, (loopTime - 6.8) / connDuration);
-
-        // Draw Dubai text label next to the network hub pin (reduced size and shine)
-        ctx.save();
-        ctx.shadowBlur = 1.5;
-        ctx.shadowColor = 'rgba(242, 223, 162, 0.4)';
-        ctx.fillStyle = '#F2DFA2';
-        ctx.font = 'bold 13px sans-serif';
-        ctx.textAlign = 'right';
-        ctx.fillText('DUBAI', dxbDrawX - 10, dxbDrawY + 4);
-        ctx.restore();
-
-        DESTINATIONS.forEach((dest, i) => {
-          const dFlatX = (dest.xPct - 0.5) * flatW + centerX;
-          const dFlatY = (dest.yPct - 0.5) * flatH + centerY;
-
-          const dDrawX = (dFlatX - centerX) * zoom + centerX + panX;
-          const dDrawY = (dFlatY - centerY) * zoom + centerY + panY;
-
-          const cp = getControlPoint(dxbDrawX, dxbDrawY, dDrawX, dDrawY);
-
-          ctx.save();
-          const lineGrad = ctx.createLinearGradient(dxbDrawX, dxbDrawY, dDrawX, dDrawY);
-          lineGrad.addColorStop(0, 'rgba(201, 162, 77, 0.7)');
-          lineGrad.addColorStop(1, 'rgba(255, 255, 255, 0.15)');
-
-          ctx.strokeStyle = lineGrad;
-          ctx.lineWidth = 1.2;
-          ctx.beginPath();
-          ctx.moveTo(dxbDrawX, dxbDrawY);
-
-          const resolution = 30;
-          const endT = connProg;
-          for (let step = 0; step <= resolution; step++) {
-            const tVal = (step / resolution) * endT;
-            const pt = getBezierPoint(tVal, { x: dxbDrawX, y: dxbDrawY }, cp, { x: dDrawX, y: dDrawY });
-            ctx.lineTo(pt.x, pt.y);
-          }
-          ctx.stroke();
-          ctx.restore();
-
-          if (loopTime >= 7.2) {
-            ctx.save();
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.shadowBlur = 3;
-            ctx.shadowColor = 'rgba(242, 223, 162, 0.4)';
-            ctx.beginPath();
-            ctx.arc(dDrawX, dDrawY, 4, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.shadowBlur = 1.5;
-            ctx.shadowColor = 'rgba(242, 223, 162, 0.4)';
-            ctx.fillStyle = '#F2DFA2';
-            ctx.font = 'bold 13px sans-serif';
-            ctx.textAlign = dest.align || 'left';
-            const dx = dest.offsetX !== undefined ? dest.offsetX : 10;
-            const dy = dest.offsetY !== undefined ? dest.offsetY : 4;
-            ctx.fillText(dest.name.toUpperCase(), dDrawX + dx, dDrawY + dy);
-            ctx.restore();
-          }
-
-          if (loopTime >= 7.5) {
-            const pulseProg = ((loopTime - 7.5) % 2.0) / 2.0;
-            const pulsePt = getBezierPoint(pulseProg, { x: dxbDrawX, y: dxbDrawY }, cp, { x: dDrawX, y: dDrawY });
-
-            ctx.save();
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = '#F2DFA2';
-            ctx.fillStyle = '#FFFFFF';
-            ctx.beginPath();
-            ctx.arc(pulsePt.x, pulsePt.y, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-          }
-        });
-      }
-
-      ctx.save();
-      ctx.font = '9px monospace';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-
-      ctx.fillStyle = 'rgba(242, 223, 162, 0.7)';
-      ctx.fillText('NETWORK_HUB: DUBAI CENTRAL', 20, 30);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-      ctx.fillText(`STATUS: LIVE SYNERGY (${progress > 0.95 ? 'FLAT_MAP_DASHBOARD' : 'SPHERE_ROTATION_MODE'})`, 20, 45);
-      ctx.fillText(`ROT_ANGLE: ${(rotY * 180 / Math.PI).toFixed(0)}°`, 20, 60);
-
-      ctx.fillStyle = 'rgba(242, 223, 162, 0.7)';
-      ctx.fillText(`ACTIVE GATEWAYS: ${loopTime >= 7.2 ? '2 / 2 ESTABLISHED' : 'CONNECTING...'}`, width - 180, 30);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-      ctx.fillText(`SYSTEM LOAD: ${(45.2 + Math.sin(loopTime * 1.5) * 2.3).toFixed(1)} GB/S`, width - 180, 45);
-      ctx.fillText(`LATENCY: ${(34 + Math.sin(loopTime * 4) * 2).toFixed(0)}MS (EXCELLENT)`, width - 180, 60);
-
-      ctx.strokeStyle = 'rgba(201, 162, 77, 0.25)';
-      ctx.lineWidth = 1;
+      // Draw continuous dark golden continent borders defining shapes
+      ctx.lineWidth = 0.85;
+      ctx.strokeStyle = `rgba(166, 126, 45, ${mapBreath * 0.72})`;
       ctx.beginPath();
-      ctx.moveTo(20, height - 40);
-      for (let i = 0; i < 12; i++) {
-        const yVal = Math.sin((loopTime * 3) + i * 0.6) * 12 + 18;
-        ctx.lineTo(20 + i * 10, height - 20 - yVal);
+      for (let i = 0; i < borderPoints.length; i++) {
+        const p1 = borderPoints[i];
+        for (let j = i + 1; j < borderPoints.length; j++) {
+          const p2 = borderPoints[j];
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          // Connect adjacent border points (within 11px) to outline the shape
+          if (dx * dx + dy * dy < 121) {
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+          }
+        }
       }
       ctx.stroke();
-      ctx.fillText('GLOBAL OPERATIONS THROUGHPUT', 20, height - 10);
 
-      ctx.fillText('HUB GPS COORDINATES', width - 150, height - 40);
-      ctx.fillStyle = 'rgba(242, 223, 162, 0.8)';
-      ctx.fillText('LAT: 25.2048° N', width - 150, height - 25);
-      ctx.fillText('LON: 55.2708° E', width - 150, height - 10);
 
-      ctx.restore();
 
-      animationFrameId = requestAnimationFrame(animate);
+      animId = requestAnimationFrame(render);
     };
 
-    animationFrameId = requestAnimationFrame(animate);
-
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      cancelAnimationFrame(animationFrameId);
-    };
+    animId = requestAnimationFrame(render);
+    return () => cancelAnimationFrame(animId);
   }, []);
 
+  const getControlPoint = (x1, y1, x2, y2) => {
+    const mx = (x1 + x2) / 2;
+    const my = (y1 + y2) / 2;
+    const dist = Math.hypot(x2 - x1, y2 - y1);
+    return { x: mx, y: my - dist * 0.14 };
+  };
+
+  const getCurvePath = (x1, y1, x2, y2) => {
+    const cp = getControlPoint(x1, y1, x2, y2);
+    return `M ${x1} ${y1} Q ${cp.x} ${cp.y} ${x2} ${y2}`;
+  };
+
+  const dbX = 580;
+  const dbY = 210;
+
+  const getPulseDuration = (id) => {
+    switch (id) {
+      case "usa": return "5.5s";
+      case "uk": return "3.8s";
+      case "netherlands": return "4.6s";
+      case "switzerland": return "4.2s";
+      case "india": return "3.4s";
+      case "singapore": return "4.8s";
+      case "malaysia": return "4.0s";
+      default: return "4s";
+    }
+  };
+
   return (
-    <canvas
-      ref={canvasRef}
-      className="w-full block select-none cursor-crosshair relative z-20"
-      style={{ minHeight: '520px' }}
-    />
+    <div className="relative w-full aspect-[2/1] min-h-[460px] lg:min-h-[500px] select-none overflow-hidden rounded-3xl">
+      {/* Background Canvas */}
+      <canvas
+        key="burgundy-canvas"
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full object-cover z-10"
+      />
+
+      {/* SVG Overlay */}
+      <svg
+        viewBox="0 0 1000 500"
+        className="absolute inset-0 w-full h-full z-20 pointer-events-none"
+      >
+        <defs>
+          <filter id="glow-gold" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="glow-burgundy" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Neon curved connections */}
+        {LOCATIONS.filter(l => l.id !== "dubai").map(loc => {
+          const curveD = getCurvePath(dbX, dbY, loc.x, loc.y);
+          const isHighlighted = hoveredLocationId === loc.id;
+          const isAnyHovered = hoveredLocationId !== null;
+          
+          let strokeOpacity = 0.35;
+          if (isAnyHovered) {
+            strokeOpacity = isHighlighted ? 0.95 : 0.08;
+          }
+
+          const filterName = loc.id === "dubai" ? "glow-gold" : "glow-burgundy";
+
+          return (
+            <g key={`connection-${loc.id}`}>
+              <path
+                id={`path-${loc.id}`}
+                d={curveD}
+                fill="none"
+                stroke="transparent"
+              />
+
+              {isHighlighted && (
+                <path
+                  d={curveD}
+                  fill="none"
+                  stroke={loc.color}
+                  strokeWidth="4"
+                  opacity="0.4"
+                  filter={`url(#${filterName})`}
+                />
+              )}
+
+              <path
+                d={curveD}
+                fill="none"
+                stroke={loc.color}
+                strokeWidth={isHighlighted ? 1.8 : 0.95}
+                opacity={strokeOpacity}
+                className="draw-path transition-all duration-300"
+              />
+
+              <circle
+                r={isHighlighted ? 4.2 : 2.6}
+                fill={loc.color}
+                filter={`url(#${filterName})`}
+                opacity={isAnyHovered && !isHighlighted ? 0.15 : 1}
+              >
+                <animateMotion
+                  dur={getPulseDuration(loc.id)}
+                  repeatCount="indefinite"
+                >
+                  <mpath href={`#path-${loc.id}`} />
+                </animateMotion>
+              </circle>
+            </g>
+          );
+        })}
+
+
+
+        {/* Location Markers */}
+        {LOCATIONS.map((loc, i) => {
+          const isHighlighted = hoveredLocationId === loc.id;
+          const isAnyHovered = hoveredLocationId !== null;
+          
+          let opacity = 1.0;
+          if (isAnyHovered && !isHighlighted) {
+            opacity = 0.25;
+          }
+
+          const filterName = loc.id === "dubai" ? "glow-gold" : "glow-burgundy";
+
+          return (
+            <g
+              key={`marker-${loc.id}`}
+              className="pointer-events-auto cursor-pointer"
+              opacity={opacity}
+            >
+              <circle
+                cx={loc.x}
+                cy={loc.y}
+                r="14"
+                fill="none"
+                stroke={loc.color}
+                strokeWidth="1.2"
+                className="marker-ripple"
+                style={{ animationDelay: `${i * 0.4}s` }}
+              />
+
+              <circle
+                cx={loc.x}
+                cy={loc.y}
+                r={isHighlighted ? 18 : 12}
+                fill="transparent"
+                onMouseEnter={() => setHoveredLocationId(loc.id)}
+                onMouseLeave={() => setHoveredLocationId(null)}
+              />
+
+              <circle
+                cx={loc.x}
+                cy={loc.y}
+                r={isHighlighted ? 7.5 : 4.8}
+                fill={loc.color}
+                filter={`url(#${filterName})`}
+                className="marker-glow transition-all duration-300"
+                style={{ '--marker-color': loc.color }}
+              />
+
+              <circle
+                cx={loc.x}
+                cy={loc.y}
+                r={isHighlighted ? 2.5 : 1.5}
+                fill="#ffffff"
+                className="transition-all duration-300"
+              />
+
+              {/* Inline Pointer Location Label */}
+              <text
+                x={loc.x + loc.dx}
+                y={loc.y + loc.dy}
+                textAnchor={loc.anchor}
+                className={`font-sans text-[9px] font-bold tracking-wider pointer-events-none transition-all duration-300 drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.95)] ${
+                  isHighlighted ? 'fill-[#C9A24D]' : 'fill-white/85'
+                }`}
+              >
+                {loc.flag} {loc.mapLabel}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+
+
+
+      {/* Premium Glass Tooltip (Mobile Touch / Desktop Hover Center Detail) */}
+      {hoveredLocationId && (
+        (() => {
+          const loc = LOCATIONS.find(l => l.id === hoveredLocationId);
+          if (!loc) return null;
+          return (
+            <div
+              className="absolute glass-tooltip p-3.5 z-50 text-left min-w-[210px]"
+              style={{
+                left: `${(loc.x / 10).toFixed(1)}%`,
+                top: `${(loc.y / 5).toFixed(1)}%`,
+              }}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-base">{loc.flag}</span>
+                <span className="font-serif text-[12px] font-bold text-white tracking-wide uppercase">{loc.name}</span>
+              </div>
+              <p className="text-[11px] text-white/85 leading-tight mb-0.5">{loc.partnerName}</p>
+              <p className="text-[9px] text-white/60 leading-normal mb-1">{loc.country}</p>
+              <p className="text-[8px] font-mono tracking-wider text-[#D4AF37] uppercase font-bold">{loc.regText}</p>
+            </div>
+          );
+        })()
+      )}
+    </div>
   );
 }
 
@@ -1329,8 +1448,8 @@ function PremiumTradingTerminal() {
           {/* Indicators layer: EMA and VWAP */}
           {candles.length > 2 && (
             <>
-              {/* VWAP Line (Translucent Cyan/Blue) */}
-              <path d={vwapPath} fill="none" stroke="#2563eb" strokeWidth="1.75" strokeOpacity="0.8" className="transition-all duration-300 ease-out" />
+              {/* VWAP Line */}
+              <path d={vwapPath} fill="none" stroke="#D4AF37" strokeWidth="1.75" strokeOpacity="0.8" className="transition-all duration-300 ease-out" />
               {/* EMA Line (Golden) */}
               <path d={emaPath} fill="none" stroke="#D4AF37" strokeWidth="1.75" strokeOpacity="0.9" className="transition-all duration-300 ease-out" />
             </>
@@ -1350,7 +1469,7 @@ function PremiumTradingTerminal() {
                   y={y}
                   width="8"
                   height={barHeight}
-                  fill={isUp ? "#10B981" : "#EF4444"}
+                  fill={isUp ? "#7E1C2C" : "#4a0b14"}
                   rx="1"
                 />
               );
@@ -1370,8 +1489,8 @@ function PremiumTradingTerminal() {
               const bodyY = Math.min(openY, closeY);
               const bodyHeight = Math.max(1.5, Math.abs(openY - closeY));
 
-              const strokeColor = isBullish ? "#10B981" : "#EF4444";
-              const fillColor = isBullish ? "#10B981" : "#EF4444";
+              const strokeColor = isBullish ? "#7E1C2C" : "#b91c1c";
+              const fillColor = isBullish ? "#7E1C2C" : "#b91c1c";
 
               return (
                 <g key={`candle-${i}`}>
@@ -1403,11 +1522,11 @@ function PremiumTradingTerminal() {
                       {/* Triangle pointing up */}
                       <polygon
                         points={`${x},${lowY + 12} ${x - 5.5},${lowY + 21} ${x + 5.5},${lowY + 21}`}
-                        fill="#10B981"
+                        fill="#7E1C2C"
                         stroke="#ffffff"
                         strokeWidth="0.5"
                       />
-                      <text x={x} y={lowY + 29} fill="#10B981" fontSize="7.5" fontFamily="monospace" textAnchor="middle" fontWeight="bold">BUY</text>
+                      <text x={x} y={lowY + 29} fill="#7E1C2C" fontSize="7.5" fontFamily="monospace" textAnchor="middle" fontWeight="bold">BUY</text>
                     </g>
                   )}
                   {candle.marker === 'sell' && (
@@ -1415,11 +1534,11 @@ function PremiumTradingTerminal() {
                       {/* Triangle pointing down */}
                       <polygon
                         points={`${x},${highY - 12} ${x - 5.5},${highY - 21} ${x + 5.5},${highY - 21}`}
-                        fill="#EF4444"
+                        fill="#b91c1c"
                         stroke="#ffffff"
                         strokeWidth="0.5"
                       />
-                      <text x={x} y={highY - 25} fill="#EF4444" fontSize="7.5" fontFamily="monospace" textAnchor="middle" fontWeight="bold">SELL</text>
+                      <text x={x} y={highY - 25} fill="#b91c1c" fontSize="7.5" fontFamily="monospace" textAnchor="middle" fontWeight="bold">SELL</text>
                     </g>
                   )}
                 </g>
@@ -1436,7 +1555,7 @@ function PremiumTradingTerminal() {
                 y1={getY(ticker.price)}
                 x2={CHART_RIGHT}
                 y2={getY(ticker.price)}
-                stroke={isUpSession ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}
+                stroke={isUpSession ? "rgba(126,28,44,0.3)" : "rgba(185,28,28,0.3)"}
                 strokeDasharray="2 2"
                 strokeWidth="0.75"
               />
@@ -1446,7 +1565,7 @@ function PremiumTradingTerminal() {
                 y={getY(ticker.price) - 8}
                 width="84"
                 height="16"
-                fill={isUpSession ? "#10B981" : "#EF4444"}
+                fill={isUpSession ? "#7E1C2C" : "#b91c1c"}
                 rx="3"
               />
               <text
@@ -1471,7 +1590,7 @@ function PremiumTradingTerminal() {
                 cy={getY(exec.price)}
                 r="18"
                 fill="none"
-                stroke={exec.type === 'buy' ? "#10B981" : "#EF4444"}
+                stroke={exec.type === 'buy' ? "#7E1C2C" : "#b91c1c"}
                 strokeWidth="1.5"
                 className="animate-ping opacity-60"
               />
@@ -1479,14 +1598,14 @@ function PremiumTradingTerminal() {
                 cx={exec.x}
                 cy={getY(exec.price)}
                 r="6"
-                fill={exec.type === 'buy' ? "#10B981" : "#EF4444"}
+                fill={exec.type === 'buy' ? "#7E1C2C" : "#b91c1c"}
                 stroke="#ffffff"
                 strokeWidth="1"
               />
               <text
                 x={exec.x}
                 y={getY(exec.price) - 14}
-                fill={exec.type === 'buy' ? "#10B981" : "#EF4444"}
+                fill={exec.type === 'buy' ? "#7E1C2C" : "#b91c1c"}
                 fontSize="8"
                 fontFamily="monospace"
                 fontWeight="bold"
@@ -1608,7 +1727,7 @@ function PremiumTradingTerminal() {
       {/* Floating Indicator labels */}
       <div className="absolute top-16 left-16 flex gap-3 text-[7.5px] font-mono font-bold select-none tracking-widest pointer-events-none">
         <span className="text-[#D4AF37] border border-gold/25 px-1.5 py-0.5 rounded bg-black/40">EMA (9)</span>
-        <span className="text-[#2563eb] border border-blue-500/25 px-1.5 py-0.5 rounded bg-black/40">VWAP</span>
+        <span className="text-[#D4AF37] border border-gold/25 px-1.5 py-0.5 rounded bg-black/40">VWAP</span>
       </div>
 
     </div>
@@ -1629,7 +1748,7 @@ export default function App() {
   const [activeNavSection, setActiveNavSection] = useState('home');
   const [selectedJob, setSelectedJob] = useState(null);
   const [careerFormStatus, setCareerFormStatus] = useState({ loading: false, submitted: false });
-  const [expandedCard, setExpandedCard] = useState(0);
+  const [hoveredLocationId, setHoveredLocationId] = useState(null);
 
   // Chatbot AI widget states
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
@@ -2286,7 +2405,7 @@ export default function App() {
 
         {/* Scroll Indicator */}
         <div className="text-center pt-2">
-          <a href="#why-choose-us" className="inline-flex flex-col items-center gap-2 cursor-pointer" aria-label="Scroll Down">
+          <a href="#about" className="inline-flex flex-col items-center gap-2 cursor-pointer" aria-label="Scroll Down">
             <span className="w-[20px] h-[34px] border border-white/40 rounded-[10px] relative block">
               <span className="w-[3px] h-[6px] bg-gold rounded-[1px] absolute top-1.5 left-1/2 -translate-x-1/2 animate-mouse-scroll"></span>
             </span>
@@ -2296,160 +2415,6 @@ export default function App() {
       </div>
     </section>
   );
-
-  const renderWhyChooseUs = () => {
-    const cardsData = [
-      {
-        title: "Premium Education",
-        desc: "Elite modules combining institutional theory with practical trading floor applications.",
-        icon: <GraduationCap className="w-5 h-5" />,
-        benefits: ["Ivy League Academy Standards", "Professional Market Insights"]
-      },
-      {
-        title: "Practical Learning",
-        desc: "Ditch textbooks. Master order flows and macro trends on real-time simulators.",
-        icon: <TrendingUp className="w-5 h-5" />,
-        benefits: ["Real-time Simulator Access", "Live Trade Reviews"]
-      },
-      {
-        title: "20+ Years Expertise",
-        desc: "Learn directly from veteran asset managers and professional risk officers.",
-        icon: <Award className="w-5 h-5" />,
-        benefits: ["Direct Mentorship", "Proven Risk Frameworks"]
-      },
-      {
-        title: "Affordable Excellence",
-        desc: "Elite education structured to be accessible without compromising quality.",
-        icon: <Shield className="w-5 h-5" />,
-        benefits: ["Flexible Payments", "Exceptional Value Ratio"]
-      },
-      {
-        title: "Student-Centered",
-        desc: "Your journey is unique. We adapt training to your goals and pace.",
-        icon: <Users className="w-5 h-5" />,
-        benefits: ["Personalized Roadmaps", "Flexible Scheduling"]
-      },
-      {
-        title: "Commitment to Excellence",
-        desc: "Cultivating high-performing habits, risk discipline, and mental consistency.",
-        icon: <Trophy className="w-5 h-5" />,
-        benefits: ["Risk Management Discipline", "Psychological Coaching"]
-      }
-    ];
-
-    return (
-      <section id="why-choose-us" className="py-12 md:py-20 bg-white text-center">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
-          <div className="mb-10">
-            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-2">
-              Heritage of Distinction
-            </span>
-            <h2 className="text-3xl md:text-4xl font-serif text-burgundy mb-4 font-medium">
-              Why Choose Beever Academy?
-            </h2>
-            <div className="w-[60px] h-[2px] bg-gold-gradient mx-auto mb-4"></div>
-            <p className="text-xs md:text-sm text-text-secondary max-w-[800px] mx-auto leading-relaxed">
-              At Beever Academy, we are committed to delivering an educational experience that goes beyond the classroom. Our focus is on providing premium financial education through practical learning, experienced professionals, and a student-first approach.
-            </p>
-          </div>
-
-          {/* Flex Expanding Cards Container */}
-          <div className="flex flex-col lg:flex-row gap-3 items-stretch justify-center w-full min-h-[300px] lg:h-[300px] mt-8">
-            {cardsData.map((card, i) => {
-              const isExpanded = expandedCard === i;
-              return (
-                <div
-                  key={i}
-                  onMouseEnter={() => setExpandedCard(i)}
-                  onClick={() => setExpandedCard(i)}
-                  className={`relative flex-shrink-0 flex-grow-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] select-none overflow-hidden rounded-2xl group ${isExpanded
-                      ? "w-full lg:w-[45%] bg-burgundy-dark text-white shadow-xl border-none p-6 lg:p-7 cursor-default"
-                      : "w-full lg:w-[11%] bg-ivory/50 border border-burgundy/10 text-burgundy hover:border-gold/30 hover:bg-white hover:shadow-md cursor-pointer p-4"
-                    }`}
-                >
-                  {isExpanded ? (
-                    /* EXPANDED STATE LAYOUT */
-                    <div className="flex flex-col justify-between h-full text-left animate-grid-fade">
-                      <div>
-                        {/* Badge with Icon */}
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-8 h-8 rounded-lg bg-gold-gradient flex justify-center items-center text-burgundy-dark shadow-sm">
-                            {card.icon}
-                          </div>
-                          <span className="text-[10px] uppercase font-mono tracking-widest text-gold-light font-bold">
-                            0{i + 1} • Details
-                          </span>
-                        </div>
-                        
-                        {/* Title */}
-                        <h3 className="text-lg md:text-xl font-serif text-gold font-bold mb-2 leading-tight">
-                          {card.title}
-                        </h3>
-                        
-                        {/* Detailed description */}
-                        <p className="text-xs lg:text-[13px] text-white/90 leading-relaxed mb-4 font-light max-w-[95%]">
-                          {card.desc}
-                        </p>
-
-                        {/* Bulleted Benefits list */}
-                        <ul className="flex flex-col gap-1.5 mb-4 text-xs lg:text-[13px] text-white/80 font-sans">
-                          {card.benefits.map((benefit, idx) => (
-                            <li key={idx} className="flex items-center gap-2">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-gold flex-shrink-0" />
-                              <span className="font-light">{benefit}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* CTA button */}
-                      <div className="mt-auto">
-                        <a
-                          href="#contact"
-                          className="inline-flex btn bg-gold-gradient text-burgundy-dark px-5 py-2.5 font-semibold uppercase tracking-widest text-[10px] rounded-lg hover:scale-102 hover:shadow-md transition-all duration-300"
-                        >
-                          Enquire Now
-                        </a>
-                      </div>
-                    </div>
-                  ) : (
-                    /* COLLAPSED STATE LAYOUT */
-                    <div className="flex flex-row lg:flex-col justify-between items-center h-full w-full">
-                      {/* Top (or Left on Mobile): Number & Icon */}
-                      <div className="flex flex-row lg:flex-col items-center gap-3 lg:gap-4">
-                        <span className="text-xs font-mono font-bold text-gold-dark tracking-wider">
-                          0{i + 1}
-                        </span>
-                        <div className="w-9 h-9 rounded-lg bg-ivory border border-burgundy/10 flex justify-center items-center text-burgundy group-hover:text-gold transition-colors">
-                          {card.icon}
-                        </div>
-                      </div>
-                      
-                      {/* Center: rotated vertical text on desktop / horizontal text on mobile */}
-                      <div className="flex-grow lg:flex-grow-0 lg:my-3 text-left lg:text-center w-full px-2 lg:px-0">
-                        <h3 className="text-sm font-serif font-bold text-burgundy leading-tight lg:writing-vertical tracking-wide lg:whitespace-nowrap lg:py-2 text-left lg:text-center lg:mx-auto">
-                          {card.title}
-                        </h3>
-                      </div>
-
-                      {/* Bottom indicator dot */}
-                      <div className="w-1 h-1 rounded-full bg-burgundy/20 group-hover:bg-gold transition-colors hidden lg:block"></div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-12 text-center">
-            <p className="font-serif text-xl md:text-2xl text-burgundy italic font-semibold">
-              "Learn Today. Lead Tomorrow."
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  };
 
   const renderAbout = () => (
     <section id="about" className="py-20 md:py-32 bg-ivory">
@@ -2529,27 +2494,48 @@ export default function App() {
   );
 
   const renderGlobalNetwork = () => (
-    <section id="global-network" className="py-20 md:py-32 bg-[#170105] text-center text-white relative overflow-hidden">
+    <section id="global-network" className="py-20 md:py-32 global-presence-section text-center text-white relative overflow-hidden">
       {/* Decorative gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1a0206] via-transparent to-[#1a0206] pointer-events-none z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-[#37060F] via-transparent to-[#37060F] pointer-events-none z-10"></div>
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-20">
         <div className="mb-16">
-          <span className="font-sans uppercase text-gold-light text-[11px] tracking-[0.2em] font-semibold block mb-3">
+          <span className="font-sans uppercase text-gold text-[11px] tracking-[0.2em] font-semibold block mb-3 animate-pulse">
             Global Connectivity Hub
           </span>
-          <h2 className="text-4xl md:text-5xl font-serif text-white mb-6 font-bold">
-            Beever Certifications Network
+          <h2 className="text-4xl md:text-5xl font-serif text-white mb-6 font-bold tracking-wide">
+            Beever Certification Network
           </h2>
-          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-4"></div>
+          <div className="w-[80px] h-[2px] bg-gradient-to-r from-burgundy-light to-gold mx-auto mb-4"></div>
           <p className="text-sm text-white/70 max-w-[650px] mx-auto leading-relaxed">
-            Connecting Dubai to the world. Charting live knowledge pathways and professional synergies across major global markets.
+            Connecting Dubai to the world. Charting live knowledge pathways and regulatory synergy across major international financial hubs.
           </p>
         </div>
 
-        {/* Dynamic Interactive Canvas */}
-        <div className="w-full bg-[#1b0207] border border-gold/15 rounded-2xl overflow-hidden shadow-2xl relative">
-          <GlobalNetworkCanvas />
+        {/* Dynamic Interactive Dashboard */}
+        <div className="w-full bg-[#37060F] border border-burgundy-light/25 rounded-3xl overflow-hidden shadow-2xl relative">
+          <GlobalPresenceDashboard
+            key="burgundy-dashboard"
+            hoveredLocationId={hoveredLocationId}
+            setHoveredLocationId={setHoveredLocationId}
+          />
+        </div>
+
+        {/* Mobile/Tablet Location Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 px-2 lg:hidden relative z-30">
+          {LOCATIONS.map(loc => (
+            <div
+              key={loc.id}
+              className="flex flex-col p-4 glass-location-panel border border-burgundy-light/25 bg-[#37060F]/75 relative overflow-hidden text-left"
+            >
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-lg leading-none">{loc.flag}</span>
+                <h4 className="font-serif text-xs font-bold text-white tracking-wide uppercase">{loc.name}</h4>
+              </div>
+              <p className="text-[11px] text-white/80 mb-1 leading-snug">{loc.partnerName}</p>
+              <span className="text-[9px] font-mono tracking-wider text-[#D4AF37] uppercase font-bold">{loc.regText}</span>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -3241,7 +3227,6 @@ export default function App() {
 
       <>
         {renderHero()}
-        {renderWhyChooseUs()}
         {renderAbout()}
         {renderGlobalNetwork()}
         {renderStrengths()}
