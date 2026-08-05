@@ -166,17 +166,28 @@ function GoldenSprinkleCursor() {
         hasMoved = true;
       }
 
-      // Generate golden sprinkle particles based on cursor speed
-      const distance = Math.hypot(mouse.x - lastMouse.x, mouse.y - lastMouse.y);
-      if (distance > 2) {
-        const spawnCount = Math.min(3, Math.floor(distance / 5) + 1);
-        for (let i = 0; i < spawnCount; i++) {
-          particlesRef.current.push(createParticle(mouse.x, mouse.y));
-        }
+      // Hide custom cursor elements if cursor is over input field
+      const target = e.target;
+      const hasClosest = target && typeof target.closest === 'function';
+      const isInputField = hasClosest && (target.closest('input, textarea, select, iframe') || document.body.classList.contains('show-native-cursor'));
 
-        // Cap active particles to prevent memory bloom
-        if (particlesRef.current.length > 80) {
-          particlesRef.current.splice(0, particlesRef.current.length - 80);
+      if (isInputField) {
+        gsap.to([dot, ring, canvas], { opacity: 0, duration: 0.15, overwrite: 'auto' });
+      }
+
+      // Generate golden sprinkle particles based on cursor speed (only outside inputs)
+      if (!isInputField) {
+        const distance = Math.hypot(mouse.x - lastMouse.x, mouse.y - lastMouse.y);
+        if (distance > 2) {
+          const spawnCount = Math.min(3, Math.floor(distance / 5) + 1);
+          for (let i = 0; i < spawnCount; i++) {
+            particlesRef.current.push(createParticle(mouse.x, mouse.y));
+          }
+
+          // Cap active particles to prevent memory bloom
+          if (particlesRef.current.length > 80) {
+            particlesRef.current.splice(0, particlesRef.current.length - 80);
+          }
         }
       }
 
@@ -286,14 +297,19 @@ function GoldenSprinkleCursor() {
     // Track active hover state to avoid redundant GSAP tween creations
     let isHovered = false;
 
-    // Event Delegation: Globally handle mouseover to hover scale
+    // Event Delegation: Globally handle mouseover to hover scale & nav/input visibility
     const handleMouseOver = (e) => {
       const target = e.target;
-      if (!target) return;
+      if (!target || typeof target.closest !== 'function') return;
 
       const isInputField = target.closest('input, textarea, select, iframe') || document.body.classList.contains('show-native-cursor');
+
       if (isInputField) {
         gsap.to([dot, ring, canvas], { opacity: 0, duration: 0.15, overwrite: 'auto' });
+        if (isHovered) {
+          isHovered = false;
+          handleMouseLeaveLink();
+        }
         return;
       } else {
         gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
@@ -316,7 +332,7 @@ function GoldenSprinkleCursor() {
     // Global click handler to handle tel: links bypass
     const handleGlobalClick = (e) => {
       const target = e.target;
-      if (!target) return;
+      if (!target || typeof target.closest !== 'function') return;
       const anchor = target.closest('a');
       if (anchor && anchor.getAttribute('href')?.startsWith('tel:')) {
         handleTelClick();
@@ -337,7 +353,12 @@ function GoldenSprinkleCursor() {
         ringPos.y = mouse.y;
         hasMoved = true;
       }
-      gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
+      const target = e.target;
+      const hasClosest = target && typeof target.closest === 'function';
+      const isInputField = hasClosest && target.closest('input, textarea, select, iframe');
+      if (!isInputField) {
+        gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
+      }
     };
 
     document.addEventListener('mouseleave', handleMouseLeaveWindow);
@@ -443,147 +464,130 @@ function GoldenSprinkleCursor() {
 const LOCATIONS = [
   {
     id: "dubai",
-    name: "Dubai Hub",
+    name: "Dubai",
     partnerName: "Beever Professional And Management Development Training LLC",
     flag: "🇦🇪",
     country: "United Arab Emirates",
     regText: "KHDA Approved License No. 89231",
-    x: 580,
+    x: 588,
     y: 210,
-    color: "#eab308", // Gold
+    color: "#ffffff", // White
     labelX: 820,
     labelY: 70,
     side: "right",
     mapLabel: "Dubai",
-    dx: 14,
-    dy: 4,
-    anchor: "start"
+    dx: 0,
+    dy: 18,
+    anchor: "middle"
   },
-  {
-    id: "usa",
-    name: "New York Office",
-    partnerName: "Beever Global Markets Advisory LLC",
-    flag: "🇺🇸",
-    country: "United States",
-    regText: "SEC Registered & NFA Member",
-    x: 230,
-    y: 170,
-    color: "#7E1C2C", // Burgundy
-    labelX: 80,
-    labelY: 70,
-    side: "left",
-    mapLabel: "USA",
-    dx: -14,
-    dy: 4,
-    anchor: "end"
-  },
+
   {
     id: "uk",
-    name: "London Office",
+    name: "United Kingdom",
     partnerName: "Beever Capital Partners UK Ltd",
     flag: "🇬🇧",
     country: "United Kingdom",
     regText: "FCA Registered No. 492315",
-    x: 475,
-    y: 115,
+    x: 465,
+    y: 105,
     color: "#7E1C2C", // Burgundy
     labelX: 80,
     labelY: 175,
     side: "left",
     mapLabel: "UK",
-    dx: -14,
-    dy: -2,
+    dx: -16,
+    dy: -6,
     anchor: "end"
   },
   {
     id: "netherlands",
-    name: "Amsterdam Office",
+    name: "Netherlands",
     partnerName: "Beever Quantitative Trading BV",
     flag: "🇳🇱",
     country: "Netherlands",
     regText: "AFM Supervised & DNB Registered",
-    x: 485,
-    y: 95,
+    x: 480,
+    y: 92,
     color: "#7E1C2C", // Burgundy
     labelX: 80,
     labelY: 280,
     side: "left",
     mapLabel: "Netherlands",
-    dx: 14,
+    dx: 16,
     dy: -8,
     anchor: "start"
   },
   {
     id: "switzerland",
-    name: "Zurich Office",
+    name: "Switzerland",
     partnerName: "Beever Wealth Management AG",
     flag: "🇨🇭",
     country: "Switzerland",
     regText: "FINMA Regulated License",
-    x: 495,
-    y: 135,
+    x: 490,
+    y: 114,
     color: "#7E1C2C", // Burgundy
     labelX: 80,
     labelY: 385,
     side: "left",
     mapLabel: "Switzerland",
-    dx: 14,
-    dy: 8,
+    dx: 16,
+    dy: 10,
     anchor: "start"
   },
   {
     id: "india",
-    name: "Mumbai Office",
+    name: "India",
     partnerName: "Beever Academy India Pvt Ltd",
     flag: "🇮🇳",
     country: "India",
     regText: "SEBI Registered RIA Advisor",
-    x: 660,
-    y: 195,
+    x: 662,
+    y: 198,
     color: "#7E1C2C", // Burgundy
     labelX: 820,
     labelY: 175,
     side: "right",
     mapLabel: "India",
-    dx: 14,
+    dx: 16,
     dy: 4,
     anchor: "start"
   },
   {
     id: "singapore",
-    name: "Singapore Office",
+    name: "Singapore",
     partnerName: "Beever Asia-Pacific Pte Ltd",
     flag: "🇸🇬",
     country: "Singapore",
     regText: "MAS CMS Licensed Office",
-    x: 760,
-    y: 250,
+    x: 758,
+    y: 252,
     color: "#7E1C2C", // Burgundy
     labelX: 820,
     labelY: 280,
     side: "right",
     mapLabel: "Singapore",
-    dx: 14,
-    dy: -4,
-    anchor: "start"
+    dx: 0,
+    dy: 18,
+    anchor: "middle"
   },
   {
     id: "malaysia",
-    name: "Labuan Partner",
+    name: "Malaysia",
     partnerName: "Beever Labuan Partners Ltd",
     flag: "🇲🇾",
     country: "Malaysia",
     regText: "LFSA Labuan Licensed Broker",
-    x: 745,
-    y: 235,
+    x: 750,
+    y: 236,
     color: "#7E1C2C", // Burgundy
     labelX: 820,
     labelY: 385,
     side: "right",
     mapLabel: "Malaysia",
-    dx: -14,
-    dy: 10,
-    anchor: "end"
+    dx: 16,
+    dy: 4,
+    anchor: "start"
   }
 ];
 
@@ -601,8 +605,7 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
     { cx: 17, cy: 26, rx: 6, ry: 5 },
     { cx: 25, cy: 26, rx: 6, ry: 5 },
     { cx: 22, cy: 33, rx: 7, ry: 5 },
-    { cx: 26, cy: 35, rx: 3, ry: 4 },
-    { cx: 28, cy: 40, rx: 2, ry: 3 },
+    { cx: 26, cy: 31, rx: 3, ry: 4 }, // East Coast (New York)
     { cx: 18, cy: 41, rx: 4, ry: 5 },
     { cx: 24, cy: 47, rx: 1.5, ry: 3 },
     // South America
@@ -612,10 +615,10 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
     { cx: 31, cy: 78, rx: 2.5, ry: 9 },
     // Europe
     { cx: 50, cy: 14, rx: 3, ry: 6 },
-    { cx: 47.5, cy: 23, rx: 2, ry: 3 },
-    { cx: 48, cy: 24, rx: 4, ry: 4 },
+    { cx: 46.5, cy: 21, rx: 2.2, ry: 3 }, // UK & Ireland
+    { cx: 48, cy: 18.5, rx: 2, ry: 2 },   // Netherlands / NW Europe
+    { cx: 49, cy: 22.8, rx: 2.5, ry: 2.5 }, // Switzerland & Central Europe
     { cx: 54, cy: 21, rx: 6, ry: 6 },
-    { cx: 50, cy: 28, rx: 5, ry: 3 },
     // Africa
     { cx: 50, cy: 40, rx: 8, ry: 6 },
     { cx: 44, cy: 46, rx: 5, ry: 5 },
@@ -624,16 +627,18 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
     { cx: 54, cy: 65, rx: 4.5, ry: 8 },
     { cx: 60, cy: 66, rx: 1.5, ry: 4.5 },
     // Middle East
-    { cx: 58, cy: 41, rx: 4, ry: 4.5 },
-    { cx: 61, cy: 34, rx: 5, ry: 4 },
+    { cx: 58.8, cy: 42, rx: 4, ry: 4.5 }, // Arabian Peninsula (Dubai / UAE)
+    { cx: 57, cy: 33, rx: 3.5, ry: 3 },
+    { cx: 62, cy: 35, rx: 4, ry: 3.5 },
     // Asia
     { cx: 72, cy: 16, rx: 15, ry: 7 },
     { cx: 70, cy: 24, rx: 10, ry: 5 },
     { cx: 74, cy: 30, rx: 8, ry: 6 },
-    { cx: 66, cy: 38, rx: 4, ry: 5 },
-    { cx: 75, cy: 42, rx: 3.5, ry: 4.5 },
+    { cx: 66.2, cy: 39.6, rx: 4.5, ry: 5 }, // India Subcontinent (Mumbai)
+    { cx: 75, cy: 47.2, rx: 3.5, ry: 4.5 }, // Southeast Asia / Malaysia
+    { cx: 75.8, cy: 50.4, rx: 1.5, ry: 1.5 }, // Singapore
     { cx: 84.5, cy: 30, rx: 1.8, ry: 5 },
-    { cx: 77, cy: 51, rx: 6, ry: 4 },
+    { cx: 78, cy: 54, rx: 5, ry: 3.5 },
     // Australia & Oceania
     { cx: 84, cy: 70, rx: 7, ry: 6 },
     { cx: 86, cy: 74, rx: 3.5, ry: 3.5 },
@@ -741,9 +746,9 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
       const mapBreath = Math.sin(elapsed * 0.001) * 0.15 + 0.7;
       
       // Draw dark golden honeycomb wireframe cells
-      ctx.lineWidth = 0.5;
+      ctx.lineWidth = 0.6;
       points.forEach(p => {
-        ctx.strokeStyle = `rgba(166, 126, 45, ${p.opacity * mapBreath * 0.38})`;
+        ctx.strokeStyle = `rgba(180, 140, 55, ${p.opacity * mapBreath * 0.45})`;
         ctx.beginPath();
         const rad = 4.9; // radius to form a continuous tiling
         for (let i = 0; i < 6; i++) {
@@ -760,9 +765,9 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
         ctx.stroke();
       });
 
-      // Draw continuous dark golden continent borders defining shapes
-      ctx.lineWidth = 0.85;
-      ctx.strokeStyle = `rgba(166, 126, 45, ${mapBreath * 0.72})`;
+      // Pass 1: Draw deep dark border contrast outline
+      ctx.lineWidth = 2.6;
+      ctx.strokeStyle = `rgba(15, 2, 4, 0.95)`;
       ctx.beginPath();
       for (let i = 0; i < borderPoints.length; i++) {
         const p1 = borderPoints[i];
@@ -770,13 +775,17 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
           const p2 = borderPoints[j];
           const dx = p1.x - p2.x;
           const dy = p1.y - p2.y;
-          // Connect adjacent border points (within 11px) to outline the shape
-          if (dx * dx + dy * dy < 121) {
+          if (dx * dx + dy * dy < 135) {
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
           }
         }
       }
+      ctx.stroke();
+
+      // Pass 2: Draw rich dark golden continent borders defining shapes clearly
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = `rgba(201, 162, 77, ${mapBreath * 0.95})`;
       ctx.stroke();
 
 
@@ -847,18 +856,20 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
           </filter>
         </defs>
 
-        {/* Neon curved connections */}
+
+
+        {/* Neon curved connections from Dubai */}
         {LOCATIONS.filter(l => l.id !== "dubai").map(loc => {
           const curveD = getCurvePath(dbX, dbY, loc.x, loc.y);
           const isHighlighted = hoveredLocationId === loc.id;
           const isAnyHovered = hoveredLocationId !== null;
           
-          let strokeOpacity = 0.35;
+          let strokeOpacity = 0.85;
           if (isAnyHovered) {
-            strokeOpacity = isHighlighted ? 0.95 : 0.08;
+            strokeOpacity = isHighlighted ? 1.0 : 0.25;
           }
 
-          const filterName = loc.id === "dubai" ? "glow-gold" : "glow-burgundy";
+          const lineColor = isHighlighted ? "#FFD700" : "#C9A24D";
 
           return (
             <g key={`connection-${loc.id}`}>
@@ -869,42 +880,60 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
                 stroke="transparent"
               />
 
-              {isHighlighted && (
-                <path
-                  d={curveD}
-                  fill="none"
-                  stroke={loc.color}
-                  strokeWidth="4"
-                  opacity="0.4"
-                  filter={`url(#${filterName})`}
-                />
-              )}
-
+              {/* Dark Under-stroke for heavy line contrast & darkness */}
               <path
                 d={curveD}
                 fill="none"
-                stroke={loc.color}
-                strokeWidth={isHighlighted ? 1.8 : 0.95}
+                stroke="#150204"
+                strokeWidth={isHighlighted ? 5.5 : 4.0}
+                opacity={strokeOpacity * 0.9}
+              />
+
+              {/* Main Visible Bolder Curved Line */}
+              <path
+                d={curveD}
+                fill="none"
+                stroke={lineColor}
+                strokeWidth={isHighlighted ? 3.2 : 2.2}
                 opacity={strokeOpacity}
+                filter={isHighlighted ? `url(#glow-gold)` : undefined}
                 className="draw-path transition-all duration-300"
               />
 
-              <circle
-                r={isHighlighted ? 4.2 : 2.6}
-                fill={loc.color}
-                filter={`url(#${filterName})`}
-                opacity={isAnyHovered && !isHighlighted ? 0.15 : 1}
-              >
-                <animateMotion
-                  dur={getPulseDuration(loc.id)}
-                  repeatCount="indefinite"
+              {/* Bigger Animated Moving Dots traveling from Dubai */}
+              <g opacity={isAnyHovered && !isHighlighted ? 0.3 : 1}>
+                {/* Moving Dot Glow Circle */}
+                <circle
+                  r={isHighlighted ? 8.5 : 5.8}
+                  fill="#FFD700"
+                  filter="url(#glow-gold)"
                 >
-                  <mpath href={`#path-${loc.id}`} />
-                </animateMotion>
-              </circle>
+                  <animateMotion
+                    dur={getPulseDuration(loc.id)}
+                    repeatCount="indefinite"
+                  >
+                    <mpath href={`#path-${loc.id}`} />
+                  </animateMotion>
+                </circle>
+
+                {/* Moving Dot Bright Core */}
+                <circle
+                  r={isHighlighted ? 4.5 : 3.0}
+                  fill="#FFFFFF"
+                >
+                  <animateMotion
+                    dur={getPulseDuration(loc.id)}
+                    repeatCount="indefinite"
+                  >
+                    <mpath href={`#path-${loc.id}`} />
+                  </animateMotion>
+                </circle>
+              </g>
             </g>
           );
         })}
+
+
 
 
 
@@ -926,17 +955,6 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
               className="pointer-events-auto cursor-pointer"
               opacity={opacity}
             >
-              <circle
-                cx={loc.x}
-                cy={loc.y}
-                r="14"
-                fill="none"
-                stroke={loc.color}
-                strokeWidth="1.2"
-                className="marker-ripple"
-                style={{ animationDelay: `${i * 0.4}s` }}
-              />
-
               <circle
                 cx={loc.x}
                 cy={loc.y}
@@ -969,8 +987,8 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
                 x={loc.x + loc.dx}
                 y={loc.y + loc.dy}
                 textAnchor={loc.anchor}
-                className={`font-sans text-[9px] font-bold tracking-wider pointer-events-none transition-all duration-300 drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.95)] ${
-                  isHighlighted ? 'fill-[#C9A24D]' : 'fill-white/85'
+                className={`font-sans text-[13px] font-extrabold tracking-wide pointer-events-none transition-all duration-300 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] ${
+                  isHighlighted ? 'fill-[#FFD700]' : 'fill-white'
                 }`}
               >
                 {loc.flag} {loc.mapLabel}
@@ -982,26 +1000,23 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
 
 
 
-      {/* Premium Glass Tooltip (Mobile Touch / Desktop Hover Center Detail) */}
+      {/* Premium Glass Tooltip showing only exact location name */}
       {hoveredLocationId && (
         (() => {
           const loc = LOCATIONS.find(l => l.id === hoveredLocationId);
           if (!loc) return null;
           return (
             <div
-              className="absolute glass-tooltip p-3.5 z-50 text-left min-w-[210px]"
+              className="absolute glass-tooltip px-3 py-2 z-50 text-left pointer-events-none shadow-lg"
               style={{
                 left: `${(loc.x / 10).toFixed(1)}%`,
                 top: `${(loc.y / 5).toFixed(1)}%`,
               }}
             >
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2">
                 <span className="text-base">{loc.flag}</span>
-                <span className="font-serif text-[12px] font-bold text-white tracking-wide uppercase">{loc.name}</span>
+                <span className="font-serif text-xs font-bold text-white tracking-wide uppercase">{loc.mapLabel}</span>
               </div>
-              <p className="text-[11px] text-white/85 leading-tight mb-0.5">{loc.partnerName}</p>
-              <p className="text-[9px] text-white/60 leading-normal mb-1">{loc.country}</p>
-              <p className="text-[8px] font-mono tracking-wider text-[#D4AF37] uppercase font-bold">{loc.regText}</p>
             </div>
           );
         })()
@@ -2494,49 +2509,99 @@ export default function App() {
   );
 
   const renderGlobalNetwork = () => (
-    <section id="global-network" className="py-20 md:py-32 global-presence-section text-center text-white relative overflow-hidden">
+    <section id="global-network" className="py-20 md:py-32 global-presence-section text-white relative overflow-hidden">
       {/* Decorative gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#37060F] via-transparent to-[#37060F] pointer-events-none z-10"></div>
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-20">
-        <div className="mb-16">
-          <span className="font-sans uppercase text-gold text-[11px] tracking-[0.2em] font-semibold block mb-3 animate-pulse">
-            Global Connectivity Hub
-          </span>
-          <h2 className="text-4xl md:text-5xl font-serif text-white mb-6 font-bold tracking-wide">
-            Beever Certification Network
-          </h2>
-          <div className="w-[80px] h-[2px] bg-gradient-to-r from-burgundy-light to-gold mx-auto mb-4"></div>
-          <p className="text-sm text-white/70 max-w-[650px] mx-auto leading-relaxed">
-            Connecting Dubai to the world. Charting live knowledge pathways and regulatory synergy across major international financial hubs.
-          </p>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          
+          {/* Left Column: Why Choose Beever Academy */}
+          <div className="lg:col-span-5 text-left flex flex-col justify-center">
+            <span className="font-sans uppercase text-gold text-[11px] tracking-[0.2em] font-semibold block mb-3 animate-pulse">
+              Why Choose Beever Academy
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-white mb-6 font-bold leading-tight">
+              Empowering Your Financial & Leadership Future.
+            </h2>
+            <div className="w-[80px] h-[2px] bg-gradient-to-r from-burgundy-light to-gold mb-6"></div>
+            <p className="text-sm text-white/80 leading-relaxed mb-8 text-justify">
+              At <strong>Beever Academy</strong>, we bridge the gap between financial market theory and real-world execution. Founded by industry veterans with over 20 years of combined experience, our academy delivers practical, institutional-grade education designed for long-term career success.
+            </p>
 
-        {/* Dynamic Interactive Dashboard */}
-        <div className="w-full bg-[#37060F] border border-burgundy-light/25 rounded-3xl overflow-hidden shadow-2xl relative">
-          <GlobalPresenceDashboard
-            key="burgundy-dashboard"
-            hoveredLocationId={hoveredLocationId}
-            setHoveredLocationId={setHoveredLocationId}
-          />
-        </div>
-
-        {/* Mobile/Tablet Location Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 px-2 lg:hidden relative z-30">
-          {LOCATIONS.map(loc => (
-            <div
-              key={loc.id}
-              className="flex flex-col p-4 glass-location-panel border border-burgundy-light/25 bg-[#37060F]/75 relative overflow-hidden text-left"
-            >
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-lg leading-none">{loc.flag}</span>
-                <h4 className="font-serif text-xs font-bold text-white tracking-wide uppercase">{loc.name}</h4>
+            {/* 4 Feature Pillars Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+              <div className="p-4 rounded-2xl bg-white/5 border border-burgundy-light/30 backdrop-blur-md hover:border-gold/50 transition-all duration-300">
+                <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center text-gold mb-3">
+                  <Star className="w-4 h-4" />
+                </div>
+                <h4 className="font-serif text-sm font-bold text-gold mb-1">20+ Years Expertise</h4>
+                <p className="text-xs text-white/70 leading-relaxed">Direct mentorship from seasoned market practitioners and strategists.</p>
               </div>
-              <p className="text-[11px] text-white/80 mb-1 leading-snug">{loc.partnerName}</p>
-              <span className="text-[9px] font-mono tracking-wider text-[#D4AF37] uppercase font-bold">{loc.regText}</span>
+
+              <div className="p-4 rounded-2xl bg-white/5 border border-burgundy-light/30 backdrop-blur-md hover:border-gold/50 transition-all duration-300">
+                <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center text-gold mb-3">
+                  <Globe className="w-4 h-4" />
+                </div>
+                <h4 className="font-serif text-sm font-bold text-gold mb-1">Global Connectivity</h4>
+                <p className="text-xs text-white/70 leading-relaxed">Connecting Dubai to major international financial hubs across 8 global markets.</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/5 border border-burgundy-light/30 backdrop-blur-md hover:border-gold/50 transition-all duration-300">
+                <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center text-gold mb-3">
+                  <TrendingUp className="w-4 h-4" />
+                </div>
+                <h4 className="font-serif text-sm font-bold text-gold mb-1">Practical Learning</h4>
+                <p className="text-xs text-white/70 leading-relaxed">Hands-on market simulation, live liquidity dynamics, and real analytical tools.</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/5 border border-burgundy-light/30 backdrop-blur-md hover:border-gold/50 transition-all duration-300">
+                <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center text-gold mb-3">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
+                <h4 className="font-serif text-sm font-bold text-gold mb-1">Career Growth</h4>
+                <p className="text-xs text-white/70 leading-relaxed">Structured advancement and professional networking with top corporate entities.</p>
+              </div>
             </div>
-          ))}
+
+            <div className="flex flex-wrap items-center gap-4">
+              <a
+                href="#contact"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gold-gradient text-burgundy-dark font-sans text-xs uppercase font-bold tracking-wider hover:shadow-lg transition-all duration-300"
+              >
+                <span>Book a Consultation</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+              <span className="font-serif text-xs italic text-gold/90">"Learn Today. Lead Tomorrow."</span>
+            </div>
+          </div>
+
+          {/* Right Column: World Map Dashboard */}
+          <div className="lg:col-span-7 flex flex-col justify-center">
+            <div className="mb-6 text-left">
+              <span className="font-sans uppercase text-gold text-[11px] tracking-[0.2em] font-semibold block mb-2">
+                Global Connectivity Hub
+              </span>
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-serif text-white font-bold tracking-wide mb-2">
+                Beever Certification Network
+              </h3>
+              <p className="text-xs md:text-sm text-white/70 leading-relaxed">
+                Connecting Dubai to the world. Charting live knowledge pathways and regulatory synergy across major international financial hubs.
+              </p>
+            </div>
+
+            <div className="w-full bg-[#37060F] border border-burgundy-light/25 rounded-3xl overflow-hidden shadow-2xl relative">
+              <GlobalPresenceDashboard
+                key="burgundy-dashboard"
+                hoveredLocationId={hoveredLocationId}
+                setHoveredLocationId={setHoveredLocationId}
+              />
+            </div>
+          </div>
+
         </div>
+
+
       </div>
     </section>
   );

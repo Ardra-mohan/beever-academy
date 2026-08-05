@@ -429,22 +429,7 @@ body.show-native-cursor *::after {
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.marker-ripple {
-  transform-origin: center;
-  animation: marker-ripple-anim 3s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-  opacity: 0;
-}
 
-@keyframes marker-ripple-anim {
-  0% {
-    transform: scale(0.6);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(3.2);
-    opacity: 0;
-  }
-}
 
 /* self-drawing connection paths */
 .draw-path {
