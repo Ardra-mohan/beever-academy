@@ -61,9 +61,7 @@ const InsideGalleryCardItem = React.memo(({ card, i }) => {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`inside-card-el relative bg-white border border-black/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_12px_35px_-5px_rgba(212,175,55,0.15),0_0_1px_1px_rgba(212,175,55,0.3)] hover:border-gold/60 inside-card-transition flex flex-col justify-between group ${
-        i === 3 || i === 4 ? 'lg:col-span-1 lg:max-w-md mx-auto w-full' : ''
-      }`}
+      className="inside-card-el relative bg-white border border-black/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_12px_35px_-5px_rgba(212,175,55,0.15),0_0_1px_1px_rgba(212,175,55,0.3)] hover:border-gold/60 inside-card-transition flex flex-col justify-between group w-full"
     >
       {/* Restrained Gold Light-Following Effect */}
       <div
@@ -75,11 +73,11 @@ const InsideGalleryCardItem = React.memo(({ card, i }) => {
       />
 
       <div className="relative overflow-hidden h-[250px] bg-black/90">
-        {/* Card Main Image - Smooth 1.03x Zoom on Hover */}
+        {/* Card Main Image - Smooth Zoom on Hover */}
         <img 
           src={card.img} 
           alt={card.title} 
-          className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-[1.03]" 
+          className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110" 
           loading="lazy" 
           width="600" 
           height="400" 
@@ -177,6 +175,11 @@ const InsideGalleryCards = React.memo(() => {
       title: "Career Development Programs",
       img: img2,
       desc: "Rigorous physical and strategic preparation designed to cultivate confidence and leadership."
+    },
+    {
+      title: "Advanced Trading Classrooms",
+      img: classroomImg,
+      desc: "State-of-the-art academic classrooms equipped with dual-screen trading stations and immersive learning facilities."
     }
   ];
 
