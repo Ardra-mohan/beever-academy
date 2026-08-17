@@ -518,3 +518,26 @@ body.show-native-cursor *::after {
   filter: drop-shadow(0 0 10px var(--marker-color)) !important;
 }
 
+/* Inside Beever Academy - Premium Financial Trading Aesthetics */
+@keyframes marketLineFlow {
+  0% {
+    stroke-dashoffset: 800;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.market-chart-line {
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  animation: marketLineFlow 16s linear infinite;
+}
+
+.inside-card-transition {
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1),
+              box-shadow 0.6s cubic-bezier(0.25, 1, 0.5, 1),
+              border-color 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+

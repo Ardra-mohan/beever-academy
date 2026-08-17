@@ -13,7 +13,10 @@ import {
 import logo from './assets/logo.png';
 import homeImg from './assets/homee.jpeg';
 import officeImg from './assets/office.jpeg';
-import ladyImg from './assets/lady.jpeg';
+import image1 from './assets/image1.jpeg';
+import img2 from './assets/img2.jpeg';
+import img3 from './assets/img3.jpeg';
+import img4 from './assets/img4.jpeg';
 import classImg from './assets/class.jpeg';
 import classroomImg from './assets/classroom.jpeg';
 
@@ -37,31 +40,142 @@ function throttle(func, limit) {
 // ==========================================
 // MEMOIZED BLOG/CAMPUS LIFE CARDS COMPONENT
 // ==========================================
+const InsideGalleryCardItem = React.memo(({ card, i }) => {
+  const cardRef = useRef(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0, opacity: 0 });
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setMousePos({ x, y, opacity: 1 });
+  };
+
+  const handleMouseLeave = () => {
+    setMousePos((prev) => ({ ...prev, opacity: 0 }));
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={`inside-card-el relative bg-white border border-black/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_12px_35px_-5px_rgba(212,175,55,0.15),0_0_1px_1px_rgba(212,175,55,0.3)] hover:border-gold/60 inside-card-transition flex flex-col justify-between group ${
+        i === 3 || i === 4 ? 'lg:col-span-1 lg:max-w-md mx-auto w-full' : ''
+      }`}
+    >
+      {/* Restrained Gold Light-Following Effect */}
+      <div
+        className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-500 z-30"
+        style={{
+          opacity: mousePos.opacity,
+          background: `radial-gradient(400px circle at ${mousePos.x}px ${mousePos.y}px, rgba(212, 175, 55, 0.08), transparent 70%)`
+        }}
+      />
+
+      <div className="relative overflow-hidden h-[250px] bg-black/90">
+        {/* Card Main Image - Smooth 1.03x Zoom on Hover */}
+        <img 
+          src={card.img} 
+          alt={card.title} 
+          className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-[1.03]" 
+          loading="lazy" 
+          width="600" 
+          height="400" 
+        />
+
+        {/* Burgundy Overlay - Slightly Strengthens on Hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-burgundy-dark/85 via-burgundy-dark/35 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-700 ease-out"></div>
+
+        {/* Very Subtle Financial Market / Candlestick Line Overlay */}
+        <svg 
+          className="absolute inset-0 w-full h-full pointer-events-none z-10 opacity-25 group-hover:opacity-40 transition-opacity duration-700"
+          viewBox="0 0 600 250" 
+          preserveAspectRatio="none"
+          fill="none"
+        >
+          <defs>
+            <linearGradient id={`chart-grad-${i}`} x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.15" />
+              <stop offset="50%" stopColor="#F3E5AB" stopOpacity="0.85" />
+              <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.2" />
+            </linearGradient>
+          </defs>
+          
+          {/* Subtle Financial Candlestick Wicks & Bodies */}
+          <g stroke="#D4AF37" strokeWidth="0.8" opacity="0.6">
+            <line x1="140" y1="120" x2="140" y2="170" strokeWidth="0.8" />
+            <rect x="136" y="135" width="8" height="20" fill="#D4AF37" fillOpacity="0.4" stroke="none" />
+            
+            <line x1="300" y1="80" x2="300" y2="140" strokeWidth="0.8" />
+            <rect x="296" y="92" width="8" height="30" fill="#D4AF37" fillOpacity="0.5" stroke="none" />
+            
+            <line x1="460" y1="100" x2="460" y2="165" strokeWidth="0.8" />
+            <rect x="456" y="115" width="8" height="32" fill="#D4AF37" fillOpacity="0.3" stroke="none" />
+          </g>
+
+          {/* Smooth Financial Wave Line */}
+          <path
+            d="M 0 170 Q 100 145 200 175 T 400 130 T 600 140"
+            stroke={`url(#chart-grad-${i})`}
+            strokeWidth="1.5"
+            className="market-chart-line"
+          />
+        </svg>
+
+        {/* Title & Explore Indicator Container */}
+        <div className="absolute bottom-5 left-6 right-6 z-20">
+          <h3 className="font-serif text-xl text-white font-medium drop-shadow-md transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:-translate-y-1.5">
+            {card.title}
+          </h3>
+
+          {/* Minimal EXPLORE → Indicator */}
+          <div className="flex items-center gap-2 mt-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] text-[11px] font-sans font-semibold tracking-[0.18em] text-gold uppercase">
+            <span>EXPLORE</span>
+            <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 transition-transform duration-300" />
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6 bg-white flex flex-col justify-between flex-grow">
+        <p className="text-xs text-text-secondary leading-relaxed font-sans">{card.desc}</p>
+        <div className="mt-4 pt-4 border-t border-black/5 flex items-center justify-between">
+          <span className="text-[10px] uppercase font-sans font-semibold tracking-wider text-gold-dark/80">
+            Beever Academy
+          </span>
+          <span className="w-1.5 h-1.5 rounded-full bg-gold/40 group-hover:bg-gold transition-colors duration-300"></span>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 const InsideGalleryCards = React.memo(() => {
   const cards = [
     {
       title: "Interactive Learning Sessions",
-      img: "https://placehold.co/600x400/170105/D4AF37/png?text=Interactive+Learning",
+      img: img4,
       desc: "Engage in collaborative workshops using modern educational technology and collaborative teaching setups."
     },
     {
       title: "Expert-Led Workshops",
-      img: classImg,
+      img: img3,
       desc: "Gain hands-on problem solving insights led directly by top industry practitioners."
     },
     {
       title: "Collaborative Learning Environment",
-      img: classroomImg,
+      img: classImg,
       desc: "Modern study environments built to nurture teamwork, cooperation, and group study projects."
     },
     {
       title: "Professional Mentorship",
-      img: "https://placehold.co/600x400/170105/D4AF37/png?text=Mentorship",
+      img: image1,
       desc: "One-on-one professional counseling guidance to layout clear long-term career growth plans."
     },
     {
       title: "Career Development Programs",
-      img: ladyImg,
+      img: img2,
       desc: "Rigorous physical and strategic preparation designed to cultivate confidence and leadership."
     }
   ];
@@ -69,28 +183,7 @@ const InsideGalleryCards = React.memo(() => {
   return (
     <div className="inside-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
       {cards.map((card, i) => (
-        <div
-          key={i}
-          className={`inside-card-el bg-white border border-black/5 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-gold/30 transition-all duration-300 flex flex-col justify-between group ${i === 3 || i === 4 ? 'lg:col-span-1 lg:max-w-md mx-auto w-full' : ''}`}
-        >
-          <div className="relative overflow-hidden h-[240px]">
-            <img 
-              src={card.img} 
-              alt={card.title} 
-              className="w-full h-full object-cover" 
-              loading="lazy" 
-              width="600" 
-              height="400" 
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-burgundy-dark/75 via-transparent to-transparent opacity-90"></div>
-            <div className="absolute bottom-4 left-6 right-6">
-              <h3 className="font-serif text-xl text-white font-medium drop-shadow-sm">{card.title}</h3>
-            </div>
-          </div>
-          <div className="p-6">
-            <p className="text-xs text-text-secondary leading-relaxed">{card.desc}</p>
-          </div>
-        </div>
+        <InsideGalleryCardItem key={i} card={card} i={i} />
       ))}
     </div>
   );
@@ -1987,19 +2080,43 @@ export default function App() {
         );
       }
 
-      // 5. Inside Gallery Cards
+      // 5. Inside Gallery Cards & Premium Sweeping Gold Line
       if (document.querySelector('.inside-grid-el')) {
-        gsap.fromTo('.inside-card-el',
-          { y: prefersReducedMotion ? 0 : 20, opacity: 0 },
+        const insideTimeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: '#blog',
+            start: 'top 80%',
+            toggleActions: 'play none none none'
+          }
+        });
+
+        if (document.querySelector('.inside-sweep-line')) {
+          insideTimeline.to('.inside-sweep-line', {
+            scaleX: 1,
+            duration: 0.85,
+            ease: 'power3.inOut'
+          });
+        }
+
+        if (document.querySelector('.inside-header-line')) {
+          insideTimeline.fromTo('.inside-header-line',
+            { scaleX: 0, opacity: 0 },
+            { scaleX: 1, opacity: 1, duration: 0.6, ease: 'power2.out' },
+            '-=0.6'
+          );
+        }
+
+        insideTimeline.fromTo('.inside-card-el',
+          { y: prefersReducedMotion ? 0 : 45, opacity: 0 },
           {
-            scrollTrigger: { trigger: '.inside-grid-el', start: 'top 85%' },
             y: 0,
             opacity: 1,
-            duration: 0.5,
-            stagger: 0.1,
-            ease: 'power1.inOut',
-            overwrite: 'auto'
-          }
+            duration: prefersReducedMotion ? 0.3 : 0.8,
+            stagger: prefersReducedMotion ? 0 : 0.08,
+            ease: 'power3.out',
+            clearProps: 'transform'
+          },
+          '-=0.4'
         );
       }
 
@@ -2735,8 +2852,11 @@ export default function App() {
   };
 
   const renderInsideGallery = () => (
-    <section id="blog" className="py-20 md:py-32 bg-white text-center">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+    <section id="blog" className="py-20 md:py-32 bg-white text-center relative overflow-hidden">
+      {/* Horizontal sweeping gold line at top of section */}
+      <div className="inside-sweep-line absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent opacity-90 scale-x-0 origin-left z-20"></div>
+
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
         <div className="mb-20">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
             Campus Life & Environment
@@ -2744,7 +2864,8 @@ export default function App() {
           <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
             Inside Beever Academy
           </h2>
-          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto"></div>
+          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-4"></div>
+          <div className="inside-header-line w-[160px] h-[1px] bg-gold/40 mx-auto rounded-full origin-center"></div>
         </div>
 
         <InsideGalleryCards />
