@@ -61,7 +61,7 @@ const InsideGalleryCardItem = React.memo(({ card, i }) => {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="inside-card-el relative bg-white border border-black/10 rounded-2xl overflow-visible shadow-sm hover:shadow-[0_12px_35px_-5px_rgba(212,175,55,0.2)] hover:border-gold/60 inside-card-transition flex flex-col justify-between group w-full cursor-pointer"
+      className="inside-card-el relative bg-white border border-black/10 rounded-2xl overflow-visible shadow-sm hover:shadow-[0_20px_50px_-10px_rgba(212,175,55,0.3)] hover:border-gold/80 inside-card-transition flex flex-col justify-between group w-full cursor-pointer hover:z-[80]"
     >
       {/* Restrained Gold Light-Following Effect */}
       <div
@@ -74,8 +74,8 @@ const InsideGalleryCardItem = React.memo(({ card, i }) => {
 
       {/* Fixed Height Image Placeholder Container */}
       <div className="relative h-[250px] w-full rounded-t-2xl z-20 overflow-visible">
-        {/* The Image Element Pops Out from its Placeholder space (up to ~40-50% scale up) on hover */}
-        <div className="inside-img-pop-wrapper absolute inset-0 rounded-t-2xl overflow-hidden bg-black/90 group-hover:scale-[1.4] group-hover:-translate-y-5 group-hover:z-[60] group-hover:rounded-2xl group-hover:shadow-[0_30px_80px_-15px_rgba(0,0,0,0.85),0_0_30px_rgba(212,175,55,0.45)] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
+        {/* The Image Element Pops Out far outside its Placeholder margin space (scale-150 / 50% larger) on hover */}
+        <div className="inside-img-pop-wrapper absolute inset-0 rounded-t-2xl overflow-hidden bg-black/90 group-hover:scale-[1.5] group-hover:-translate-y-8 group-hover:z-[100] group-hover:rounded-2xl group-hover:shadow-[0_35px_90px_-10px_rgba(0,0,0,0.9),0_0_35px_rgba(212,175,55,0.5)] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
           {/* Card Main Image */}
           <img 
             src={card.img} 
