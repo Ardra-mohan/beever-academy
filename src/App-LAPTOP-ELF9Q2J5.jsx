@@ -61,84 +61,82 @@ const InsideGalleryCardItem = React.memo(({ card, i }) => {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="inside-card-el relative bg-white border border-black/10 rounded-2xl overflow-visible shadow-sm hover:shadow-[0_12px_35px_-5px_rgba(212,175,55,0.2)] hover:border-gold/60 inside-card-transition flex flex-col justify-between group w-full cursor-pointer"
+      className="inside-card-el relative bg-white border border-black/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_12px_35px_-5px_rgba(212,175,55,0.15),0_0_1px_1px_rgba(212,175,55,0.3)] hover:border-gold/60 inside-card-transition flex flex-col justify-between group w-full"
     >
       {/* Restrained Gold Light-Following Effect */}
       <div
-        className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-500 z-30 overflow-hidden"
+        className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-500 z-30"
         style={{
           opacity: mousePos.opacity,
           background: `radial-gradient(400px circle at ${mousePos.x}px ${mousePos.y}px, rgba(212, 175, 55, 0.08), transparent 70%)`
         }}
       />
 
-      {/* Fixed Height Image Placeholder Container */}
-      <div className="relative h-[250px] w-full rounded-t-2xl z-20 overflow-visible">
-        {/* The Image Element Pops Out from its Placeholder space (up to ~40-50% scale up) on hover */}
-        <div className="inside-img-pop-wrapper absolute inset-0 rounded-t-2xl overflow-hidden bg-black/90 group-hover:scale-[1.4] group-hover:-translate-y-5 group-hover:z-[60] group-hover:rounded-2xl group-hover:shadow-[0_30px_80px_-15px_rgba(0,0,0,0.85),0_0_30px_rgba(212,175,55,0.45)] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
-          {/* Card Main Image */}
-          <img 
-            src={card.img} 
-            alt={card.title} 
-            className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110" 
-            loading="lazy" 
-            width="600" 
-            height="400" 
-          />
+      <div className="relative overflow-hidden h-[250px] bg-black/90">
+        {/* Card Main Image - Smooth Zoom on Hover */}
+        <img 
+          src={card.img} 
+          alt={card.title} 
+          className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110" 
+          loading="lazy" 
+          width="600" 
+          height="400" 
+        />
 
-          {/* Burgundy Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-burgundy-dark/90 via-burgundy-dark/40 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-700 ease-out"></div>
+        {/* Burgundy Overlay - Slightly Strengthens on Hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-burgundy-dark/85 via-burgundy-dark/35 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-700 ease-out"></div>
 
-          {/* Financial Market Wave Overlay */}
-          <svg 
-            className="absolute inset-0 w-full h-full pointer-events-none z-10 opacity-25 group-hover:opacity-40 transition-opacity duration-700"
-            viewBox="0 0 600 250" 
-            preserveAspectRatio="none"
-            fill="none"
-          >
-            <defs>
-              <linearGradient id={`chart-grad-${i}`} x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.15" />
-                <stop offset="50%" stopColor="#F3E5AB" stopOpacity="0.85" />
-                <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.2" />
-              </linearGradient>
-            </defs>
+        {/* Very Subtle Financial Market / Candlestick Line Overlay */}
+        <svg 
+          className="absolute inset-0 w-full h-full pointer-events-none z-10 opacity-25 group-hover:opacity-40 transition-opacity duration-700"
+          viewBox="0 0 600 250" 
+          preserveAspectRatio="none"
+          fill="none"
+        >
+          <defs>
+            <linearGradient id={`chart-grad-${i}`} x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.15" />
+              <stop offset="50%" stopColor="#F3E5AB" stopOpacity="0.85" />
+              <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.2" />
+            </linearGradient>
+          </defs>
+          
+          {/* Subtle Financial Candlestick Wicks & Bodies */}
+          <g stroke="#D4AF37" strokeWidth="0.8" opacity="0.6">
+            <line x1="140" y1="120" x2="140" y2="170" strokeWidth="0.8" />
+            <rect x="136" y="135" width="8" height="20" fill="#D4AF37" fillOpacity="0.4" stroke="none" />
             
-            <g stroke="#D4AF37" strokeWidth="0.8" opacity="0.6">
-              <line x1="140" y1="120" x2="140" y2="170" strokeWidth="0.8" />
-              <rect x="136" y="135" width="8" height="20" fill="#D4AF37" fillOpacity="0.4" stroke="none" />
-              
-              <line x1="300" y1="80" x2="300" y2="140" strokeWidth="0.8" />
-              <rect x="296" y="92" width="8" height="30" fill="#D4AF37" fillOpacity="0.5" stroke="none" />
-              
-              <line x1="460" y1="100" x2="460" y2="165" strokeWidth="0.8" />
-              <rect x="456" y="115" width="8" height="32" fill="#D4AF37" fillOpacity="0.3" stroke="none" />
-            </g>
+            <line x1="300" y1="80" x2="300" y2="140" strokeWidth="0.8" />
+            <rect x="296" y="92" width="8" height="30" fill="#D4AF37" fillOpacity="0.5" stroke="none" />
+            
+            <line x1="460" y1="100" x2="460" y2="165" strokeWidth="0.8" />
+            <rect x="456" y="115" width="8" height="32" fill="#D4AF37" fillOpacity="0.3" stroke="none" />
+          </g>
 
-            <path
-              d="M 0 170 Q 100 145 200 175 T 400 130 T 600 140"
-              stroke={`url(#chart-grad-${i})`}
-              strokeWidth="1.5"
-              className="market-chart-line"
-            />
-          </svg>
+          {/* Smooth Financial Wave Line */}
+          <path
+            d="M 0 170 Q 100 145 200 175 T 400 130 T 600 140"
+            stroke={`url(#chart-grad-${i})`}
+            strokeWidth="1.5"
+            className="market-chart-line"
+          />
+        </svg>
 
-          {/* Title & Explore Indicator Container */}
-          <div className="absolute bottom-5 left-6 right-6 z-20">
-            <h3 className="font-serif text-xl text-white font-medium drop-shadow-md transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1">
-              {card.title}
-            </h3>
+        {/* Title & Explore Indicator Container */}
+        <div className="absolute bottom-5 left-6 right-6 z-20">
+          <h3 className="font-serif text-xl text-white font-medium drop-shadow-md transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:-translate-y-1.5">
+            {card.title}
+          </h3>
 
-            {/* Minimal EXPLORE → Indicator */}
-            <div className="flex items-center gap-2 mt-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] text-[11px] font-sans font-semibold tracking-[0.18em] text-gold uppercase">
-              <span>EXPLORE</span>
-              <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 transition-transform duration-300" />
-            </div>
+          {/* Minimal EXPLORE → Indicator */}
+          <div className="flex items-center gap-2 mt-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] text-[11px] font-sans font-semibold tracking-[0.18em] text-gold uppercase">
+            <span>EXPLORE</span>
+            <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 transition-transform duration-300" />
           </div>
         </div>
       </div>
 
-      <div className="p-6 bg-white flex flex-col justify-between flex-grow rounded-b-2xl">
+      <div className="p-6 bg-white flex flex-col justify-between flex-grow">
         <p className="text-xs text-text-secondary leading-relaxed font-sans">{card.desc}</p>
         <div className="mt-4 pt-4 border-t border-black/5 flex items-center justify-between">
           <span className="text-[10px] uppercase font-sans font-semibold tracking-wider text-gold-dark/80">
@@ -186,7 +184,7 @@ const InsideGalleryCards = React.memo(() => {
   ];
 
   return (
-    <div className="inside-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left relative">
+    <div className="inside-grid-el grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
       {cards.map((card, i) => (
         <InsideGalleryCardItem key={i} card={card} i={i} />
       ))}
@@ -822,12 +820,7 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
       if (!start) start = time;
       const elapsed = time - start;
 
-      // Rich deep dark burgundy background gradient to make map points & connections pop
-      const bgGrad = ctx.createRadialGradient(500, 250, 60, 500, 250, 550);
-      bgGrad.addColorStop(0, "#2B040B");
-      bgGrad.addColorStop(0.7, "#1A0206");
-      bgGrad.addColorStop(1, "#100103");
-      ctx.fillStyle = bgGrad;
+      ctx.fillStyle = "#37060F";
       ctx.fillRect(0, 0, 1000, 500);
 
       // Drifting background stars
@@ -2225,58 +2218,33 @@ export default function App() {
     const phone = e.target.querySelector('#phone')?.value || '';
     const msg = e.target.querySelector('#msg')?.value || '';
 
-    // Primary WhatsApp number on the website (+971 50 702 1275)
-    const whatsappNum = "971507021275";
-    const formattedMessage = `*New Enquiry - Beever Academy Website*\n\n` +
-      `👤 *Name:* ${name}\n` +
-      `📱 *Phone:* ${phone}\n` +
-      `💬 *Enquiry:* ${msg}\n\n` +
-      `_Submitted via Website Enquiry Form_`;
-
-    const whatsappUrl = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(formattedMessage)}`;
-
     setTimeout(() => {
       setFormStatus({ loading: false, submitted: true });
       e.target.reset();
 
-      // Simultaneously redirect to WhatsApp with full enquiry details
-      window.open(whatsappUrl, '_blank');
-
-      // Simultaneously open and activate Bee Assistant AI
       setChatUser({ name, phone });
       const initialHasEmoji = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g.test(msg);
-      const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       setChatbotMessages([
-        {
-          sender: 'bot',
-          text: `Hello ${name}! I am Bee Assistant, the official AI assistant for Beever Academy. 🐝✨\n\nI have logged your enquiry and automatically redirected your details directly to our official WhatsApp (+971 50 702 1275).\n\nWhile our team processes your message, I am right here to assist you instantly!`,
-          time: currentTime,
-          whatsappUrl
-        },
-        {
-          sender: 'user',
-          text: `Name: ${name}\nPhone: ${phone}\nEnquiry: ${msg}`,
-          time: currentTime
-        }
+        { sender: 'bot', text: `Hello! I am Bee, the official AI assistant for Beever Academy. I have successfully received your enquiry. Our admissions team has been notified, and I am here to help you instantly in the meantime.`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
+        { sender: 'user', text: `Name: ${name}\nPhone: ${phone}\nMessage: ${msg}`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
       ]);
       setIsChatbotOpen(true);
       setIsAiTyping(true);
 
       setTimeout(() => {
         setIsAiTyping(false);
-        let botFollowUpText = `Hi ${name}, based on your message, I would love to answer any questions you have about Beever Academy. Are you looking to learn more about our trading courses, tuition details, mentorship, or campus enrollment?`;
+        let botFollowUpText = `Hi ${name}, based on your message, I would love to answer any questions you have about Beever Academy. Are you looking to learn more about our trading courses, tuition details, mentorship, or enrollment? I encourage you to book a consultation with our team for the best guidance.`;
         if (initialHasEmoji) {
           botFollowUpText += " ✨";
         }
         setChatbotMessages(prev => [...prev, {
           sender: 'bot',
           text: botFollowUpText,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          whatsappUrl
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }]);
       }, 1500);
-    }, 800);
+    }, 1000);
   };
 
   const handleChatbotSend = (e) => {
@@ -2289,7 +2257,7 @@ export default function App() {
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    // Check if user has ever typed an emoji in the current input or historical log
+    // Check if user has ever typed an emoji in the current input or the historical log
     const currentHasEmoji = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g.test(chatbotInput);
     const logHasEmoji = chatbotMessages.some(m => m.sender === 'user' && /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g.test(m.text));
     const anyHasEmoji = currentHasEmoji || logHasEmoji;
@@ -2298,7 +2266,7 @@ export default function App() {
     setChatbotInput('');
     setIsAiTyping(true);
 
-    // Simulate Bee Assistant thinking and response
+    // Simulate AI thinking and response
     setTimeout(() => {
       let botResponseText = "";
       const textLower = userMessage.text.toLowerCase();
@@ -2312,7 +2280,7 @@ export default function App() {
         'live', 'class', 'session', 'cohort',
         'certif', 'diploma', 'exam',
         'contact', 'number', 'phone', 'address', 'location', 'where', 'office', 'dubai',
-        'demo', 'trial', 'whatsapp', 'bee assistant', 'who are you', 'your name'
+        'demo', 'trial'
       ];
 
       const unrelatedKeywords = [
@@ -2326,35 +2294,32 @@ export default function App() {
       const isUnrelated = unrelatedKeywords.some(kw => textLower.includes(kw));
 
       if (isUnrelated || (!isAllowed && textLower.split(' ').length > 4)) {
-        botResponseText = "I am Bee Assistant, here to assist specifically with Beever Academy and our financial trading programs. Feel free to ask about our FMMTA course, admissions, mentorship, or campus location!";
-      } else if (textLower.includes('who are you') || textLower.includes('your name') || textLower.includes('bee assistant')) {
-        botResponseText = "I am Bee Assistant, the official AI assistant for Beever Academy! 🐝✨ I am here to answer your questions, assist with course details, and help connect you directly with our admissions team on WhatsApp.";
-      } else if (textLower.includes('whatsapp') || textLower.includes('message team')) {
-        botResponseText = "You can connect with our team on WhatsApp at +971 50 702 1275. When you submit an enquiry on our website, your details are automatically sent there so our counselors can reach out instantly!";
+        botResponseText = "I'm here to assist only with Beever Academy and our trading programs. Feel free to ask anything about our courses, enrollment, mentorship, or trading education.";
       } else if (textLower.includes('course') || textLower.includes('program') || textLower.includes('fmmta') || textLower.includes('learn') || textLower.includes('syllabus')) {
-        botResponseText = "Beever Academy's signature curriculum is the Foundation Market Mechanics & Technical Analysis (FMMTA) course. It is an intensive 8-week program covering macroeconomics, order flow, technical charting, and institutional risk management. We host live, practical trading sessions at our Dubai campus.";
+        botResponseText = "Beever Academy's signature curriculum is the Foundation Market Mechanics & Technical Analysis (FMMTA) course. It is an intensive program covering macroeconomics, order flow, technical charting, and institutional risk management. We host live, practical trading sessions. I highly recommend booking a consultation with our advisor to review the curriculum.";
       } else if (textLower.includes('duration') || textLower.includes('how long') || textLower.includes('time')) {
-        botResponseText = "Our flagship FMMTA program spans 8 weeks of intensive study, combining theoretical models with live market application in weekend or weekday evening batches.";
+        botResponseText = "Our flagship FMMTA program spans 8 weeks of intensive study, combining theoretical models with live market application. You can complete it in weekend batches or weekday evenings. Please let me know if you would like to book a consultation to review timings.";
       } else if (textLower.includes('beginner') || textLower.includes('basics') || textLower.includes('trading') || textLower.includes('market') || textLower.includes('start') || textLower.includes('guide')) {
-        botResponseText = "We offer absolute beginner guidance to build solid foundations. The FMMTA course starts with core principles of economics and market mechanics, making it suitable for both beginners and intermediate traders.";
+        botResponseText = "We offer absolute beginner guidance to build solid foundations. The FMMTA course starts with core principles of economics and market mechanics, making it suitable for both beginners and intermediate traders. I suggest scheduling a demo session or booking a free consultation to start.";
       } else if (textLower.includes('enroll') || textLower.includes('join') || textLower.includes('register') || textLower.includes('apply') || textLower.includes('admission')) {
-        botResponseText = "Enrollment for the upcoming FMMTA cohort is currently open. You can submit your enquiry form on this page to get redirected to our WhatsApp admissions desk (+971 50 702 1275).";
+        botResponseText = "Enrollment for the upcoming FMMTA cohort is currently open. The process involves a brief candidate profile review. I would be happy to schedule a consultation with our admissions desk to secure your seat.";
       } else if (textLower.includes('mentor') || textLower.includes('coach') || textLower.includes('mentorship')) {
-        botResponseText = "Mentorship is at the core of Beever Academy. You will receive 1-on-1 feedback sessions, group review calls, and direct access to professional traders who monitor your progress.";
+        botResponseText = "Mentorship is at the core of Beever Academy. You will receive 1-on-1 feedback sessions, group review calls, and direct access to professional traders who monitor your progress. Let me connect you with an advisor to discuss mentorship packages.";
       } else if (textLower.includes('fee') || textLower.includes('price') || textLower.includes('cost') || textLower.includes('pay') || textLower.includes('tuition')) {
-        botResponseText = "Tuition at Beever Academy depends on your chosen format (Executive Cohort, Weekend Intensive, or Professional Module). We offer customizable payment plans. Contact our WhatsApp desk for current cohort pricing.";
+        botResponseText = "Tuition at Beever Academy depends on the program format (Executive Cohort, Weekend Intensive, or Professional Module). We offer customizable payment plan installations. I'd be happy to connect you with our admissions team for the most accurate information.";
       } else if (textLower.includes('live') || textLower.includes('class')) {
-        botResponseText = "Yes, classes are conducted live on-site at our Aspin Commercial Tower facility in Dubai and streamed for hybrid students.";
+        botResponseText = "Yes, classes are conducted live on-site at our Dubai facility and streamed for hybrid students. You get to interact directly with the instructor and perform live market exercises. Would you like to schedule a consultation to view class slots?";
       } else if (textLower.includes('certif')) {
-        botResponseText = "Upon successful completion of the FMMTA course and passing the final risk assessment, you will receive the official Beever Academy Financial Markets Certification.";
+        botResponseText = "Upon successful completion of the FMMTA course and passing the final architectural risk assessment, you will receive the Beever Academy Financial Markets Certification, recognized by our institutional network.";
       } else if (textLower.includes('demo') || textLower.includes('trial')) {
-        botResponseText = "Yes, we host weekly interactive demo sessions at our Dubai campus where you can experience a live trading class.";
+        botResponseText = "Yes, we host weekly interactive demo sessions at our Dubai campus. You can experience a live class environment and meet our instructors. I can book a consultation slot for you to register for the next demo.";
       } else if (textLower.includes('contact') || textLower.includes('number') || textLower.includes('phone') || textLower.includes('address') || textLower.includes('location') || textLower.includes('where') || textLower.includes('office') || textLower.includes('dubai')) {
-        botResponseText = "Beever Academy is located at Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai, UAE. Call us at +971 4 892 3151 or message us on WhatsApp (+971 50 702 1275).";
+        botResponseText = "Beever Academy is located at Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai. You can call us directly at +971 4 892 3151 or +971 4 226 6388, or email admissions@beeveracademy.com. I encourage you to book an on-site consultation to visit us.";
       } else {
-        botResponseText = "I'd be happy to assist you! Would you like me to connect you with our admissions team via WhatsApp (+971 50 702 1275) or share more details about the FMMTA program?";
+        botResponseText = "I'd be happy to connect you with our admissions team for the most accurate information. Would you like me to schedule a consultation with an advisor?";
       }
 
+      // Emoji check: if user used emojis, add premium sparkle icon, otherwise strictly omit all emojis
       if (anyHasEmoji) {
         botResponseText += " ✨";
       }
@@ -2363,10 +2328,9 @@ export default function App() {
       setChatbotMessages(prev => [...prev, {
         sender: 'bot',
         text: botResponseText,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        whatsappUrl: "https://wa.me/971507021275"
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
-    }, 1200);
+    }, 1800);
   };
 
   const renderChatbot = () => {
@@ -2385,7 +2349,7 @@ export default function App() {
             </div>
             <div className="text-left">
               <h4 className="text-sm font-semibold text-white font-serif tracking-wider flex items-center gap-1.5">
-                BEE ASSISTANT <span className="text-[9px] px-1.5 py-0.5 rounded bg-gold/15 text-gold-light border border-gold/25 font-sans font-bold">AI</span>
+                BEE <span className="text-[9px] px-1.5 py-0.5 rounded bg-gold/15 text-gold-light border border-gold/25 font-sans font-bold">AI</span>
               </h4>
               <p className="text-[10px] text-white/50 tracking-wider">Official AI Assistant</p>
             </div>
@@ -2415,22 +2379,15 @@ export default function App() {
               >
                 {msg.text}
 
-                {/* Direct escalation buttons for WhatsApp & Phone */}
-                {msg.sender === 'bot' && (
-                  <div className="mt-3 pt-2.5 border-t border-gold/15 flex flex-wrap gap-2">
+                {/* Direct escalation widget if AI prompts WhatsApp link */}
+                {msg.sender === 'bot' && (msg.text.includes('admissions team') || msg.text.includes('WhatsApp') || msg.text.includes('advisor')) && (
+                  <div className="mt-3 pt-3 border-t border-gold/10">
                     <a
-                      href={msg.whatsappUrl || "https://wa.me/971507021275"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-wider bg-[#25D366] hover:bg-[#20ba5a] text-white px-3 py-1.5 rounded-lg hover:scale-105 transition-all duration-200 shadow-sm"
+                      href="#contact"
+                      onClick={() => setIsChatbotOpen(false)}
+                      className="inline-flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider gold-gradient-bg text-burgundy-dark px-3 py-2 rounded-lg hover:scale-105 transition-transform duration-200"
                     >
-                      <MessageSquare className="w-3.5 h-3.5" /> Send via WhatsApp
-                    </a>
-                    <a
-                      href="tel:+97148923151"
-                      className="inline-flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-wider gold-gradient-bg text-burgundy-dark px-3 py-1.5 rounded-lg hover:scale-105 transition-all duration-200"
-                    >
-                      <Phone className="w-3.5 h-3.5" /> Call Admissions
+                      <MessageSquare className="w-3.5 h-3.5" /> Book Consultation
                     </a>
                   </div>
                 )}
@@ -2449,7 +2406,7 @@ export default function App() {
                 <span className="w-1.5 h-1.5 bg-gold rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
                 <span className="w-1.5 h-1.5 bg-gold rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
               </div>
-              <span className="text-[8px] text-white/30 mt-1 px-1 tracking-wider uppercase">Bee Assistant is formulating response...</span>
+              <span className="text-[8px] text-white/30 mt-1 px-1 tracking-wider uppercase">Bee is formulating response...</span>
             </div>
           )}
 
@@ -2462,7 +2419,7 @@ export default function App() {
             type="text"
             value={chatbotInput}
             onChange={(e) => setChatbotInput(e.target.value)}
-            placeholder="Ask Bee Assistant a question..."
+            placeholder="Ask Beever AI a question..."
             className="flex-grow text-xs p-3.5 border border-gold/15 bg-[#1a0206] text-white placeholder-white/40 rounded-xl focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/20 transition-all duration-200"
           />
           <button
@@ -2672,9 +2629,9 @@ export default function App() {
   );
 
   const renderGlobalNetwork = () => (
-    <section id="global-network" className="py-20 md:py-32 bg-[#170205] text-white relative overflow-hidden">
+    <section id="global-network" className="py-20 md:py-32 global-presence-section text-white relative overflow-hidden">
       {/* Decorative gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#120002] via-transparent to-[#120002] pointer-events-none z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-[#37060F] via-transparent to-[#37060F] pointer-events-none z-10"></div>
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
@@ -2753,7 +2710,7 @@ export default function App() {
               </p>
             </div>
 
-            <div className="w-full bg-[#140104] border border-burgundy-light/30 rounded-3xl overflow-hidden shadow-2xl relative">
+            <div className="w-full bg-[#37060F] border border-burgundy-light/25 rounded-3xl overflow-hidden shadow-2xl relative">
               <GlobalPresenceDashboard
                 key="burgundy-dashboard"
                 hoveredLocationId={hoveredLocationId}
@@ -2898,7 +2855,7 @@ export default function App() {
   };
 
   const renderInsideGallery = () => (
-    <section id="blog" className="py-20 md:py-32 bg-white text-center relative overflow-visible">
+    <section id="blog" className="py-20 md:py-32 bg-white text-center relative overflow-hidden">
       {/* Horizontal sweeping gold line at top of section */}
       <div className="inside-sweep-line absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent opacity-90 scale-x-0 origin-left z-20"></div>
 
@@ -3225,10 +3182,10 @@ export default function App() {
                 <div className="bg-[#e6fffa] border border-[#319795] text-[#234e52] p-5 rounded-xl flex flex-col gap-2 mb-8 animate-chatbot-slide text-left">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5 text-[#319795]" />
-                    <span className="font-bold text-sm">Enquiry Submitted & WhatsApp Opened!</span>
+                    <span className="font-bold text-sm">Enquiry Received Successfully!</span>
                   </div>
                   <p className="text-xs leading-relaxed">
-                    Thank you for reaching out! Your enquiry details have been redirected to our official WhatsApp (+971 50 702 1275), and <strong>Bee Assistant</strong> has been launched below to guide you simultaneously.
+                    Thank you for reaching out. We have opened our AI assistant Bee at the bottom-right corner to answer any questions you have instantly.
                   </p>
                   <button
                     onClick={() => setFormStatus(prev => ({ ...prev, submitted: false }))}
@@ -3598,47 +3555,21 @@ export default function App() {
         </div>
       </footer>
       {renderChatbot()}
-      {/* Floating Action Buttons: Bee Assistant & WhatsApp Stacked Vertically */}
-      <div className="fixed bottom-6 right-6 z-[900] flex flex-col items-end gap-3.5">
-        {/* Bee Assistant Floating Toggle (Top) */}
-        <button
-          onClick={() => {
-            if (!isChatbotOpen && chatbotMessages.length === 0) {
-              setChatbotMessages([{
-                sender: 'bot',
-                text: `Hello! I am Bee Assistant, your official AI guide at Beever Academy. 🐝✨\n\nHow can I assist you with our courses, enrollment, or campus location today?`,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                whatsappUrl: "https://wa.me/971507021275"
-              }]);
-            }
-            setIsChatbotOpen(!isChatbotOpen);
-          }}
-          className="w-14 h-14 rounded-full gold-gradient-bg text-burgundy-dark flex justify-center items-center shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 group cursor-pointer border border-gold/40 relative"
-          aria-label="Open Bee Assistant AI"
-        >
-          <Sparkles className="w-6 h-6 text-burgundy-dark animate-pulse" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-gold rounded-full border-2 border-burgundy-dark animate-ping"></span>
-          <span className="absolute right-16 top-3 scale-0 group-hover:scale-100 transition-all duration-200 bg-burgundy-dark border border-gold/30 px-3 py-1.5 rounded-lg text-xs tracking-wider text-gold-light font-semibold shadow-lg whitespace-nowrap">
-            Bee Assistant AI
-          </span>
-        </button>
-
-        {/* WhatsApp Direct Link (Bottom) */}
-        <a
-          href="https://wa.me/971507021275"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white flex justify-center items-center shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 group relative"
-          aria-label="Chat on WhatsApp"
-        >
-          <svg viewBox="0 0 24 24" className="w-7 h-7 fill-white">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.705 1.459h.008c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-          </svg>
-          <span className="absolute right-16 top-3 scale-0 group-hover:scale-100 transition-all duration-200 bg-burgundy px-3 py-1.5 rounded-lg text-xs tracking-wider text-white font-semibold shadow-md whitespace-nowrap">
-            Chat on WhatsApp
-          </span>
-        </a>
-      </div>
+      {/* Floating authentic green WhatsApp Button */}
+      <a
+        href="https://wa.me/971507021275"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-[900] w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white flex justify-center items-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 group"
+        aria-label="Chat on WhatsApp"
+      >
+        <svg viewBox="0 0 24 24" className="w-8 h-8 fill-white">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.705 1.459h.008c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+        <span className="absolute right-16 scale-0 group-hover:scale-100 transition-all duration-200 bg-burgundy px-3 py-1.5 rounded-lg text-xs tracking-wider text-white font-semibold shadow-md whitespace-nowrap">
+          Chat on WhatsApp
+        </span>
+      </a>
     </div>
   );
 }
