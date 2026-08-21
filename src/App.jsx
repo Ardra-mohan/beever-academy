@@ -195,33 +195,26 @@ const InsideGalleryCards = React.memo(() => {
 });
 
 // ==========================================
-// CUSTOM GOLDEN SPRINKLE CURSOR COMPONENT
+// SINGLE LUXURY CUSTOM ARROW CURSOR COMPONENT (WITH GOLDEN SPARKLE TRAIL)
 // ==========================================
-function GoldenSprinkleCursor() {
-  const dotRef = useRef(null);
-  const ringRef = useRef(null);
+function CustomArrowCursor() {
+  const cursorRef = useRef(null);
   const canvasRef = useRef(null);
-  const requestRef = useRef(null);
   const particlesRef = useRef([]);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
 
   useEffect(() => {
     // Check if device supports touch/coarse pointers (mobile)
     const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
-    if (isTouchDevice) {
-      if (dotRef.current) dotRef.current.style.display = 'none';
-      if (ringRef.current) ringRef.current.style.display = 'none';
-      if (canvasRef.current) canvasRef.current.style.display = 'none';
-      return;
-    }
+    if (isTouchDevice) return;
 
-    const dot = dotRef.current;
-    const ring = ringRef.current;
+    const cursor = cursorRef.current;
     const canvas = canvasRef.current;
-    if (!dot || !ring || !canvas) return;
+    if (!cursor || !canvas) return;
 
     const ctx = canvas.getContext('2d');
 
-    // Set canvas sizes
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -229,266 +222,121 @@ function GoldenSprinkleCursor() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Mouse coordinates tracking
     let mouse = { x: -100, y: -100 };
-    let dotPos = { x: -100, y: -100 };
-    let ringPos = { x: -100, y: -100 };
     let lastMouse = { x: -100, y: -100 };
+    let cursorPos = { x: -100, y: -100 };
     let hasMoved = false;
+    let animId;
 
-    // Scale variables for dot/ring (animated by GSAP to avoid transform conflicts)
-    const dotScale = { value: 1.0 };
-    const ringScale = { value: 1.0 };
-
-    // Set initial custom cursor positioning off-screen
-    dot.style.transform = `translate3d(-100px, -100px, 0) translate(-50%, -50%) scale(${dotScale.value})`;
-    ring.style.transform = `translate3d(-100px, -100px, 0) translate(-50%, -50%) scale(${ringScale.value})`;
-
-    const handleMouseMove = (e) => {
-      // Revert native cursor if it was temporarily shown
-      if (document.body.classList.contains('show-native-cursor')) {
-        document.body.classList.remove('show-native-cursor');
-        gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
-      }
-
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-
-      if (!hasMoved) {
-        dotPos.x = mouse.x;
-        dotPos.y = mouse.y;
-        ringPos.x = mouse.x;
-        ringPos.y = mouse.y;
-        dot.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0) translate(-50%, -50%) scale(${dotScale.value})`;
-        ring.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0) translate(-50%, -50%) scale(${ringScale.value})`;
-        hasMoved = true;
-      }
-
-      // Hide custom cursor elements if cursor is over input field
-      const target = e.target;
-      const hasClosest = target && typeof target.closest === 'function';
-      const isInputField = hasClosest && (target.closest('input, textarea, select, iframe') || document.body.classList.contains('show-native-cursor'));
-
-      if (isInputField) {
-        gsap.to([dot, ring, canvas], { opacity: 0, duration: 0.15, overwrite: 'auto' });
-      }
-
-      // Generate golden sprinkle particles based on cursor speed (only outside inputs)
-      if (!isInputField) {
-        const distance = Math.hypot(mouse.x - lastMouse.x, mouse.y - lastMouse.y);
-        if (distance > 2) {
-          const spawnCount = Math.min(3, Math.floor(distance / 5) + 1);
-          for (let i = 0; i < spawnCount; i++) {
-            particlesRef.current.push(createParticle(mouse.x, mouse.y));
-          }
-
-          // Cap active particles to prevent memory bloom
-          if (particlesRef.current.length > 80) {
-            particlesRef.current.splice(0, particlesRef.current.length - 80);
-          }
-        }
-      }
-
-      lastMouse.x = mouse.x;
-      lastMouse.y = mouse.y;
-    };
-
-    // Curated color values for luxury gold sparkles
     const goldColors = [
-      { r: 201, g: 162, b: 77 },   // --color-gold (#C9A24D)
-      { r: 242, g: 223, b: 162 },  // --color-gold-light (#F2DFA2)
-      { r: 166, g: 126, b: 45 }    // --color-gold-dark (#A67E2D)
+      { r: 242, g: 223, b: 162 }, // Gold Light (#F2DFA2)
+      { r: 201, g: 162, b: 77 },  // Gold (#C9A24D)
+      { r: 166, g: 126, b: 45 }   // Gold Dark (#A67E2D)
     ];
 
     const createParticle = (x, y) => {
       const colorObj = goldColors[Math.floor(Math.random() * goldColors.length)];
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 1.5 + 0.5;
+      const speed = Math.random() * 1.2 + 0.3;
       return {
-        x,
-        y,
-        vx: Math.cos(angle) * speed + (Math.random() - 0.5) * 0.4,
-        vy: Math.sin(angle) * speed + 0.3, // biased slightly downwards
-        size: Math.random() * 3 + 1.5,
+        x: x + (Math.random() - 0.5) * 4,
+        y: y + (Math.random() - 0.5) * 4,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed + 0.2, // subtle downward gravity drift
+        size: Math.random() * 2.5 + 1.2,
         r: colorObj.r,
         g: colorObj.g,
         b: colorObj.b,
         alpha: 1.0,
-        decay: Math.random() * 0.02 + 0.015,
+        decay: Math.random() * 0.03 + 0.02,
         rotation: Math.random() * Math.PI,
-        rotationSpeed: (Math.random() - 0.5) * 0.08
+        rotationSpeed: (Math.random() - 0.5) * 0.1
       };
     };
 
-    // Hover updates scale to leverage GPU acceleration
-    const handleMouseEnterLink = () => {
-      gsap.to(ringScale, {
-        value: 1.5,
-        duration: 0.25,
-        overwrite: 'auto'
-      });
-      gsap.to(ring, {
-        backgroundColor: 'rgba(201, 162, 77, 0.15)',
-        borderColor: '#F2DFA2',
-        boxShadow: '0 0 15px rgba(201, 162, 77, 0.4)',
-        duration: 0.25,
-        overwrite: 'auto'
-      });
-      gsap.to(dotScale, {
-        value: 0.5,
-        duration: 0.2,
-        overwrite: 'auto'
-      });
-      gsap.to(dot, {
-        backgroundColor: '#F2DFA2',
-        duration: 0.2,
-        overwrite: 'auto'
-      });
-    };
+    const handleMouseMove = (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
 
-    const handleMouseLeaveLink = () => {
-      gsap.to(ringScale, {
-        value: 1.0,
-        duration: 0.25,
-        overwrite: 'auto'
-      });
-      gsap.to(ring, {
-        backgroundColor: 'transparent',
-        borderColor: 'rgba(201, 162, 77, 0.6)',
-        boxShadow: '0 0 10px rgba(201, 162, 77, 0.2)',
-        duration: 0.25,
-        overwrite: 'auto'
-      });
-      gsap.to(dotScale, {
-        value: 1.0,
-        duration: 0.2,
-        overwrite: 'auto'
-      });
-      gsap.to(dot, {
-        backgroundColor: '#C9A24D',
-        duration: 0.2,
-        overwrite: 'auto'
-      });
-    };
+      if (!hasMoved) {
+        cursorPos.x = mouse.x;
+        cursorPos.y = mouse.y;
+        cursor.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0)`;
+        cursor.style.opacity = '1';
+        hasMoved = true;
+        lastMouse.x = mouse.x;
+        lastMouse.y = mouse.y;
+        return;
+      }
 
-    const handleWindowFocus = () => {
-      document.body.classList.remove('show-native-cursor');
-      gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('focus', handleWindowFocus);
-
-    const handleTelClick = () => {
-      document.body.classList.add('show-native-cursor');
-      gsap.to([dot, ring, canvas], { opacity: 0, duration: 0.15, overwrite: 'auto' });
-
-      // Auto-revert after 4 seconds as a fallback
-      setTimeout(() => {
-        if (document.body.classList.contains('show-native-cursor')) {
-          document.body.classList.remove('show-native-cursor');
-          gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
+      // Spawn golden sparkles on movement
+      const dist = Math.hypot(mouse.x - lastMouse.x, mouse.y - lastMouse.y);
+      if (dist > 3) {
+        const count = Math.min(3, Math.floor(dist / 6) + 1);
+        for (let i = 0; i < count; i++) {
+          particlesRef.current.push(createParticle(mouse.x, mouse.y));
         }
-      }, 4000);
+        if (particlesRef.current.length > 70) {
+          particlesRef.current.splice(0, particlesRef.current.length - 70);
+        }
+        lastMouse.x = mouse.x;
+        lastMouse.y = mouse.y;
+      }
     };
 
-    // Track active hover state to avoid redundant GSAP tween creations
-    let isHovered = false;
+    const handleMouseDown = () => setIsPressed(true);
+    const handleMouseUp = () => setIsPressed(false);
 
-    // Event Delegation: Globally handle mouseover to hover scale & nav/input visibility
+    // Track hover state over interactive elements
     const handleMouseOver = (e) => {
       const target = e.target;
       if (!target || typeof target.closest !== 'function') return;
 
-      const isInputField = target.closest('input, textarea, select, iframe') || document.body.classList.contains('show-native-cursor');
-
-      if (isInputField) {
-        gsap.to([dot, ring, canvas], { opacity: 0, duration: 0.15, overwrite: 'auto' });
-        if (isHovered) {
-          isHovered = false;
-          handleMouseLeaveLink();
-        }
-        return;
-      } else {
-        gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
-      }
-
-      const interactiveEl = target.closest('a, button, [role="button"], .cursor-pointer');
+      const interactiveEl = target.closest(
+        'a, button, input, textarea, select, iframe, label, [role="button"], .cursor-pointer, .inside-card-el, .strength-card-el, img, svg'
+      );
       if (interactiveEl) {
-        if (!isHovered) {
-          isHovered = true;
-          handleMouseEnterLink();
-        }
+        setIsHovered(true);
       } else {
-        if (isHovered) {
-          isHovered = false;
-          handleMouseLeaveLink();
-        }
-      }
-    };
-
-    // Global click handler to handle tel: links bypass
-    const handleGlobalClick = (e) => {
-      const target = e.target;
-      if (!target || typeof target.closest !== 'function') return;
-      const anchor = target.closest('a');
-      if (anchor && anchor.getAttribute('href')?.startsWith('tel:')) {
-        handleTelClick();
+        setIsHovered(false);
       }
     };
 
     const handleMouseLeaveWindow = () => {
-      gsap.to([dot, ring, canvas], { opacity: 0, duration: 0.15, overwrite: 'auto' });
+      if (cursor) cursor.style.opacity = '0';
     };
 
     const handleMouseEnterWindow = (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
-      if (!hasMoved) {
-        dotPos.x = mouse.x;
-        dotPos.y = mouse.y;
-        ringPos.x = mouse.x;
-        ringPos.y = mouse.y;
-        hasMoved = true;
-      }
-      const target = e.target;
-      const hasClosest = target && typeof target.closest === 'function';
-      const isInputField = hasClosest && target.closest('input, textarea, select, iframe');
-      if (!isInputField) {
-        gsap.to([dot, ring, canvas], { opacity: 1, duration: 0.15, overwrite: 'auto' });
-      }
+      if (cursor) cursor.style.opacity = '1';
     };
 
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mousedown', handleMouseDown, { passive: true });
+    window.addEventListener('mouseup', handleMouseUp, { passive: true });
+    document.addEventListener('mouseover', handleMouseOver, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeaveWindow);
     document.addEventListener('mouseenter', handleMouseEnterWindow);
-    document.addEventListener('mouseover', handleMouseOver);
-    document.addEventListener('click', handleGlobalClick);
 
-    // Sparkles canvas rendering loop
-    const animateParticles = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    // High-precision smooth animation loop using LERP & particle canvas render
+    const render = () => {
       if (hasMoved) {
-        // Dot follows cursor very fast (0.35 LERP factor = ultra responsive and smooth)
-        dotPos.x += (mouse.x - dotPos.x) * 0.35;
-        dotPos.y += (mouse.y - dotPos.y) * 0.35;
+        // Snappy, lag-free LERP factor (0.45)
+        cursorPos.x += (mouse.x - cursorPos.x) * 0.45;
+        cursorPos.y += (mouse.y - cursorPos.y) * 0.45;
 
-        // Ring follows cursor smoothly (0.15 LERP factor = smooth trails)
-        ringPos.x += (mouse.x - ringPos.x) * 0.15;
-        ringPos.y += (mouse.y - ringPos.y) * 0.15;
-
-        // Apply transformations using translate3d for hardware GPU acceleration
-        dot.style.transform = `translate3d(${dotPos.x}px, ${dotPos.y}px, 0) translate(-50%, -50%) scale(${dotScale.value})`;
-        ring.style.transform = `translate3d(${ringPos.x}px, ${ringPos.y}px, 0) translate(-50%, -50%) scale(${ringScale.value})`;
+        cursor.style.transform = `translate3d(${cursorPos.x}px, ${cursorPos.y}px, 0)`;
       }
 
+      // Draw golden sparkles on canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       const particles = particlesRef.current;
 
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.035; // simulated gravity drift
         p.alpha -= p.decay;
         p.rotation += p.rotationSpeed;
 
@@ -497,57 +345,102 @@ function GoldenSprinkleCursor() {
           continue;
         }
 
-        // Draw diamond-shaped sparkle element
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.rotation);
 
-        // Simulated glow (larger, semi-transparent diamond)
+        // Soft outer golden glow
         ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha * 0.35})`;
         ctx.beginPath();
         ctx.moveTo(0, -p.size * 2.2);
+        ctx.lineTo(p.size * 0.7, -p.size * 0.7);
         ctx.lineTo(p.size * 2.2, 0);
+        ctx.lineTo(p.size * 0.7, p.size * 0.7);
         ctx.lineTo(0, p.size * 2.2);
+        ctx.lineTo(-p.size * 0.7, p.size * 0.7);
         ctx.lineTo(-p.size * 2.2, 0);
+        ctx.lineTo(-p.size * 0.7, -p.size * 0.7);
         ctx.closePath();
         ctx.fill();
 
-        // Core diamond particle
+        // Core sharp 4-pointed golden sparkle star
         ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha})`;
         ctx.beginPath();
-        ctx.moveTo(0, -p.size);
-        ctx.lineTo(p.size, 0);
-        ctx.lineTo(0, p.size);
-        ctx.lineTo(-p.size, 0);
+        ctx.moveTo(0, -p.size * 1.5);
+        ctx.lineTo(p.size * 0.4, -p.size * 0.4);
+        ctx.lineTo(p.size * 1.5, 0);
+        ctx.lineTo(p.size * 0.4, p.size * 0.4);
+        ctx.lineTo(0, p.size * 1.5);
+        ctx.lineTo(-p.size * 0.4, p.size * 0.4);
+        ctx.lineTo(-p.size * 1.5, 0);
+        ctx.lineTo(-p.size * 0.4, -p.size * 0.4);
         ctx.closePath();
         ctx.fill();
 
         ctx.restore();
       }
 
-      requestRef.current = requestAnimationFrame(animateParticles);
+      animId = requestAnimationFrame(render);
     };
 
-    requestRef.current = requestAnimationFrame(animateParticles);
+    animId = requestAnimationFrame(render);
 
-    // Cleanup events & timers
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('focus', handleWindowFocus);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseover', handleMouseOver);
       document.removeEventListener('mouseleave', handleMouseLeaveWindow);
       document.removeEventListener('mouseenter', handleMouseEnterWindow);
-      document.removeEventListener('mouseover', handleMouseOver);
-      document.removeEventListener('click', handleGlobalClick);
-      cancelAnimationFrame(requestRef.current);
+      cancelAnimationFrame(animId);
     };
   }, []);
 
   return (
     <>
-      <div ref={dotRef} className="custom-cursor-dot hidden lg:block" />
-      <div ref={ringRef} className="custom-cursor-ring hidden lg:block" />
-      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[10000] hidden lg:block" />
+      <canvas
+        ref={canvasRef}
+        className="fixed inset-0 pointer-events-none z-[99999] hidden lg:block"
+      />
+      <div
+        ref={cursorRef}
+        className={`beever-custom-cursor-wrapper ${isHovered ? 'is-hovered' : ''} ${isPressed ? 'is-pressed' : ''}`}
+        aria-hidden="true"
+      >
+        <svg
+          className="beever-arrow-svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="beever-arrow-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#F2DFA2" />
+              <stop offset="50%" stopColor="#C9A24D" />
+              <stop offset="100%" stopColor="#A67E2D" />
+            </linearGradient>
+          </defs>
+          
+          {/* Modern Sharp Beever Luxury Arrow Head Pointer */}
+          <path
+            d="M 0,0 L 16.5,11.5 L 10.2,12.2 L 14.5,21.2 L 11.5,22.6 L 7.2,13.6 L 3.2,16.8 Z"
+            fill="url(#beever-arrow-grad)"
+            stroke="#240000"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+          />
+
+          {/* Metallic Bevel Inner Highlight Line */}
+          <path
+            d="M 2,3 L 13.2,10.8 L 9,11.3 L 12.8,19.2"
+            stroke="rgba(255, 255, 255, 0.45)"
+            strokeWidth="0.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
     </>
   );
 }
@@ -3344,7 +3237,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-charcoal font-sans bg-white relative overflow-x-hidden">
-      <GoldenSprinkleCursor />
+      <CustomArrowCursor />
       {/* ==========================================
          PAGE LOADER
          ========================================== */}
