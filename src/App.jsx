@@ -422,19 +422,20 @@ function CustomArrowCursor() {
             </linearGradient>
           </defs>
           
-          {/* Modern Sharp Beever Luxury Arrow Head Pointer */}
+          {/* Modern Sharp Real OS Luxury Arrow Head Pointer */}
           <path
-            d="M 0,0 L 16.5,11.5 L 10.2,12.2 L 14.5,21.2 L 11.5,22.6 L 7.2,13.6 L 3.2,16.8 Z"
+            d="M 0,0 L 16,11 L 9.5,11 L 14.2,20.4 L 11.2,21.9 L 6.5,12.5 L 0,16 Z"
             fill="url(#beever-arrow-grad)"
             stroke="#240000"
             strokeWidth="1.2"
             strokeLinejoin="round"
+            strokeLinecap="round"
           />
 
           {/* Metallic Bevel Inner Highlight Line */}
           <path
-            d="M 2,3 L 13.2,10.8 L 9,11.3 L 12.8,19.2"
-            stroke="rgba(255, 255, 255, 0.45)"
+            d="M 1.8,3.2 L 13.2,10.2 L 8.5,11.2 L 12.2,18.6"
+            stroke="rgba(255, 255, 255, 0.55)"
             strokeWidth="0.8"
             strokeLinecap="round"
             strokeLinejoin="round"
