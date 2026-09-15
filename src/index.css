@@ -131,19 +131,30 @@
 
 /* Base custom styles to complement Tailwind */
 html {
-  scroll-behavior: smooth;
   color-scheme: light !important;
 }
 
 body {
   overflow-x: hidden;
   color-scheme: light !important;
+  cursor: auto;
 }
 
-/* Base Cursor Styles */
-html,
-body {
-  cursor: auto;
+/* Lenis Smooth Scroll Styles */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
 
 

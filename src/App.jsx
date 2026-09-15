@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
@@ -90,15 +91,16 @@ const MentorsSliderSection = React.memo(() => {
                 <img
                   src={mentor.img}
                   alt={mentor.name}
-                  className="w-full h-full object-cover object-top group-hover/card:scale-105 transition-transform duration-500 ease-out mentor-card-gpu"
+                  decoding="async"
                   loading="lazy"
+                  className="w-full h-full object-cover object-top group-hover/card:scale-105 transition-transform duration-500 ease-out mentor-card-gpu"
                 />
                 {/* Gradient overlay for text contrast */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0d0204] via-[#0d0204]/30 to-transparent opacity-90 pointer-events-none"></div>
 
                 {/* Top Badge */}
                 <div className="absolute top-4 left-4 z-10 pointer-events-none">
-                  <span className="px-3 py-1 bg-burgundy-dark/90 border border-gold/40 rounded-full text-[10px] font-sans font-semibold tracking-wider text-gold uppercase shadow-md backdrop-blur-md">
+                  <span className="px-3 py-1 bg-[#240000]/95 border border-gold/40 rounded-full text-[10px] font-sans font-semibold tracking-wider text-gold uppercase shadow-md">
                     {mentor.badge}
                   </span>
                 </div>
@@ -1860,6 +1862,69 @@ export default function App() {
       document.body.style.overflow = 'auto';
     };
   }, [mobileMenuOpen]);
+
+  // Initialize Lenis Inertia Smooth Scroll (Ultra Smooth Scroll Movement Up & Down)
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.5,
+      infinite: false,
+    });
+
+    lenis.on('scroll', () => {
+      ScrollTrigger.update();
+    });
+
+    let rafId;
+    function updateRaf(time) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(updateRaf);
+    }
+    rafId = requestAnimationFrame(updateRaf);
+
+    window.lenis = lenis;
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+      delete window.lenis;
+    };
+  }, []);
+
+  // Smooth Navigation Link Scroll Handling
+  useEffect(() => {
+    const handleAnchorClick = (e) => {
+      const anchor = e.target.closest('a[href^="#"]');
+      if (!anchor) return;
+      const href = anchor.getAttribute('href');
+      if (href && href !== '#') {
+        const targetElement = document.querySelector(href);
+        if (targetElement) {
+          e.preventDefault();
+          if (window.lenis) {
+            window.lenis.scrollTo(targetElement, {
+              offset: -70,
+              duration: 1.2,
+              easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+            });
+          } else {
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      }
+    };
+
+    document.addEventListener('click', handleAnchorClick);
+    return () => document.removeEventListener('click', handleAnchorClick);
+  }, []);
 
   // Navbar Scroll Trigger
   useEffect(() => {
