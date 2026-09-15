@@ -20,6 +20,112 @@ import img4 from './assets/img4.jpeg';
 import classImg from './assets/class.jpeg';
 import closImg from './assets/clos.png';
 
+// Import Mentor Images
+import mentor1Img from './assets/mentor 1.jpeg';
+import mentor2Img from './assets/mentor 2.jpeg';
+import mentor3Img from './assets/mentor 3.jpeg';
+import mentor4Img from './assets/mentor 4.jpeg';
+
+const MENTORS_DATA = [
+  {
+    name: "KRISHNAMURTHY VENKATACHALAM IYER",
+    title: "Senior Financial Strategist & Lead Mentor",
+    img: mentor1Img,
+    badge: "Master Mentor"
+  },
+  {
+    name: "PRAVEEN PATHIYIL",
+    title: "Institutional Market Analyst & Mentor",
+    img: mentor2Img,
+    badge: "Senior Faculty"
+  },
+  {
+    name: "MUHAMMED H",
+    title: "Technical Analysis & Derivatives Specialist",
+    img: mentor3Img,
+    badge: "Market Specialist"
+  },
+  {
+    name: "HUNISH KUMAR",
+    title: "Risk Management & Quantitative Mentor",
+    img: mentor4Img,
+    badge: "Quantitative Mentor"
+  }
+];
+
+// ==========================================
+// MEMOIZED HARDWARE-ACCELERATED MENTOR SLIDER
+// ==========================================
+const MentorsSliderSection = React.memo(() => {
+  return (
+    <div className="mt-20 sm:mt-28 pt-16 border-t border-gold/20 relative z-10">
+      <div className="text-center mb-10 pointer-events-none select-none">
+        <span className="font-sans uppercase text-gold text-[11px] tracking-[0.25em] font-semibold block mb-3">
+          FACULTY & MENTORSHIP
+        </span>
+        <h3 className="text-3xl md:text-4xl lg:text-5xl font-serif text-white font-bold tracking-wide">
+          Meet Our Distinguish Mentors
+        </h3>
+        <div className="w-[80px] h-[2px] bg-gold mx-auto mt-4 opacity-70"></div>
+        <p className="text-xs sm:text-sm text-white/60 font-light max-w-[650px] mx-auto mt-4 leading-relaxed">
+          Direct guidance from industry experts and institutional market leaders dedicated to your professional growth.
+        </p>
+      </div>
+
+      {/* Continuous Right-to-Left Marquee Slider */}
+      <div className="relative overflow-hidden w-full py-6">
+        {/* Subtle Gradient Edge Fades */}
+        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-r from-[#0c0103] to-transparent z-20 pointer-events-none"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-l from-[#0c0103] to-transparent z-20 pointer-events-none"></div>
+
+        {/* Infinite Animated Marquee Strip */}
+        <div className="flex w-max gap-6 sm:gap-8 animate-mentor-slider">
+          {[...MENTORS_DATA, ...MENTORS_DATA, ...MENTORS_DATA, ...MENTORS_DATA].map((mentor, idx) => (
+            <div
+              key={idx}
+              className="w-[280px] sm:w-[320px] md:w-[340px] flex-shrink-0 bg-gradient-to-b from-[#1a0509] to-[#0d0204] border border-gold/25 rounded-2xl overflow-hidden shadow-xl hover:border-gold hover:shadow-[0_0_25px_rgba(201,162,77,0.3)] transition-all duration-300 group/card cursor-pointer mentor-card-gpu"
+            >
+              {/* Mentor Image Container */}
+              <div className="relative h-[320px] sm:h-[360px] overflow-hidden bg-black/60">
+                <img
+                  src={mentor.img}
+                  alt={mentor.name}
+                  className="w-full h-full object-cover object-top group-hover/card:scale-105 transition-transform duration-500 ease-out mentor-card-gpu"
+                  loading="lazy"
+                />
+                {/* Gradient overlay for text contrast */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0d0204] via-[#0d0204]/30 to-transparent opacity-90 pointer-events-none"></div>
+
+                {/* Top Badge */}
+                <div className="absolute top-4 left-4 z-10 pointer-events-none">
+                  <span className="px-3 py-1 bg-burgundy-dark/90 border border-gold/40 rounded-full text-[10px] font-sans font-semibold tracking-wider text-gold uppercase shadow-md backdrop-blur-md">
+                    {mentor.badge}
+                  </span>
+                </div>
+              </div>
+
+              {/* Mentor Info & Label */}
+              <div className="p-6 relative z-10 bg-[#0d0204] border-t border-gold/10">
+                <h4 className="font-serif text-lg sm:text-xl font-bold text-white tracking-wide uppercase group-hover/card:text-gold transition-colors duration-300 leading-snug min-h-[56px] flex items-center">
+                  {mentor.name}
+                </h4>
+                <p className="text-xs font-sans text-gold/90 font-medium tracking-wider mt-1 uppercase">
+                  {mentor.title}
+                </p>
+                <div className="w-full h-[1px] bg-gradient-to-r from-gold/30 via-gold/10 to-transparent mt-4 mb-3"></div>
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-sans font-semibold text-white/50 group-hover/card:text-gold transition-colors duration-300">
+                  <span>Beever Academy Faculty</span>
+                  <Sparkles className="w-3 h-3 text-gold/70" />
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+});
+
 // Register GSAP ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
 
@@ -195,257 +301,148 @@ const InsideGalleryCards = React.memo(() => {
 });
 
 // ==========================================
-// SINGLE LUXURY CUSTOM ARROW CURSOR COMPONENT (WITH GOLDEN SPARKLE TRAIL)
+// LIGHTWEIGHT ELEGANT CURSOR SPARKLE TRAIL
 // ==========================================
-function CustomArrowCursor() {
-  const cursorRef = useRef(null);
+function CursorSparkleTrail() {
   const canvasRef = useRef(null);
-  const particlesRef = useRef([]);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isPressed, setIsPressed] = useState(false);
 
   useEffect(() => {
-    // Check if device supports touch/coarse pointers (mobile)
-    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
-    if (isTouchDevice) return;
+    if (window.matchMedia('(pointer: coarse)').matches) return;
 
-    const cursor = cursorRef.current;
     const canvas = canvasRef.current;
-    if (!cursor || !canvas) return;
+    if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    let particles = [];
+    let lastX = -100;
+    let lastY = -100;
+    let isIdle = true;
 
-    const resizeCanvas = () => {
+    const handleResize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    handleResize();
+    window.addEventListener('resize', handleResize);
 
-    let mouse = { x: -100, y: -100 };
-    let lastMouse = { x: -100, y: -100 };
-    let cursorPos = { x: -100, y: -100 };
-    let hasMoved = false;
-    let animId;
-
-    const goldColors = [
-      { r: 242, g: 223, b: 162 }, // Gold Light (#F2DFA2)
-      { r: 201, g: 162, b: 77 },  // Gold (#C9A24D)
-      { r: 166, g: 126, b: 45 }   // Gold Dark (#A67E2D)
+    const goldPalette = [
+      { r: 242, g: 223, b: 162 }, // Gold Light #F2DFA2
+      { r: 201, g: 162, b: 77 },  // Gold #C9A24D
+      { r: 255, g: 245, b: 210 }  // Soft Ivory Gold
     ];
 
-    const createParticle = (x, y) => {
-      const colorObj = goldColors[Math.floor(Math.random() * goldColors.length)];
+    const addSparkle = (x, y) => {
+      const color = goldPalette[Math.floor(Math.random() * goldPalette.length)];
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 1.2 + 0.3;
-      return {
-        x: x + (Math.random() - 0.5) * 4,
-        y: y + (Math.random() - 0.5) * 4,
+      const speed = Math.random() * 1.4 + 0.4;
+
+      particles.push({
+        x: x + (Math.random() - 0.5) * 6,
+        y: y + (Math.random() - 0.5) * 6,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed + 0.2, // subtle downward gravity drift
-        size: Math.random() * 2.5 + 1.2,
-        r: colorObj.r,
-        g: colorObj.g,
-        b: colorObj.b,
+        vy: Math.sin(angle) * speed - 0.15,
+        size: Math.random() * 1.8 + 1.0,
+        r: color.r,
+        g: color.g,
+        b: color.b,
         alpha: 1.0,
-        decay: Math.random() * 0.03 + 0.02,
+        decay: Math.random() * 0.05 + 0.03,
         rotation: Math.random() * Math.PI,
-        rotationSpeed: (Math.random() - 0.5) * 0.1
-      };
+        rotSpeed: (Math.random() - 0.5) * 0.15
+      });
+
+      if (particles.length > 35) {
+        particles.shift();
+      }
     };
 
     const handleMouseMove = (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
+      const x = e.clientX;
+      const y = e.clientY;
 
-      if (!hasMoved) {
-        cursorPos.x = mouse.x;
-        cursorPos.y = mouse.y;
-        cursor.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0)`;
-        cursor.style.opacity = '1';
-        hasMoved = true;
-        lastMouse.x = mouse.x;
-        lastMouse.y = mouse.y;
-        return;
+      const dist = Math.hypot(x - lastX, y - lastY);
+      if (dist > 4) {
+        addSparkle(x, y);
+        if (Math.random() > 0.4) addSparkle(x, y);
+        lastX = x;
+        lastY = y;
       }
 
-      // Spawn golden sparkles on movement
-      const dist = Math.hypot(mouse.x - lastMouse.x, mouse.y - lastMouse.y);
-      if (dist > 3) {
-        const count = Math.min(3, Math.floor(dist / 6) + 1);
-        for (let i = 0; i < count; i++) {
-          particlesRef.current.push(createParticle(mouse.x, mouse.y));
-        }
-        if (particlesRef.current.length > 70) {
-          particlesRef.current.splice(0, particlesRef.current.length - 70);
-        }
-        lastMouse.x = mouse.x;
-        lastMouse.y = mouse.y;
+      if (isIdle) {
+        isIdle = false;
+        loop();
       }
     };
 
-    const handleMouseDown = () => setIsPressed(true);
-    const handleMouseUp = () => setIsPressed(false);
+    const drawSparkleStar = (p) => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
 
-    // Track hover state over interactive elements
-    const handleMouseOver = (e) => {
-      const target = e.target;
-      if (!target || typeof target.closest !== 'function') return;
+      // Delicate 4-point golden sparkle star
+      ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha})`;
+      ctx.beginPath();
+      ctx.moveTo(0, -p.size * 2);
+      ctx.lineTo(p.size * 0.5, -p.size * 0.5);
+      ctx.lineTo(p.size * 2, 0);
+      ctx.lineTo(p.size * 0.5, p.size * 0.5);
+      ctx.lineTo(0, p.size * 2);
+      ctx.lineTo(-p.size * 0.5, p.size * 0.5);
+      ctx.lineTo(-p.size * 2, 0);
+      ctx.lineTo(-p.size * 0.5, -p.size * 0.5);
+      ctx.closePath();
+      ctx.fill();
 
-      const interactiveEl = target.closest(
-        'a, button, input, textarea, select, iframe, label, [role="button"], .cursor-pointer, .inside-card-el, .strength-card-el, img, svg'
-      );
-      if (interactiveEl) {
-        setIsHovered(true);
-      } else {
-        setIsHovered(false);
-      }
+      // Soft white core glow dot
+      ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 0.9})`;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.size * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
     };
 
-    const handleMouseLeaveWindow = () => {
-      if (cursor) cursor.style.opacity = '0';
-    };
-
-    const handleMouseEnterWindow = (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-      if (cursor) cursor.style.opacity = '1';
-    };
-
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    window.addEventListener('mousedown', handleMouseDown, { passive: true });
-    window.addEventListener('mouseup', handleMouseUp, { passive: true });
-    document.addEventListener('mouseover', handleMouseOver, { passive: true });
-    document.addEventListener('mouseleave', handleMouseLeaveWindow);
-    document.addEventListener('mouseenter', handleMouseEnterWindow);
-
-    // High-precision smooth animation loop using LERP & particle canvas render
-    const render = () => {
-      if (hasMoved) {
-        // Snappy, lag-free LERP factor (0.45)
-        cursorPos.x += (mouse.x - cursorPos.x) * 0.45;
-        cursorPos.y += (mouse.y - cursorPos.y) * 0.45;
-
-        cursor.style.transform = `translate3d(${cursorPos.x}px, ${cursorPos.y}px, 0)`;
-      }
-
-      // Draw golden sparkles on canvas
+    const loop = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const particles = particlesRef.current;
 
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
         p.alpha -= p.decay;
-        p.rotation += p.rotationSpeed;
+        p.rotation += p.rotSpeed;
 
         if (p.alpha <= 0) {
           particles.splice(i, 1);
-          continue;
+        } else {
+          drawSparkleStar(p);
         }
-
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rotation);
-
-        // Soft outer golden glow
-        ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha * 0.35})`;
-        ctx.beginPath();
-        ctx.moveTo(0, -p.size * 2.2);
-        ctx.lineTo(p.size * 0.7, -p.size * 0.7);
-        ctx.lineTo(p.size * 2.2, 0);
-        ctx.lineTo(p.size * 0.7, p.size * 0.7);
-        ctx.lineTo(0, p.size * 2.2);
-        ctx.lineTo(-p.size * 0.7, p.size * 0.7);
-        ctx.lineTo(-p.size * 2.2, 0);
-        ctx.lineTo(-p.size * 0.7, -p.size * 0.7);
-        ctx.closePath();
-        ctx.fill();
-
-        // Core sharp 4-pointed golden sparkle star
-        ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha})`;
-        ctx.beginPath();
-        ctx.moveTo(0, -p.size * 1.5);
-        ctx.lineTo(p.size * 0.4, -p.size * 0.4);
-        ctx.lineTo(p.size * 1.5, 0);
-        ctx.lineTo(p.size * 0.4, p.size * 0.4);
-        ctx.lineTo(0, p.size * 1.5);
-        ctx.lineTo(-p.size * 0.4, p.size * 0.4);
-        ctx.lineTo(-p.size * 1.5, 0);
-        ctx.lineTo(-p.size * 0.4, -p.size * 0.4);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.restore();
       }
 
-      animId = requestAnimationFrame(render);
+      if (particles.length > 0) {
+        animationFrameId = requestAnimationFrame(loop);
+      } else {
+        isIdle = true;
+      }
     };
 
-    animId = requestAnimationFrame(render);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('mouseover', handleMouseOver);
-      document.removeEventListener('mouseleave', handleMouseLeaveWindow);
-      document.removeEventListener('mouseenter', handleMouseEnterWindow);
-      cancelAnimationFrame(animId);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
   return (
-    <>
-      <canvas
-        ref={canvasRef}
-        className="fixed inset-0 pointer-events-none z-[99999] hidden lg:block"
-      />
-      <div
-        ref={cursorRef}
-        className={`beever-custom-cursor-wrapper ${isHovered ? 'is-hovered' : ''} ${isPressed ? 'is-pressed' : ''}`}
-        aria-hidden="true"
-      >
-        <svg
-          className="beever-arrow-svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <linearGradient id="beever-arrow-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#F2DFA2" />
-              <stop offset="50%" stopColor="#C9A24D" />
-              <stop offset="100%" stopColor="#A67E2D" />
-            </linearGradient>
-          </defs>
-          
-          {/* Modern Sharp Real OS Luxury Arrow Head Pointer */}
-          <path
-            d="M 0,0 L 16,11 L 9.5,11 L 14.2,20.4 L 11.2,21.9 L 6.5,12.5 L 0,16 Z"
-            fill="url(#beever-arrow-grad)"
-            stroke="#240000"
-            strokeWidth="1.2"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
-
-          {/* Metallic Bevel Inner Highlight Line */}
-          <path
-            d="M 1.8,3.2 L 13.2,10.2 L 8.5,11.2 L 12.2,18.6"
-            stroke="rgba(255, 255, 255, 0.55)"
-            strokeWidth="0.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-[99999] hidden lg:block"
+    />
   );
 }
-
 
 // ==========================================
 // CINEMATIC GLOBAL NETWORK CANVAS COMPONENT
@@ -2786,6 +2783,9 @@ export default function App() {
             </div>
 
           </div>
+
+          {/* SLIDING RIGHT-TO-LEFT MENTORS SECTION UNDER ADMISSIONS & ENROLLMENT */}
+          <MentorsSliderSection />
         </div>
       </section>
     );
@@ -3238,7 +3238,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-charcoal font-sans bg-white relative overflow-x-hidden">
-      <CustomArrowCursor />
+      <CursorSparkleTrail />
       {/* ==========================================
          PAGE LOADER
          ========================================== */}
