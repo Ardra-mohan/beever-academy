@@ -822,17 +822,18 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
   };
 
   return (
-    <div className="relative w-full aspect-[2/1] min-h-[460px] lg:min-h-[500px] select-none overflow-hidden rounded-3xl">
+    <div className="relative w-full aspect-[2/1] min-h-[220px] sm:min-h-[360px] lg:min-h-[480px] select-none overflow-hidden rounded-2xl sm:rounded-3xl bg-[#100103]">
       {/* Background Canvas */}
       <canvas
         key="burgundy-canvas"
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full object-cover z-10"
+        className="absolute inset-0 w-full h-full object-cover z-10 opacity-90"
       />
 
       {/* SVG Overlay */}
       <svg
         viewBox="0 0 1000 500"
+        preserveAspectRatio="xMidYMid meet"
         className="absolute inset-0 w-full h-full z-20 pointer-events-none"
       >
         <defs>
@@ -1017,6 +1018,24 @@ function GlobalPresenceDashboard({ hoveredLocationId, setHoveredLocationId }) {
           );
         })()
       )}
+
+      {/* Mobile Location Quick Selector Chips */}
+      <div className="absolute bottom-2 left-2 right-2 flex sm:hidden overflow-x-auto gap-1.5 p-2 bg-[#120003]/90 backdrop-blur-md rounded-xl border border-gold/20 z-30 pointer-events-auto scrollbar-none">
+        {LOCATIONS.map(loc => (
+          <button
+            key={`mobile-chip-${loc.id}`}
+            onClick={() => setHoveredLocationId(hoveredLocationId === loc.id ? null : loc.id)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-sans font-semibold whitespace-nowrap transition-all duration-200 border ${
+              hoveredLocationId === loc.id
+                ? 'bg-gold text-burgundy-dark border-gold shadow-md'
+                : 'bg-white/10 text-white/80 border-white/10'
+            }`}
+          >
+            <span>{loc.flag}</span>
+            <span>{loc.mapLabel}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
