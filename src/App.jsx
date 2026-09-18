@@ -1960,7 +1960,7 @@ export default function App() {
       }
 
       // Track active section for navbar highlighting
-      const sections = ['home', 'about', 'programs', 'blog', 'careers', 'contact'];
+      const sections = ['home', 'about', 'programs', 'mentors', 'blog', 'careers', 'contact'];
 
       for (const sectionId of sections) {
         const current = document.getElementById(sectionId);
@@ -2804,7 +2804,7 @@ export default function App() {
 
   const renderFaculty = () => {
     return (
-      <section id="faculty" className="py-20 md:py-28 bg-[#0c0103] text-left relative overflow-hidden">
+      <section id="mentors" className="py-20 md:py-28 bg-[#0c0103] text-left relative overflow-hidden">
         {/* Cinematic Backdrop Volumetric lighting */}
         <div className="absolute inset-0 bg-radial-gradient from-burgundy-dark/45 via-[#0c0103] to-[#090001] pointer-events-none z-0"></div>
         <div className="light-blob light-blob-gold z-0 opacity-25"></div>
@@ -3305,7 +3305,7 @@ export default function App() {
 
           {/* Desktop Nav */}
           <ul className="hidden lg:flex gap-7">
-            {['home', 'about', 'programs', 'blog', 'careers', 'contact'].map(sec => (
+            {['home', 'about', 'programs', 'mentors', 'blog', 'careers', 'contact'].map(sec => (
               <li key={sec}>
                 <a
                   href={`#${sec}`}
@@ -3359,7 +3359,7 @@ export default function App() {
       {mobileMenuOpen && (
         <div className="fixed inset-0 bg-burgundy-dark z-[990] flex flex-col justify-start items-center overflow-y-auto pt-28 pb-12 transition-all duration-500">
           <ul className="flex flex-col items-center gap-8">
-            {['home', 'about', 'programs', 'blog', 'careers', 'contact'].map(sec => (
+            {['home', 'about', 'programs', 'mentors', 'blog', 'careers', 'contact'].map(sec => (
               <li key={sec} onClick={() => setMobileMenuOpen(false)}>
                 <a href={`#${sec}`} className="font-serif text-white text-3xl tracking-wide hover:text-gold transition-colors duration-200 capitalize font-bold">
                   {sec.replace('-', ' ')}
@@ -3435,7 +3435,7 @@ export default function App() {
               Quick Links
             </h4>
             <ul className="flex flex-col gap-4 text-xs text-text-light">
-              {['about', 'programs', 'blog', 'contact'].map(link => (
+              {['about', 'programs', 'mentors', 'blog', 'contact'].map(link => (
                 <li key={link}>
                   <a href={`#${link}`} className="hover:text-gold-light hover:pl-1 transition-all duration-200 capitalize">
                     {link.replace('-', ' ')}
