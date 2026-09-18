@@ -1960,7 +1960,7 @@ export default function App() {
       }
 
       // Track active section for navbar highlighting
-      const sections = ['home', 'about', 'programs', 'admissions', 'blog', 'careers', 'contact'];
+      const sections = ['home', 'about', 'programs', 'blog', 'careers', 'contact'];
 
       for (const sectionId of sections) {
         const current = document.getElementById(sectionId);
@@ -2043,27 +2043,7 @@ export default function App() {
         );
       }
 
-      // 4. Admissions Section Animation Sequence
-      if (document.querySelector('#admissions')) {
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: '#admissions',
-            start: 'top 65%',
-            once: true
-          }
-        });
 
-        tl.fromTo('.admissions-left-content',
-          { opacity: 0, x: prefersReducedMotion ? 0 : -50 },
-          { opacity: 1, x: 0, duration: 1.0, ease: 'power3.out' }
-        );
-
-        tl.fromTo('.admissions-right-content',
-          { opacity: 0, x: prefersReducedMotion ? 0 : 50, scale: prefersReducedMotion ? 1 : 0.97 },
-          { opacity: 1, x: 0, scale: 1, duration: 1.2, ease: 'power3.out' },
-          '-=0.8'
-        );
-      }
 
       // 5. Inside Gallery Cards & Premium Sweeping Gold Line
       if (document.querySelector('.inside-grid-el')) {
@@ -2301,9 +2281,9 @@ export default function App() {
       const isUnrelated = unrelatedKeywords.some(kw => textLower.includes(kw));
 
       if (isUnrelated || (!isAllowed && textLower.split(' ').length > 4)) {
-        botResponseText = "I am Bee Assistant, here to assist specifically with Beever Academy and our financial trading programs. Feel free to ask about our FMMTA course, admissions, mentorship, or campus location!";
+        botResponseText = "I am Bee Assistant, here to assist specifically with Beever Academy and our financial trading programs. Feel free to ask about our FMMTA course, mentorship, or campus location!";
       } else if (textLower.includes('who are you') || textLower.includes('your name') || textLower.includes('bee assistant')) {
-        botResponseText = "I am Bee Assistant, the official AI assistant for Beever Academy! 🐝✨ I am here to answer your questions, assist with course details, and help connect you directly with our admissions team on WhatsApp.";
+        botResponseText = "I am Bee Assistant, the official AI assistant for Beever Academy! 🐝✨ I am here to answer your questions, assist with course details, and help connect you directly with our team on WhatsApp.";
       } else if (textLower.includes('whatsapp') || textLower.includes('message team')) {
         botResponseText = "You can connect with our team on WhatsApp at +971 50 702 1275. When you submit an enquiry on our website, your details are automatically sent there so our counselors can reach out instantly!";
       } else if (textLower.includes('course') || textLower.includes('program') || textLower.includes('fmmta') || textLower.includes('learn') || textLower.includes('syllabus')) {
@@ -2313,7 +2293,7 @@ export default function App() {
       } else if (textLower.includes('beginner') || textLower.includes('basics') || textLower.includes('trading') || textLower.includes('market') || textLower.includes('start') || textLower.includes('guide')) {
         botResponseText = "We offer absolute beginner guidance to build solid foundations. The FMMTA course starts with core principles of economics and market mechanics, making it suitable for both beginners and intermediate traders.";
       } else if (textLower.includes('enroll') || textLower.includes('join') || textLower.includes('register') || textLower.includes('apply') || textLower.includes('admission')) {
-        botResponseText = "Enrollment for the upcoming FMMTA cohort is currently open. You can submit your enquiry form on this page to get redirected to our WhatsApp admissions desk (+971 50 702 1275).";
+        botResponseText = "Registration for the upcoming FMMTA cohort is currently open. You can submit your enquiry form on this page to get redirected to our WhatsApp desk (+971 50 702 1275).";
       } else if (textLower.includes('mentor') || textLower.includes('coach') || textLower.includes('mentorship')) {
         botResponseText = "Mentorship is at the core of Beever Academy. You will receive 1-on-1 feedback sessions, group review calls, and direct access to professional traders who monitor your progress.";
       } else if (textLower.includes('fee') || textLower.includes('price') || textLower.includes('cost') || textLower.includes('pay') || textLower.includes('tuition')) {
@@ -2327,7 +2307,7 @@ export default function App() {
       } else if (textLower.includes('contact') || textLower.includes('number') || textLower.includes('phone') || textLower.includes('address') || textLower.includes('location') || textLower.includes('where') || textLower.includes('office') || textLower.includes('dubai')) {
         botResponseText = "Beever Academy is located at Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai, UAE. Call us at +971 4 892 3151 or message us on WhatsApp (+971 50 702 1275).";
       } else {
-        botResponseText = "I'd be happy to assist you! Would you like me to connect you with our admissions team via WhatsApp (+971 50 702 1275) or share more details about the FMMTA program?";
+        botResponseText = "I'd be happy to assist you! Would you like me to connect you with our student support team via WhatsApp (+971 50 702 1275) or share more details about the FMMTA program?";
       }
 
       if (anyHasEmoji) {
@@ -2405,7 +2385,7 @@ export default function App() {
                       href="tel:+97148923151"
                       className="inline-flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-wider gold-gradient-bg text-burgundy-dark px-3 py-1.5 rounded-lg hover:scale-105 transition-all duration-200"
                     >
-                      <Phone className="w-3.5 h-3.5" /> Call Admissions
+                      <Phone className="w-3.5 h-3.5" /> Call Us
                     </a>
                   </div>
                 )}
@@ -2822,53 +2802,18 @@ export default function App() {
     </section>
   );
 
-  const renderJourney = () => {
+  const renderFaculty = () => {
     return (
-      <section id="admissions" className="py-20 md:py-32 bg-[#0c0103] text-left relative overflow-hidden">
+      <section id="faculty" className="py-20 md:py-28 bg-[#0c0103] text-left relative overflow-hidden">
         {/* Cinematic Backdrop Volumetric lighting */}
         <div className="absolute inset-0 bg-radial-gradient from-burgundy-dark/45 via-[#0c0103] to-[#090001] pointer-events-none z-0"></div>
         <div className="light-blob light-blob-gold z-0 opacity-25"></div>
         <div className="light-blob light-blob-burgundy z-0 opacity-40"></div>
 
-        {/* Faint Background Particle System */}
-        <AdmissionsBackgroundParticles />
-
         {/* Backdrop Grid Pattern */}
         <div className="absolute inset-0 terminal-grid-bg opacity-35 z-0 pointer-events-none"></div>
 
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-
-            {/* LEFT COLUMN: Text Copy */}
-            <div className="lg:col-span-5 flex flex-col justify-center select-none z-10 text-white pr-0 lg:pr-8 admissions-left-content">
-              <span className="font-sans uppercase text-gold text-[11px] tracking-[0.2em] font-semibold block mb-4 animate-pulse">
-                ADMISSIONS & ENROLLMENT
-              </span>
-              <h2 className="text-4xl md:text-5xl lg:text-[52px] font-serif leading-[1.1] text-white mb-6 font-bold tracking-wide">
-                Master the Markets<br />
-                <span className="text-gold">with Confidence.</span>
-              </h2>
-              <div className="w-[80px] h-[2px] bg-gold mb-6 opacity-60"></div>
-              <p className="text-sm md:text-base text-white/70 font-light leading-relaxed mb-8 max-w-[520px]">
-                Beever Academy offers Dubai's premier environment for high-end financial markets training and strategic wealth development. Gain access to expert instruction, institutional-grade tools, and real-time market simulators. Join a cohort of high-performing leaders, master liquidity dynamics, and advance your trading journey today.
-              </p>
-
-              <div className="admission-action-btn relative z-10">
-                <a href="#contact" className="inline-flex btn px-8 py-4 font-semibold uppercase tracking-widest shadow-lg hover:shadow-xl hover:-translate-y-[2px] transition-all duration-300 items-center gap-2 gold-gradient-bg text-burgundy-dark font-sans text-xs">
-                  <span>Start Your Trading Journey</span>
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
-
-            {/* RIGHT COLUMN: Interactive Embedded Trading Terminal */}
-            <div className="lg:col-span-7 w-full overflow-hidden border border-gold/15 bg-black rounded-2xl shadow-2xl relative z-10 admissions-right-content">
-              <PremiumTradingTerminal />
-            </div>
-
-          </div>
-
-          {/* SLIDING RIGHT-TO-LEFT MENTORS SECTION UNDER ADMISSIONS & ENROLLMENT */}
           <MentorsSliderSection />
         </div>
       </section>
@@ -2901,8 +2846,8 @@ export default function App() {
     const openings = [
       {
         id: "sen-admissions",
-        title: "Senior Admissions Advisor",
-        dept: "Admissions & Student Relations",
+        title: "Senior Student Advisor",
+        dept: "Student Relations & Academic Counseling",
         location: "Dubai (On-site)",
         type: "Full-time",
         desc: "Lead student consultations, evaluate applications, and support prospective students in selecting their optimal educational pathway at Beever Academy."
@@ -3186,7 +3131,7 @@ export default function App() {
           </h2>
           <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-8"></div>
           <p className="text-sm md:text-base text-text-secondary max-w-[850px] mx-auto leading-relaxed text-justify md:text-center">
-            Ready to begin your learning journey with Beever Academy? Our team is here to assist you with program details, admissions support, and general enquiries. We welcome you to connect with us and take the first step toward premium financial education.
+            Ready to begin your learning journey with Beever Academy? Our team is here to assist you with program details, course support, and general enquiries. We welcome you to connect with us and take the first step toward premium financial education.
           </p>
         </div>
 
@@ -3360,7 +3305,7 @@ export default function App() {
 
           {/* Desktop Nav */}
           <ul className="hidden lg:flex gap-7">
-            {['home', 'about', 'programs', 'admissions', 'blog', 'careers', 'contact'].map(sec => (
+            {['home', 'about', 'programs', 'blog', 'careers', 'contact'].map(sec => (
               <li key={sec}>
                 <a
                   href={`#${sec}`}
@@ -3414,7 +3359,7 @@ export default function App() {
       {mobileMenuOpen && (
         <div className="fixed inset-0 bg-burgundy-dark z-[990] flex flex-col justify-start items-center overflow-y-auto pt-28 pb-12 transition-all duration-500">
           <ul className="flex flex-col items-center gap-8">
-            {['home', 'about', 'programs', 'admissions', 'blog', 'careers', 'contact'].map(sec => (
+            {['home', 'about', 'programs', 'blog', 'careers', 'contact'].map(sec => (
               <li key={sec} onClick={() => setMobileMenuOpen(false)}>
                 <a href={`#${sec}`} className="font-serif text-white text-3xl tracking-wide hover:text-gold transition-colors duration-200 capitalize font-bold">
                   {sec.replace('-', ' ')}
@@ -3440,7 +3385,7 @@ export default function App() {
         {renderAbout()}
         {renderGlobalNetwork()}
         {renderStrengths()}
-        {renderJourney()}
+        {renderFaculty()}
         {renderInsideGallery()}
         {renderCareers()}
         {renderTestimonials()}
@@ -3490,7 +3435,7 @@ export default function App() {
               Quick Links
             </h4>
             <ul className="flex flex-col gap-4 text-xs text-text-light">
-              {['about', 'programs', 'admissions', 'blog', 'contact'].map(link => (
+              {['about', 'programs', 'blog', 'contact'].map(link => (
                 <li key={link}>
                   <a href={`#${link}`} className="hover:text-gold-light hover:pl-1 transition-all duration-200 capitalize">
                     {link.replace('-', ' ')}
