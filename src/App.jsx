@@ -26,6 +26,7 @@ import mentor1Img from './assets/mentor 1.jpeg';
 import mentor2Img from './assets/mentor 2.jpeg';
 import mentor3Img from './assets/mentor 3.jpeg';
 import mentor4Img from './assets/mentor 4.jpeg';
+import mentor5Img from './assets/mentor 5.jpeg';
 
 const MENTORS_DATA = [
   {
@@ -51,6 +52,12 @@ const MENTORS_DATA = [
     title: "Risk Management & Quantitative Mentor",
     img: mentor4Img,
     badge: "Quantitative Mentor"
+  },
+  {
+    name: "",
+    title: "",
+    img: mentor5Img,
+    badge: "Faculty Mentor"
   }
 ];
 
