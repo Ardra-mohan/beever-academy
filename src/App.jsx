@@ -7,7 +7,8 @@ import {
   Monitor, ChevronLeft, ChevronRight,
   MapPin, Phone, Mail, Facebook, Instagram, Linkedin, Youtube,
   Quote, Sparkles, Menu, X, ArrowRight, CheckCircle2,
-  Star, TrendingUp, Clock, MessageSquare, Send
+  Star, TrendingUp, Clock, MessageSquare, Send,
+  ShieldCheck, BookOpen, Target, Award, Compass
 } from 'lucide-react';
 
 // Import local logo from assets
@@ -30,34 +31,39 @@ import mentor5Img from './assets/mentor 5.jpeg';
 
 const MENTORS_DATA = [
   {
-    name: "KRISHNAMURTHY VENKATACHALAM IYER",
-    title: "Senior Financial Strategist & Lead Mentor",
+    name: "KRISHNAMOORTHI VENKATACHALAM",
+    title: "Chairman",
     img: mentor1Img,
-    badge: "Master Mentor"
+    badge: "Chairman",
+    bio: "Over 40 years of market experience, providing strategic leadership and educational vision."
   },
   {
     name: "PRAVEEN PATHIYIL",
-    title: "Institutional Market Analyst & Mentor",
+    title: "Academic Director",
     img: mentor2Img,
-    badge: "Senior Faculty"
+    badge: "Academic Director",
+    bio: "Over 20 years in fund management and technical analysis, steering academic direction."
+  },
+  {
+    name: "ABDUL JALEEL",
+    title: "Head of Operations",
+    img: mentor5Img,
+    badge: "Head of Operations",
+    bio: "Nearly three decades in gold markets, leading operational coordination and delivery."
   },
   {
     name: "MUHAMMED H",
-    title: "Technical Analysis & Derivatives Specialist",
+    title: "Academic Head",
     img: mentor3Img,
-    badge: "Market Specialist"
+    badge: "Academic Head",
+    bio: "Specialist in gold and technical analysis, guiding mentor coordination and training."
   },
   {
     name: "HUNISH KUMAR",
     title: "Risk Management & Quantitative Mentor",
     img: mentor4Img,
-    badge: "Quantitative Mentor"
-  },
-  {
-    name: "",
-    title: "",
-    img: mentor5Img,
-    badge: "Faculty Mentor"
+    badge: "Faculty Mentor",
+    bio: "Specialist in algorithmic risk modeling and quantitative market strategies."
   }
 ];
 
@@ -121,6 +127,11 @@ const MentorsSliderSection = React.memo(() => {
                 <p className="text-xs font-sans text-gold/90 font-medium tracking-wider mt-1 uppercase">
                   {mentor.title}
                 </p>
+                {mentor.bio && (
+                  <p className="text-[11.5px] text-white/70 font-light leading-relaxed mt-2.5 min-h-[36px] group-hover/card:text-white/90 transition-colors duration-300">
+                    {mentor.bio}
+                  </p>
+                )}
                 <div className="w-full h-[1px] bg-gradient-to-r from-gold/30 via-gold/10 to-transparent mt-4 mb-3"></div>
                 <span className="inline-flex items-center gap-1.5 text-[11px] font-sans font-semibold text-white/50 group-hover/card:text-gold transition-colors duration-300">
                   <span>Beever Academy Faculty</span>
@@ -466,7 +477,7 @@ const LOCATIONS = [
     partnerName: "Beever Professional And Management Development Training LLC",
     flag: "🇦🇪",
     country: "United Arab Emirates",
-    regText: "KHDA Approved License No. 89231",
+    regText: "Approved and permitted by KHDA",
     x: 588,
     y: 210,
     color: "#ffffff", // White
@@ -2288,33 +2299,33 @@ export default function App() {
       const isUnrelated = unrelatedKeywords.some(kw => textLower.includes(kw));
 
       if (isUnrelated || (!isAllowed && textLower.split(' ').length > 4)) {
-        botResponseText = "I am Bee Assistant, here to assist specifically with Beever Academy and our financial trading programs. Feel free to ask about our FMMTA course, mentorship, or campus location!";
+        botResponseText = "I am Bee Assistant, here to assist specifically with Beever Academy and our financial trading programmes. Feel free to ask about our Foundation, Intermediate, and Advanced programmes, mentorship, or campus location!";
       } else if (textLower.includes('who are you') || textLower.includes('your name') || textLower.includes('bee assistant')) {
-        botResponseText = "I am Bee Assistant, the official AI assistant for Beever Academy! 🐝✨ I am here to answer your questions, assist with course details, and help connect you directly with our team on WhatsApp.";
+        botResponseText = "I am Bee Assistant, the official AI assistant for Beever Academy! 🐝✨ I am here to answer your questions, assist with programme details, and help connect you directly with our team on WhatsApp.";
       } else if (textLower.includes('whatsapp') || textLower.includes('message team')) {
         botResponseText = "You can connect with our team on WhatsApp at +971 50 702 1275. When you submit an enquiry on our website, your details are automatically sent there so our counselors can reach out instantly!";
       } else if (textLower.includes('course') || textLower.includes('program') || textLower.includes('fmmta') || textLower.includes('learn') || textLower.includes('syllabus')) {
-        botResponseText = "Beever Academy's signature curriculum is the Foundation Market Mechanics & Technical Analysis (FMMTA) course. It is an intensive 8-week program covering macroeconomics, order flow, technical charting, and institutional risk management. We host live, practical trading sessions at our Dubai campus.";
+        botResponseText = "Beever Academy offers three structured trading programmes: Programme 01 – Foundation (10 Classes, AED 1,850), Programme 02 – Intermediate (15 Classes, AED 5,500), and Programme 03 – Advanced (15 Classes, AED 11,000). All feature practical chart analysis and risk discipline.";
       } else if (textLower.includes('duration') || textLower.includes('how long') || textLower.includes('time')) {
-        botResponseText = "Our flagship FMMTA program spans 8 weeks of intensive study, combining theoretical models with live market application in weekend or weekday evening batches.";
+        botResponseText = "Our Foundation programme runs for 10 Classes (1 Hour per class), while both our Intermediate and Advanced programmes span 15 comprehensive classes with hands-on chart practice.";
       } else if (textLower.includes('beginner') || textLower.includes('basics') || textLower.includes('trading') || textLower.includes('market') || textLower.includes('start') || textLower.includes('guide')) {
-        botResponseText = "We offer absolute beginner guidance to build solid foundations. The FMMTA course starts with core principles of economics and market mechanics, making it suitable for both beginners and intermediate traders.";
+        botResponseText = "Programme 01 – Foundation is designed specifically for new traders and learners rebuilding core skills. It covers market basics, MT5, TradingView, risk sizing, and guided practice for AED 1,850.";
       } else if (textLower.includes('enroll') || textLower.includes('join') || textLower.includes('register') || textLower.includes('apply') || textLower.includes('admission')) {
-        botResponseText = "Registration for the upcoming FMMTA cohort is currently open. You can submit your enquiry form on this page to get redirected to our WhatsApp desk (+971 50 702 1275).";
+        botResponseText = "Enrolment for all three programmes is open. Submit your enquiry form on this page to be connected with our admissions desk on WhatsApp (+971 50 702 1275).";
       } else if (textLower.includes('mentor') || textLower.includes('coach') || textLower.includes('mentorship')) {
-        botResponseText = "Mentorship is at the core of Beever Academy. You will receive 1-on-1 feedback sessions, group review calls, and direct access to professional traders who monitor your progress.";
+        botResponseText = "Mentorship is at the core of Beever Academy. You will receive 1-on-1 feedback sessions, chart reviews, and direct access to experienced market practitioners who guide your learning journey.";
       } else if (textLower.includes('fee') || textLower.includes('price') || textLower.includes('cost') || textLower.includes('pay') || textLower.includes('tuition')) {
-        botResponseText = "Tuition at Beever Academy depends on your chosen format (Executive Cohort, Weekend Intensive, or Professional Module). We offer customizable payment plans. Contact our WhatsApp desk for current cohort pricing.";
+        botResponseText = "Programme fees are: Foundation: AED 1,850 (10 classes), Intermediate: AED 5,500 (15 classes), and Advanced: AED 11,000 (15 classes). All include practical chart sessions and materials.";
       } else if (textLower.includes('live') || textLower.includes('class')) {
-        botResponseText = "Yes, classes are conducted live on-site at our Aspin Commercial Tower facility in Dubai and streamed for hybrid students.";
+        botResponseText = "Classes are conducted with dedicated workstations and shared screens on the 49th Floor of Aspin Commercial Tower, Sheikh Zayed Road, Dubai.";
       } else if (textLower.includes('certif')) {
-        botResponseText = "Upon successful completion of the FMMTA course and passing the final risk assessment, you will receive the official Beever Academy Financial Markets Certification.";
+        botResponseText = "Upon completing your programme and practical assessments, you will receive official Beever Academy certification. This institution is approved and permitted by KHDA.";
       } else if (textLower.includes('demo') || textLower.includes('trial')) {
-        botResponseText = "Yes, we host weekly interactive demo sessions at our Dubai campus where you can experience a live trading class.";
+        botResponseText = "Yes, we welcome prospective students to visit our academy on the 49th Floor of Aspin Commercial Tower to explore our classrooms and meet the academic team.";
       } else if (textLower.includes('contact') || textLower.includes('number') || textLower.includes('phone') || textLower.includes('address') || textLower.includes('location') || textLower.includes('where') || textLower.includes('office') || textLower.includes('dubai')) {
-        botResponseText = "Beever Academy is located at Office No. 4904, Aspin Commercial Tower, Sheikh Zayed Road, Dubai, UAE. Call us at +971 4 892 3151 or message us on WhatsApp (+971 50 702 1275).";
+        botResponseText = "Beever Academy is located at Office 4904, 49th Floor, Aspin Commercial Tower, Sheikh Zayed Road, Dubai, UAE (Near Financial Centre Metro, Exit 2). Office Hours: 10:00 AM to 8:00 PM. Call +971 4 892 3151 or WhatsApp +971 50 702 1275.";
       } else {
-        botResponseText = "I'd be happy to assist you! Would you like me to connect you with our student support team via WhatsApp (+971 50 702 1275) or share more details about the FMMTA program?";
+        botResponseText = "I'd be happy to assist you! Would you like me to connect you with our student support team via WhatsApp (+971 50 702 1275) or discuss which programme fits your experience level?";
       }
 
       if (anyHasEmoji) {
@@ -2485,8 +2496,8 @@ export default function App() {
             <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse flex-shrink-0"></span>
             <div className="overflow-hidden w-full relative">
               <div className="animate-marquee whitespace-nowrap flex">
-                <span className="flex-shrink-0 pr-8">Your Learning Never Stops <span className="text-gold mx-2">•</span> Beever Academy is Open 7 Days a Week <span className="text-gold mx-2">•</span> 10:00 AM – 10:00 PM <span className="text-gold mx-4">•</span></span>
-                <span className="flex-shrink-0 pr-8">Your Learning Never Stops <span className="text-gold mx-2">•</span> Beever Academy is Open 7 Days a Week <span className="text-gold mx-2">•</span> 10:00 AM – 10:00 PM <span className="text-gold mx-4">•</span></span>
+                <span className="flex-shrink-0 pr-8">Your Learning Never Stops <span className="text-gold mx-2">•</span> Beever Academy is Open 7 Days a Week <span className="text-gold mx-2">•</span> 10:00 AM – 8:00 PM <span className="text-gold mx-4">•</span></span>
+                <span className="flex-shrink-0 pr-8">Your Learning Never Stops <span className="text-gold mx-2">•</span> Beever Academy is Open 7 Days a Week <span className="text-gold mx-2">•</span> 10:00 AM – 8:00 PM <span className="text-gold mx-4">•</span></span>
               </div>
             </div>
           </div>
@@ -2559,73 +2570,114 @@ export default function App() {
   const renderAbout = () => (
     <section id="about" className="py-20 md:py-32 bg-ivory">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
-        <div className="about-grid-el grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+        <div className="about-grid-el grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Visual Column */}
-          <div className="about-img-box-el relative border border-burgundy/10 p-[15px] bg-white shadow-md rounded-2xl">
+          <div className="lg:col-span-5 about-img-box-el relative border border-burgundy/10 p-[15px] bg-white shadow-md rounded-2xl">
             <div className="overflow-hidden rounded-xl">
               <img
                 src={officeImg}
-                alt="Grand Academy Facade"
-                className="w-full h-[280px] sm:h-[380px] lg:h-[480px] object-cover rounded-xl transition-transform duration-700 ease-out hover:scale-105"
+                alt="Beever Academy Dubai Headquarters"
+                className="w-full h-[320px] sm:h-[420px] lg:h-[500px] object-cover rounded-xl transition-transform duration-700 ease-out hover:scale-105"
                 loading="lazy"
                 width="800"
                 height="600"
               />
             </div>
 
-            {/* Overlay Glass Card */}
-            <div className="about-glass-card-el absolute -bottom-10 right-4 lg:-right-10 w-[280px] bg-burgundy/90 backdrop-blur-[12px] border border-gold/30 p-8 shadow-2xl text-white rounded-2xl hidden sm:block">
+            {/* Overlay Glass Card - KHDA Approved */}
+            <div className="about-glass-card-el absolute -bottom-8 right-4 lg:-right-8 w-[290px] bg-burgundy-dark/95 backdrop-blur-[12px] border border-gold/40 p-6 shadow-2xl text-white rounded-2xl hidden sm:block">
               <div className="relative">
-                <h4 className="font-serif text-2xl text-gold mb-3">Education For Life</h4>
-                <p className="text-xs text-text-light leading-relaxed">Transforming knowledge into success through practical, industry-focused programs.</p>
-                <Sparkles className="absolute -top-[10px] -right-[10px] w-[35px] h-[35px] text-gold/20" />
+                <div className="flex items-center gap-2 mb-2">
+                  <ShieldCheck className="w-5 h-5 text-gold flex-shrink-0" />
+                  <span className="font-sans text-[10px] font-bold text-gold uppercase tracking-wider">Approved & Permitted</span>
+                </div>
+                <h4 className="font-serif text-lg text-white mb-1.5 font-bold">KHDA Permitted</h4>
+                <p className="text-xs text-text-light/90 leading-relaxed">This institution is approved and permitted by KHDA.</p>
+                <Sparkles className="absolute -top-[10px] -right-[10px] w-[30px] h-[30px] text-gold/20" />
               </div>
             </div>
           </div>
 
           {/* Content Column */}
-          <div className="about-text-el">
-            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-4 font-medium">
-              About Beever Academy
-            </h2>
-            <h3 className="text-lg md:text-xl font-serif text-gold-dark mb-6 font-medium italic">
-              Premium Financial Education. Affordable for Everyone.
-            </h3>
-            <div className="w-[80px] h-[2px] bg-gold-gradient mb-8"></div>
-
-            <div className="text-sm text-text-secondary leading-relaxed flex flex-col gap-6 mb-10 text-justify">
-              <p>
-                At <strong>Beever Academy</strong>, we believe quality financial education should be accessible to everyone. Our mission is to deliver premium, industry-focused learning at an affordable price, empowering individuals with the knowledge, confidence, and practical skills to succeed in today's dynamic financial world.
-              </p>
-              <p>
-                Founded by professionals with over <strong>20 years of combined industry experience</strong>, Beever Academy brings expertise across financial markets, trading, wealth management, leadership, and professional development. Our programs combine real-world insights with practical training to bridge the gap between theory and application.
-              </p>
-              <p>
-                Through expert mentorship, interactive learning, and a career-focused approach, we equip our students with the skills, discipline, and mindset needed to make informed decisions, seize new opportunities, and achieve long-term success in the financial industry.
-              </p>
-              <p className="font-serif text-lg md:text-xl text-burgundy italic font-semibold mt-2">
-                "Learn Today. Lead Tomorrow."
-              </p>
+          <div className="lg:col-span-7 about-text-el text-left">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-burgundy/5 border border-gold/30 mb-4">
+              <ShieldCheck className="w-3.5 h-3.5 text-gold-dark" />
+              <span className="font-sans uppercase text-gold-dark text-[10px] tracking-[0.2em] font-bold">
+                About Beever Academy
+              </span>
             </div>
 
-            {/* Stats Highlights Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 border-t border-burgundy/10 pt-8">
-              <div>
-                <div className="font-serif text-2xl font-bold text-burgundy mb-1">20+ Years</div>
-                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Collective Industry Expertise</div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-burgundy mb-4 font-bold leading-tight">
+              Where Trading Knowledge Meets Practice.
+            </h2>
+            <div className="w-[80px] h-[2px] bg-gold-gradient mb-6"></div>
+
+            <p className="text-sm sm:text-base text-text-secondary leading-relaxed mb-8">
+              Beever Academy is a Dubai-based training academy focused on trading and financial market education. We connect structured lessons with practical chart analysis to help learners develop market understanding, analytical skills and trading discipline.
+            </p>
+
+            {/* Vision & Mission Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
+              <div className="bg-white p-6 rounded-2xl border border-burgundy/10 shadow-sm hover:border-gold/40 transition-all duration-300">
+                <div className="w-9 h-9 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center text-gold-dark mb-3">
+                  <Compass className="w-5 h-5" />
+                </div>
+                <h4 className="font-serif text-lg font-bold text-burgundy mb-2">Our Vision</h4>
+                <p className="text-xs sm:text-[13px] text-text-secondary leading-relaxed">
+                  To develop informed, disciplined learners who approach financial markets with clarity and responsibility.
+                </p>
               </div>
-              <div>
-                <div className="font-serif text-2xl font-bold text-burgundy mb-1">Premium Education</div>
-                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">World-Class Learning at Affordable Pricing</div>
+
+              <div className="bg-white p-6 rounded-2xl border border-burgundy/10 shadow-sm hover:border-gold/40 transition-all duration-300">
+                <div className="w-9 h-9 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center text-gold-dark mb-3">
+                  <Target className="w-5 h-5" />
+                </div>
+                <h4 className="font-serif text-lg font-bold text-burgundy mb-2">Our Mission</h4>
+                <p className="text-xs sm:text-[13px] text-text-secondary leading-relaxed">
+                  To make trading education clear and practical through structured teaching, chart-based learning and a focus on risk management.
+                </p>
               </div>
-              <div>
-                <div className="font-serif text-2xl font-bold text-burgundy mb-1">Practical Learning</div>
-                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Industry-Focused Training with Real-World Application</div>
+            </div>
+
+            {/* Three Core Learning Principles */}
+            <div className="border-t border-burgundy/10 pt-6">
+              <span className="font-sans text-[11px] font-bold uppercase tracking-wider text-gold-dark block mb-4">
+                Core Learning Principles
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-burgundy/10 shadow-sm">
+                  <div className="w-8 h-8 rounded-lg bg-burgundy/5 flex items-center justify-center text-gold-dark flex-shrink-0">
+                    <BookOpen className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h5 className="font-serif text-sm font-bold text-burgundy leading-snug">Market Understanding</h5>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-burgundy/10 shadow-sm">
+                  <div className="w-8 h-8 rounded-lg bg-burgundy/5 flex items-center justify-center text-gold-dark flex-shrink-0">
+                    <TrendingUp className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h5 className="font-serif text-sm font-bold text-burgundy leading-snug">Practical Analysis</h5>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-burgundy/10 shadow-sm">
+                  <div className="w-8 h-8 rounded-lg bg-burgundy/5 flex items-center justify-center text-gold-dark flex-shrink-0">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h5 className="font-serif text-sm font-bold text-burgundy leading-snug">Trading Discipline</h5>
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="font-serif text-2xl font-bold text-burgundy mb-1">Career Growth</div>
-                <div className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-semibold">Building Skills for Long-Term Success</div>
-              </div>
+            </div>
+
+            {/* KHDA Banner notice */}
+            <div className="mt-6 flex items-center gap-2.5 text-xs text-text-secondary bg-white border border-gold/25 px-4 py-2.5 rounded-xl shadow-sm">
+              <Award className="w-4 h-4 text-gold-dark flex-shrink-0" />
+              <span>This institution is approved and permitted by <strong>KHDA</strong>.</span>
             </div>
           </div>
         </div>
@@ -2731,83 +2783,242 @@ export default function App() {
     </section>
   );
 
-  const renderStrengths = () => (
-    <section id="programs" className="py-20 md:py-32 bg-white text-center">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
-        <div className="mb-16">
-          <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-            Where Knowledge Meets Opportunity
-          </span>
-          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6 font-medium">
-            Our Program
-          </h2>
-          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-8"></div>
-          <p className="text-sm md:text-base text-text-secondary max-w-[900px] mx-auto leading-relaxed text-justify md:text-center">
-            The journey to success in the financial markets begins with a strong foundation. At Beever Academy, we believe that lasting success is built through knowledge, discipline, and practical understanding. Our program is carefully designed to help learners develop the confidence, skills, and mindset required to navigate today's financial markets with clarity and purpose.
-          </p>
-        </div>
+  const renderStrengths = () => {
+    const programmes = [
+      {
+        id: "prog-01",
+        number: "PROGRAMME 01",
+        title: "FOUNDATION",
+        forWhom: "For new traders and learners rebuilding their core skills.",
+        duration: "10 Classes – 1 Hour Per Class",
+        fee: "AED 1,850",
+        badge: "Essential Track",
+        topics: [
+          "Financial market basics.",
+          "MT5, TradingView and economic calendars.",
+          "Risk, position sizing and broker selection.",
+          "Simple strategy and guided practice."
+        ]
+      },
+      {
+        id: "prog-02",
+        number: "PROGRAMME 02",
+        title: "INTERMEDIATE",
+        forWhom: "For traders developing a structured approach to analysis and execution.",
+        duration: "15 Classes",
+        fee: "AED 5,500",
+        badge: "Core Track",
+        highlight: true,
+        topics: [
+          "ICT and Smart Money Concepts.",
+          "MSNR and Volume Spread Analysis.",
+          "Multi-timeframe analysis and entry models.",
+          "Strategy application and execution review."
+        ]
+      },
+      {
+        id: "prog-03",
+        number: "PROGRAMME 03",
+        title: "ADVANCED",
+        forWhom: "For experienced learners seeking deeper analysis and risk planning.",
+        duration: "15 Classes",
+        fee: "AED 11,000",
+        badge: "Mastery Level",
+        topics: [
+          "Market forecasting and scenario planning.",
+          "Advanced technical analysis.",
+          "Portfolio diversification and risk management.",
+          "Technology-supported market analysis."
+        ]
+      }
+    ];
 
-        {/* FMMTA Program Card Layout */}
-        <div className="strengths-grid-el grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch text-left bg-ivory/40 p-6 md:p-12 rounded-3xl border border-burgundy/10 shadow-lg mt-12">
-          {/* Visual Column */}
-          <div className="strength-card-el lg:col-span-5 relative group overflow-hidden rounded-2xl border border-gold/20 shadow-md">
-            <img
-              src="https://placehold.co/800x600/170105/D4AF37/png?text=FMMTA+Program"
-              alt="FMMTA Classroom Training"
-              className="w-full h-full min-h-[320px] md:min-h-[400px] object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            {/* Dark gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-burgundy-dark/95 via-burgundy-dark/30 to-transparent"></div>
-            {/* Badge overlay */}
-            <span className="absolute top-4 left-4 bg-gold text-burgundy-dark font-sans text-[10px] uppercase font-bold tracking-widest px-3 py-1.5 rounded-full shadow-lg">
-              Primary Program
+    return (
+      <section id="programs" className="py-20 md:py-32 bg-white text-center relative">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+          <div className="mb-16">
+            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
+              ACADEMIC CURRICULUM
             </span>
-            <div className="absolute bottom-6 left-6 right-6 text-white">
-              <h4 className="font-serif text-xl text-gold mb-2">Build the Foundation.</h4>
-              <p className="text-xs text-white/80 leading-relaxed font-sans">Learn key market mechanics and technical analytical strategies.</p>
-            </div>
+            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-4 font-bold">
+              Our Programmes
+            </h2>
+            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-6"></div>
+            <p className="text-sm md:text-base text-text-secondary max-w-[850px] mx-auto leading-relaxed text-justify md:text-center">
+              Structured courses engineered to advance your trading journey with clarity, practical chart analysis, and strict risk discipline. Select the programme suited to your experience and goals.
+            </p>
           </div>
 
-          {/* Details Column */}
-          <div className="strength-card-el lg:col-span-7 flex flex-col justify-between h-full py-2">
-            <div>
-              <span className="font-sans text-[11px] uppercase tracking-wider text-gold-dark font-bold mb-2 block">
-                FMMTA Course
-              </span>
-              <h3 className="text-2xl md:text-3xl font-serif text-burgundy mb-6 leading-tight">
-                Foundation Market Mechanics & Technical Analysis (FMMTA)
-              </h3>
+          {/* 3 Premium Course Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left items-stretch">
+            {programmes.map((prog) => (
+              <div
+                key={prog.id}
+                className={`relative flex flex-col justify-between rounded-3xl p-8 sm:p-10 transition-all duration-300 ${
+                  prog.highlight
+                    ? 'bg-gradient-to-b from-[#220207] to-[#120003] text-white border-2 border-gold shadow-[0_10px_35px_rgba(201,162,77,0.25)] hover:shadow-[0_15px_45px_rgba(201,162,77,0.35)] -translate-y-1'
+                    : 'bg-ivory/60 border border-burgundy/15 text-charcoal shadow-md hover:shadow-xl hover:border-gold/40'
+                }`}
+              >
+                {/* Top Badge */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className={`font-sans text-[11px] font-bold tracking-widest uppercase ${prog.highlight ? 'text-gold' : 'text-gold-dark'}`}>
+                      {prog.number}
+                    </span>
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-sans font-bold tracking-wider uppercase ${
+                      prog.highlight
+                        ? 'bg-gold text-burgundy-dark'
+                        : 'bg-burgundy/10 text-burgundy'
+                    }`}>
+                      {prog.badge}
+                    </span>
+                  </div>
 
-              <div className="text-sm text-text-secondary leading-relaxed flex flex-col gap-6 text-justify">
-                <p>
-                  The Foundation Market Mechanics & Technical Analysis (FMMTA) program is the first step toward understanding how financial markets truly operate. Designed with a practical and structured approach, the program introduces learners to the core principles of market mechanics and technical analysis, helping them build a solid foundation before advancing to higher levels of financial education.
-                </p>
-                <p>
-                  Whether you are taking your first step into the world of financial markets or looking to strengthen your understanding of market behavior, FMMTA provides the essential knowledge required to begin your learning journey with confidence.
-                </p>
-              </div>
-            </div>
+                  <h3 className={`text-2xl sm:text-3xl font-serif font-bold tracking-wide mb-3 ${prog.highlight ? 'text-white' : 'text-burgundy'}`}>
+                    {prog.title}
+                  </h3>
 
-            <div className="mt-10 pt-8 border-t border-burgundy/10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-              <div>
-                <p className="font-serif text-xl md:text-2xl text-burgundy italic font-semibold">
-                  "Build the Foundation. Master the Markets."
-                </p>
+                  <p className={`text-xs sm:text-[13px] leading-relaxed mb-6 ${prog.highlight ? 'text-white/80' : 'text-text-secondary'}`}>
+                    <strong className={prog.highlight ? 'text-gold' : 'text-burgundy'}>For Whom: </strong>
+                    {prog.forWhom}
+                  </p>
+
+                  {/* Duration Pill */}
+                  <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold mb-6 ${
+                    prog.highlight
+                      ? 'bg-white/10 text-gold-light border border-gold/30'
+                      : 'bg-white text-burgundy border border-burgundy/15 shadow-sm'
+                  }`}>
+                    <Clock className="w-3.5 h-3.5 text-gold flex-shrink-0" />
+                    <span>Duration: {prog.duration}</span>
+                  </div>
+
+                  {/* What You Will Learn Section */}
+                  <div className="border-t border-gold/20 pt-6 mb-6">
+                    <span className={`font-sans text-[10px] font-bold uppercase tracking-wider block mb-4 ${prog.highlight ? 'text-gold' : 'text-gold-dark'}`}>
+                      What You Will Learn
+                    </span>
+                    <ul className="flex flex-col gap-3">
+                      {prog.topics.map((topic, tIdx) => (
+                        <li key={tIdx} className="flex items-start gap-2.5 text-xs sm:text-[13px] leading-relaxed">
+                          <CheckCircle2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${prog.highlight ? 'text-gold' : 'text-gold-dark'}`} />
+                          <span className={prog.highlight ? 'text-white/90' : 'text-text-secondary'}>{topic}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Card Footer: Fee & CTA */}
+                <div className={`border-t pt-6 mt-6 ${prog.highlight ? 'border-white/10' : 'border-burgundy/10'}`}>
+                  <div className="flex items-baseline justify-between mb-5">
+                    <div>
+                      <span className={`text-[10px] uppercase tracking-wider font-semibold block ${prog.highlight ? 'text-white/60' : 'text-text-secondary/70'}`}>
+                        Programme Fee
+                      </span>
+                      <span className={`text-2xl sm:text-3xl font-serif font-bold ${prog.highlight ? 'text-gold' : 'text-burgundy'}`}>
+                        {prog.fee}
+                      </span>
+                    </div>
+                  </div>
+
+                  <a
+                    href="#contact"
+                    className={`w-full block text-center py-3.5 px-6 rounded-xl font-sans text-xs uppercase font-bold tracking-wider transition-all duration-300 shadow-md hover:shadow-lg ${
+                      prog.highlight
+                        ? 'bg-gold-gradient text-burgundy-dark hover:brightness-110 hover:-translate-y-0.5'
+                        : 'bg-burgundy text-white hover:bg-burgundy-light hover:-translate-y-0.5'
+                    }`}
+                  >
+                    Enquire Now
+                  </a>
+                </div>
               </div>
-              <div className="self-start sm:self-center">
-                <a
-                  href="#contact"
-                  className="btn btn-gold gold-gradient-bg text-burgundy-dark px-8 py-3.5 font-semibold uppercase tracking-widest text-xs shadow-md hover:shadow-lg hover:-translate-y-[2px] transition-all duration-300 inline-block text-center whitespace-nowrap"
-                >
-                  Enquire Now
-                </a>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
-      </div>
-    </section>
-  );
+      </section>
+    );
+  };
+
+  const renderLearningExperience = () => {
+    const stages = [
+      {
+        step: "01",
+        title: "GUIDED PRACTICE",
+        desc: "Connect concepts with chart examples, historical replay and structured trading scenarios.",
+        icon: <TrendingUp className="w-5 h-5" />
+      },
+      {
+        step: "02",
+        title: "ASSESSMENT & FEEDBACK",
+        desc: "Check understanding, identify learning gaps and review progress with mentor guidance.",
+        icon: <Target className="w-5 h-5" />
+      },
+      {
+        step: "03",
+        title: "REFLECTION & DISCIPLINE",
+        desc: "Use trading plans and journal reviews to strengthen preparation, risk awareness and decision-making.",
+        icon: <ShieldCheck className="w-5 h-5" />
+      },
+      {
+        step: "04",
+        title: "CONTINUED CONNECTION",
+        desc: "Stay connected through the learning community, with opportunities to ask questions and continue discussions.",
+        icon: <Users className="w-5 h-5" />
+      }
+    ];
+
+    return (
+      <section id="experience" className="py-20 md:py-28 bg-ivory text-center relative overflow-hidden">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
+          <div className="mb-16">
+            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
+              METHODOLOGY & APPROACH
+            </span>
+            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-3 font-bold">
+              The Learning Experience.
+            </h2>
+            <h3 className="text-lg md:text-xl font-serif text-gold-dark mb-4 font-medium italic">
+              Learn with Guidance. Develop Through Practice.
+            </h3>
+            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-6"></div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+            {stages.map((stage, idx) => (
+              <div
+                key={idx}
+                className="bg-white p-8 rounded-2xl border border-burgundy/10 shadow-sm hover:shadow-xl hover:border-gold/50 hover:-translate-y-1 transition-all duration-300 relative group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <span className="font-serif text-4xl font-bold text-gold/60 group-hover:text-gold transition-colors duration-300">
+                      {stage.step}
+                    </span>
+                    <div className="w-10 h-10 rounded-xl bg-burgundy/5 group-hover:bg-gold/15 text-gold-dark flex items-center justify-center transition-colors duration-300">
+                      {stage.icon}
+                    </div>
+                  </div>
+
+                  <h4 className="font-serif text-base font-bold text-burgundy mb-3 tracking-wide">
+                    {stage.title}
+                  </h4>
+
+                  <p className="text-xs sm:text-[13px] text-text-secondary leading-relaxed">
+                    {stage.desc}
+                  </p>
+                </div>
+
+                <div className="w-12 h-[2px] bg-gold/30 group-hover:w-full group-hover:bg-gold transition-all duration-500 mt-6"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  };
 
   const renderFaculty = () => {
     return (
@@ -2827,27 +3038,98 @@ export default function App() {
     );
   };
 
-  const renderInsideGallery = () => (
-    <section id="blog" className="py-20 md:py-32 bg-white text-center relative overflow-visible">
-      {/* Horizontal sweeping gold line at top of section */}
-      <div className="inside-sweep-line absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent opacity-90 scale-x-0 origin-left z-20"></div>
+  const renderInsideGallery = () => {
+    const environmentPillars = [
+      {
+        title: "PURPOSEFUL CLASSROOMS",
+        desc: "Dedicated workstations and shared screens support focused learning and practical chart analysis.",
+        icon: <Monitor className="w-5 h-5" />,
+        img: closImg
+      },
+      {
+        title: "A PROFESSIONAL SETTING",
+        desc: "A welcoming reception and spaces for discussion, learning and interaction.",
+        icon: <Users className="w-5 h-5" />,
+        img: officeImg
+      },
+      {
+        title: "DUBAI, FROM THE 49TH FLOOR",
+        desc: "Located in Aspin Commercial Tower on Sheikh Zayed Road, with city views and access near Financial Centre Metro.",
+        icon: <MapPin className="w-5 h-5" />,
+        img: classImg
+      }
+    ];
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
-        <div className="mb-20">
-          <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-            Campus Life & Environment
-          </span>
-          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6">
-            Inside Beever Academy
-          </h2>
-          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-4"></div>
-          <div className="inside-header-line w-[160px] h-[1px] bg-gold/40 mx-auto rounded-full origin-center"></div>
+    return (
+      <section id="blog" className="py-20 md:py-32 bg-white text-center relative overflow-visible">
+        {/* Horizontal sweeping gold line at top of section */}
+        <div className="inside-sweep-line absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent opacity-90 scale-x-0 origin-left z-20"></div>
+
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
+          <div className="mb-16">
+            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
+              ACADEMY FACILITIES
+            </span>
+            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-3 font-bold">
+              Our Learning Environment.
+            </h2>
+            <h3 className="text-lg md:text-xl font-serif text-gold-dark mb-4 font-medium italic">
+              A Focused Space. A Wider Perspective.
+            </h3>
+            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-6"></div>
+          </div>
+
+          {/* 3 Core Environment Pillars */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20 text-left">
+            {environmentPillars.map((pillar, idx) => (
+              <div
+                key={idx}
+                className="bg-ivory/50 border border-burgundy/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-gold/40 transition-all duration-300 group flex flex-col justify-between"
+              >
+                <div className="h-[200px] overflow-hidden relative">
+                  <img
+                    src={pillar.img}
+                    alt={pillar.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  <div className="absolute bottom-3 left-4 flex items-center gap-2 text-white">
+                    <div className="w-7 h-7 rounded-lg bg-gold/90 text-burgundy-dark flex items-center justify-center">
+                      {pillar.icon}
+                    </div>
+                    <span className="font-sans text-[10px] font-bold tracking-wider text-gold-light uppercase">
+                      Campus Feature
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <h4 className="font-serif text-base font-bold text-burgundy mb-2 group-hover:text-gold transition-colors duration-300">
+                    {pillar.title}
+                  </h4>
+                  <p className="text-xs sm:text-[13px] text-text-secondary leading-relaxed">
+                    {pillar.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Preserved Inside Gallery Cards */}
+          <div className="border-t border-burgundy/10 pt-16">
+            <h4 className="font-serif text-2xl md:text-3xl font-bold text-burgundy mb-3">
+              Inside Beever Academy
+            </h4>
+            <p className="text-xs sm:text-sm text-text-secondary max-w-[650px] mx-auto mb-10 leading-relaxed">
+              Explore our modern workstations, collaborative meeting suites, and academic learning spaces.
+            </p>
+            <InsideGalleryCards />
+          </div>
         </div>
-
-        <InsideGalleryCards />
-      </div>
-    </section>
-  );
+      </section>
+    );
+  };
 
   const renderCareers = () => {
     const openings = [
@@ -3131,24 +3413,27 @@ export default function App() {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
         <div className="text-center mb-16">
           <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
-            Contact Us
+            Contact & Location Details
           </span>
-          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-6 font-medium">
-            Learn Today. Lead Tomorrow.
+          <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-3 font-bold">
+            Your Next Chapter Starts Here.
           </h2>
-          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-8"></div>
+          <h3 className="text-lg md:text-xl font-serif text-gold-dark mb-4 font-medium italic">
+            Visit. Ask. Explore Your Learning Path.
+          </h3>
+          <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-6"></div>
           <p className="text-sm md:text-base text-text-secondary max-w-[850px] mx-auto leading-relaxed text-justify md:text-center">
-            Ready to begin your learning journey with Beever Academy? Our team is here to assist you with program details, course support, and general enquiries. We welcome you to connect with us and take the first step toward premium financial education.
+            Meet our team, explore the academy and discuss the programme that fits your experience and learning goals.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-stretch">
           {/* Form Wrap */}
-          <div className="lg:col-span-7 bg-[#F2ECE1] p-10 sm:p-14 border border-burgundy/15 rounded-2xl shadow-md text-left flex flex-col justify-between">
+          <div className="lg:col-span-7 bg-[#F2ECE1] p-8 sm:p-12 border border-burgundy/15 rounded-3xl shadow-md text-left flex flex-col justify-between">
             <div>
-              <h3 className="text-2xl font-serif text-burgundy mb-8 font-bold flex items-center justify-between">
-                <span>Contact Form</span>
-                <span className="text-[10px] font-sans text-burgundy/70 font-bold tracking-wider uppercase border border-burgundy/20 px-3 py-1 rounded-full bg-white/60">Priority Support</span>
+              <h3 className="text-2xl font-serif text-burgundy mb-6 font-bold flex items-center justify-between">
+                <span>Enquiry Form</span>
+                <span className="text-[10px] font-sans text-burgundy/70 font-bold tracking-wider uppercase border border-burgundy/20 px-3 py-1 rounded-full bg-white/60">Priority Consultation</span>
               </h3>
 
               {formStatus.submitted && (
@@ -3170,21 +3455,21 @@ export default function App() {
               )}
             </div>
 
-            <form onSubmit={handleInquirySubmit} className="flex flex-col gap-6 flex-1 justify-between mt-2">
-              <div className="flex flex-col gap-5">
-                <div className="flex flex-col gap-2">
+            <form onSubmit={handleInquirySubmit} className="flex flex-col gap-5 flex-1 justify-between mt-2">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
                   <label htmlFor="name" className="font-sans text-[11px] font-bold uppercase tracking-wider text-burgundy-dark">Full Name</label>
-                  <input type="text" id="name" placeholder="John Doe" required className="font-sans text-sm p-4 border border-burgundy/15 bg-white text-burgundy-dark placeholder:text-gray-400 font-medium rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/20 transition-all duration-200 shadow-sm" />
+                  <input type="text" id="name" placeholder="John Doe" required className="font-sans text-sm p-3.5 border border-burgundy/15 bg-white text-burgundy-dark placeholder:text-gray-400 font-medium rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/20 transition-all duration-200 shadow-sm" />
                 </div>
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1.5">
                   <label htmlFor="phone" className="font-sans text-[11px] font-bold uppercase tracking-wider text-burgundy-dark">Phone Number</label>
-                  <input type="tel" id="phone" placeholder="+971 50 000 0000" required className="font-sans text-sm p-4 border border-burgundy/15 bg-white text-burgundy-dark placeholder:text-gray-400 font-medium rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/20 transition-all duration-200 shadow-sm" />
+                  <input type="tel" id="phone" placeholder="+971 50 000 0000" required className="font-sans text-sm p-3.5 border border-burgundy/15 bg-white text-burgundy-dark placeholder:text-gray-400 font-medium rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/20 transition-all duration-200 shadow-sm" />
                 </div>
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1.5">
                   <label htmlFor="msg" className="font-sans text-[11px] font-bold uppercase tracking-wider text-burgundy-dark">Message</label>
-                  <textarea id="msg" rows="5" placeholder="Your enquiry details..." required className="font-sans text-sm p-4 border border-burgundy/15 bg-white text-burgundy-dark placeholder:text-gray-400 font-medium rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/20 transition-all duration-200 shadow-sm"></textarea>
+                  <textarea id="msg" rows="4" placeholder="Discuss your experience and learning goals..." required className="font-sans text-sm p-3.5 border border-burgundy/15 bg-white text-burgundy-dark placeholder:text-gray-400 font-medium rounded-xl focus:outline-none focus:border-gold-dark focus:ring-4 focus:ring-gold/20 transition-all duration-200 shadow-sm"></textarea>
                 </div>
               </div>
 
@@ -3199,72 +3484,86 @@ export default function App() {
           </div>
 
           {/* Info Cards Wrap */}
-          <div className="lg:col-span-5 flex flex-col gap-6 text-left h-full">
-            {[
-              {
-                icon: <Phone className="w-5.5 h-5.5" />,
-                title: "Call Us",
-                phones: [
-                  { label: "+971 4 892 3151", link: "tel:+97148923151" },
-                  { label: "+971 4 226 6388", link: "tel:+97142266388" }
-                ]
-              },
-              {
-                icon: <MessageSquare className="w-5.5 h-5.5" />,
-                title: "WhatsApp",
-                desc: "+971 50 702 1275",
-                link: "https://wa.me/971507021275"
-              }
-            ].map((card, i) => {
-              if (card.phones) {
-                return (
-                  <div key={i} className="flex gap-6 items-start bg-white p-7 border border-black/3 rounded-2xl shadow-sm hover:shadow-md hover:border-gold/30 transition-all duration-300 group">
-                    <div className="w-[48px] h-[48px] bg-ivory border border-burgundy/5 rounded-full flex justify-center items-center text-burgundy flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                      {card.icon}
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-serif text-burgundy font-bold mb-1 group-hover:text-gold transition-colors duration-300">{card.title}</h4>
-                      <div className="flex flex-col gap-1 text-sm font-semibold">
-                        {card.phones.map((phone, pIdx) => (
-                          <a
-                            key={pIdx}
-                            href={phone.link}
-                            className="text-text-secondary hover:text-burgundy transition-colors duration-200"
-                          >
-                            {phone.label}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              }
-
-              return (
-                <a
-                  key={i}
-                  href={card.link}
-                  target={card.link.startsWith('http') ? "_blank" : undefined}
-                  rel={card.link.startsWith('http') ? "noopener noreferrer" : undefined}
-                  className="flex gap-6 items-start bg-white p-7 border border-black/3 rounded-2xl shadow-sm hover:shadow-md hover:border-gold/30 hover:-translate-y-[2px] transition-all duration-300 group cursor-pointer"
-                >
-                  <div className="w-[48px] h-[48px] bg-ivory border border-burgundy/5 rounded-full flex justify-center items-center text-burgundy flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                    {card.icon}
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-serif text-burgundy font-bold mb-1 group-hover:text-gold transition-colors duration-300">{card.title}</h4>
-                    <p className="text-sm text-text-secondary leading-relaxed">{card.desc}</p>
-                  </div>
-                </a>
-              );
-            })}
-
-            <div className="flex-1 min-h-[180px] bg-cover bg-center border border-black/5 rounded-2xl shadow-sm relative overflow-hidden" style={{ backgroundImage: "url('https://placehold.co/800x400/170105/D4AF37/png?text=Aspin+Tower%2C+Dubai')" }}>
-              <div className="absolute inset-0 bg-burgundy/30 flex justify-center items-center">
-                <a href="https://maps.google.com" target="_blank" rel="noreferrer" className="btn btn-gold text-[10px] font-semibold tracking-wider gold-gradient-bg text-burgundy-dark px-5 py-3 rounded-xl uppercase flex items-center gap-2">
-                  <Globe className="w-4 h-4" /> View Map
-                </a>
+          <div className="lg:col-span-5 flex flex-col gap-5 text-left h-full justify-between">
+            {/* Phone Card */}
+            <a
+              href="tel:+97148923151"
+              className="flex gap-5 items-start bg-ivory/60 p-6 border border-burgundy/10 rounded-2xl shadow-sm hover:shadow-md hover:border-gold/40 hover:-translate-y-0.5 transition-all duration-300 group"
+            >
+              <div className="w-[46px] h-[46px] bg-white border border-burgundy/10 rounded-full flex justify-center items-center text-burgundy flex-shrink-0 group-hover:scale-105 group-hover:text-gold transition-all duration-300 shadow-sm">
+                <Phone className="w-5 h-5" />
               </div>
+              <div>
+                <h4 className="text-base font-serif text-burgundy font-bold mb-1 group-hover:text-gold transition-colors duration-300">Call Us</h4>
+                <p className="text-sm font-semibold text-text-secondary group-hover:text-burgundy transition-colors duration-200">+971 4 892 3151</p>
+                <span className="text-[11px] text-text-secondary/70">Click to call directly</span>
+              </div>
+            </a>
+
+            {/* WhatsApp Card */}
+            <a
+              href="https://wa.me/971507021275"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex gap-5 items-start bg-ivory/60 p-6 border border-burgundy/10 rounded-2xl shadow-sm hover:shadow-md hover:border-gold/40 hover:-translate-y-0.5 transition-all duration-300 group"
+            >
+              <div className="w-[46px] h-[46px] bg-white border border-burgundy/10 rounded-full flex justify-center items-center text-burgundy flex-shrink-0 group-hover:scale-105 group-hover:text-gold transition-all duration-300 shadow-sm">
+                <MessageSquare className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-base font-serif text-burgundy font-bold mb-1 group-hover:text-gold transition-colors duration-300">WhatsApp</h4>
+                <p className="text-sm font-semibold text-text-secondary group-hover:text-burgundy transition-colors duration-200">+971 50 702 1275</p>
+                <span className="text-[11px] text-text-secondary/70">Open WhatsApp conversation</span>
+              </div>
+            </a>
+
+            {/* Academy Location Card */}
+            <div className="bg-ivory/60 p-6 border border-burgundy/10 rounded-2xl shadow-sm">
+              <div className="flex gap-5 items-start mb-3">
+                <div className="w-[46px] h-[46px] bg-white border border-burgundy/10 rounded-full flex justify-center items-center text-burgundy flex-shrink-0 shadow-sm">
+                  <MapPin className="w-5 h-5 text-gold-dark" />
+                </div>
+                <div>
+                  <h4 className="text-base font-serif text-burgundy font-bold mb-1">Academy Location</h4>
+                  <p className="text-xs font-semibold text-burgundy-dark mb-1">
+                    Beever Professional and Management Development Training LLC
+                  </p>
+                  <p className="text-xs text-text-secondary leading-relaxed">
+                    Office 4904, 49th Floor, Aspin Commercial Tower, Sheikh Zayed Road, Dubai, UAE.
+                  </p>
+                  <p className="text-[11px] text-gold-dark font-medium mt-1">
+                    Nearby Landmark: Near Financial Centre Metro, Exit 2.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-3 border-t border-burgundy/10 text-xs text-text-secondary">
+                <Clock className="w-3.5 h-3.5 text-gold-dark flex-shrink-0" />
+                <span>Office Hours: <strong>10:00 AM to 8:00 PM</strong></span>
+              </div>
+            </div>
+
+            {/* Website & Maps Links */}
+            <div className="flex gap-4 items-center">
+              <a
+                href="https://beeveracademy.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-burgundy/5 border border-burgundy/15 hover:border-gold/50 text-xs font-bold text-burgundy transition-all duration-200"
+              >
+                <Globe className="w-3.5 h-3.5 text-gold-dark" />
+                <span>beeveracademy.com</span>
+              </a>
+
+              <a
+                href="https://maps.google.com/?q=Aspin+Commercial+Tower+Dubai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gold-gradient text-burgundy-dark text-xs font-bold uppercase tracking-wider hover:shadow-md transition-all duration-200"
+              >
+                <MapPin className="w-3.5 h-3.5" />
+                <span>View on Maps</span>
+              </a>
             </div>
           </div>
         </div>
@@ -3332,8 +3631,8 @@ export default function App() {
               <div className="flex justify-center text-gold/80">
                 <Phone className="w-4 h-4" />
               </div>
-              <a href="tel:048923151" className="text-gold-light hover:text-white transition-colors duration-200 font-bold font-mono text-[19px] tracking-[0.1em] mr-[-0.1em] leading-none">
-                04 892 3151
+              <a href="tel:+97148923151" className="text-gold-light hover:text-white transition-colors duration-200 font-bold font-mono text-[17px] tracking-[0.05em] leading-none">
+                +971 4 892 3151
               </a>
               <div className="flex justify-center text-white/60">
                 <Mail className="w-3.5 h-3.5" />
@@ -3374,9 +3673,9 @@ export default function App() {
               </li>
             ))}
             <li onClick={() => setMobileMenuOpen(false)} className="mt-6 flex flex-col items-center gap-2">
-              <a href="tel:048923151" className="flex items-center gap-2 font-serif text-gold-light text-3xl tracking-wide font-bold">
-                <Phone className="w-6.5 h-6.5 text-gold/80" />
-                04 892 3151
+              <a href="tel:+97148923151" className="flex items-center gap-2 font-serif text-gold-light text-2xl tracking-wide font-bold">
+                <Phone className="w-6 h-6 text-gold/80" />
+                +971 4 892 3151
               </a>
               <a href="mailto:info@beeveracademy.com" className="flex items-center gap-2 font-sans text-white/75 text-lg hover:text-gold-light transition-colors duration-200">
                 <Mail className="w-5 h-5 text-white/60" />
@@ -3392,6 +3691,7 @@ export default function App() {
         {renderAbout()}
         {renderGlobalNetwork()}
         {renderStrengths()}
+        {renderLearningExperience()}
         {renderFaculty()}
         {renderInsideGallery()}
         {renderCareers()}
@@ -3413,15 +3713,19 @@ export default function App() {
                 <img src={logo} alt="Beever Academy Logo" className="w-full h-full object-contain" />
               </div>
               <span className="font-serif text-white text-[15px] sm:text-base font-semibold tracking-wider leading-snug max-w-[280px]">
-                Beever Professional And Management Development Training LLC
+                Beever Professional and Management Development Training LLC
               </span>
             </a>
             <p className="font-sans text-[10px] font-semibold text-gold uppercase tracking-wider">
-              Empowering Minds. Building Character. Shaping Future Leaders.
+              Where Trading Knowledge Meets Practice
             </p>
             <p className="text-xs text-text-light leading-relaxed">
-              An elite world-class educational institution dedicated to intellectual brilliance, elite leadership preparation, and ethical foundation.
+              Dubai-based training academy focused on trading and financial market education through structured lessons and practical chart analysis.
             </p>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-gold/30 text-[11px] text-gold w-fit">
+              <ShieldCheck className="w-3.5 h-3.5 flex-shrink-0" />
+              <span>Approved and permitted by KHDA</span>
+            </div>
             <div className="flex gap-4">
               {[
                 { icon: <Facebook className="w-4 h-4" />, label: "Facebook" },
@@ -3455,13 +3759,18 @@ export default function App() {
           {/* Programs Col */}
           <div className="flex flex-col gap-6">
             <h4 className="text-lg text-gold font-serif font-semibold relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-9 after:h-[1px] after:bg-gold">
-              Programs
+              Programmes
             </h4>
             <ul className="flex flex-col gap-4 text-xs text-text-light">
-              {['Foundation Market Mechanics & Technical Analysis (FMMTA)'].map(prog => (
-                <li key={prog}>
-                  <a href="#programs" className="hover:text-gold-light hover:pl-1 transition-all duration-200">
-                    {prog}
+              {[
+                { name: 'Programme 01 – Foundation', fee: 'AED 1,850' },
+                { name: 'Programme 02 – Intermediate', fee: 'AED 5,500' },
+                { name: 'Programme 03 – Advanced', fee: 'AED 11,000' }
+              ].map(prog => (
+                <li key={prog.name}>
+                  <a href="#programs" className="hover:text-gold-light hover:pl-1 transition-all duration-200 flex justify-between items-center">
+                    <span>{prog.name}</span>
+                    <span className="text-gold/80 font-mono text-[11px]">{prog.fee}</span>
                   </a>
                 </li>
               ))}
@@ -3476,30 +3785,31 @@ export default function App() {
             <ul className="flex flex-col gap-5 text-xs text-text-light">
               <li className="flex gap-4 items-start">
                 <MapPin className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
-                <a href="https://maps.google.com/?q=Aspin+Commercial+Tower+Dubai" target="_blank" rel="noopener noreferrer" className="hover:text-gold-light transition-colors duration-200">
-                  Office No. 4904, Aspin Commercial Tower, Near financial center metro exit 2, Sheikh Zayed Road, Dubai, UAE
+                <a href="https://maps.google.com/?q=Aspin+Commercial+Tower+Dubai" target="_blank" rel="noopener noreferrer" className="hover:text-gold-light transition-colors duration-200 leading-relaxed">
+                  Office 4904, 49th Floor, Aspin Commercial Tower, Sheikh Zayed Road, Dubai, UAE (Near Financial Centre Metro, Exit 2)
                 </a>
               </li>
               <li className="flex gap-4 items-start">
                 <Phone className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
-                <div className="flex flex-col gap-0.5 font-bold">
-                  <a href="tel:+97148923151" className="hover:text-gold-light transition-colors duration-200">
-                    +971 4 892 3151
-                  </a>
-                  <a href="tel:+97142266388" className="hover:text-gold-light transition-colors duration-200">
-                    +971 4 226 6388
-                  </a>
-                </div>
+                <a href="tel:+97148923151" className="hover:text-gold-light transition-colors duration-200 font-bold">
+                  +971 4 892 3151
+                </a>
               </li>
               <li className="flex gap-4 items-start">
                 <MessageSquare className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
-                <a href="https://wa.me/971507021275" target="_blank" rel="noopener noreferrer" className="hover:text-gold-light transition-colors duration-200">
+                <a href="https://wa.me/971507021275" target="_blank" rel="noopener noreferrer" className="hover:text-gold-light transition-colors duration-200 font-bold">
                   WhatsApp: +971 50 702 1275
                 </a>
               </li>
               <li className="flex gap-4 items-start">
+                <Globe className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
+                <a href="https://beeveracademy.com" target="_blank" rel="noopener noreferrer" className="hover:text-gold-light transition-colors duration-200">
+                  beeveracademy.com
+                </a>
+              </li>
+              <li className="flex gap-4 items-start">
                 <Clock className="w-[18px] h-[18px] text-gold mt-[2px] flex-shrink-0" />
-                <span>Mon - Sun: 10:00 AM - 10:00 PM</span>
+                <span>Office Hours: 10:00 AM to 8:00 PM</span>
               </li>
             </ul>
           </div>
