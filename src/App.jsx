@@ -71,8 +71,162 @@ const MENTORS_DATA = [
 // MEMOIZED HARDWARE-ACCELERATED MENTOR SLIDER
 // ==========================================
 const MentorsSliderSection = React.memo(() => {
+  const sliderRef = useRef(null);
+  const isPausedRef = useRef(false);
+  const scrollPosRef = useRef(0);
+  const resumeTimeoutRef = useRef(null);
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const startScrollLeftRef = useRef(0);
+
+  // 6 identical copies of MENTORS_DATA for completely seamless infinite loop in both directions
+  const repeatedMentors = [
+    ...MENTORS_DATA,
+    ...MENTORS_DATA,
+    ...MENTORS_DATA,
+    ...MENTORS_DATA,
+    ...MENTORS_DATA,
+    ...MENTORS_DATA
+  ];
+
+  // Initialize scroll position to middle sets and run smooth RAF auto-glide
+  useEffect(() => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+
+    // Center to set 2 after mount
+    const initTimer = setTimeout(() => {
+      if (slider) {
+        const singleSetWidth = slider.scrollWidth / 6;
+        if (singleSetWidth > 0) {
+          slider.scrollLeft = singleSetWidth * 2;
+          scrollPosRef.current = singleSetWidth * 2;
+        }
+      }
+    }, 120);
+
+    let animationFrameId;
+    let lastTime = performance.now();
+    const speed = 0.75; // Smooth cinematic glide speed
+
+    const tick = (now) => {
+      const dt = Math.min((now - lastTime) / 16.67, 2);
+      lastTime = now;
+
+      if (!isPausedRef.current && sliderRef.current) {
+        const s = sliderRef.current;
+        scrollPosRef.current += speed * dt;
+
+        const singleSetWidth = s.scrollWidth / 6;
+        if (singleSetWidth > 0) {
+          // Wrap around seamlessly when passing boundary of middle sets
+          if (scrollPosRef.current >= singleSetWidth * 4) {
+            scrollPosRef.current -= singleSetWidth * 2;
+          } else if (scrollPosRef.current <= singleSetWidth * 1) {
+            scrollPosRef.current += singleSetWidth * 2;
+          }
+        }
+
+        s.scrollLeft = scrollPosRef.current;
+      }
+
+      animationFrameId = requestAnimationFrame(tick);
+    };
+
+    animationFrameId = requestAnimationFrame(tick);
+
+    return () => {
+      clearTimeout(initTimer);
+      cancelAnimationFrame(animationFrameId);
+      if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+    };
+  }, []);
+
+  // Update position tracker when manual scroll occurs while paused
+  const handleScrollEvent = () => {
+    if (isPausedRef.current && sliderRef.current) {
+      scrollPosRef.current = sliderRef.current.scrollLeft;
+    }
+  };
+
+  // Helper to calculate exact step width based on card width + gap
+  const getStepWidth = () => {
+    if (!sliderRef.current) return 360;
+    const card = sliderRef.current.querySelector('.mentor-slider-card');
+    if (card) {
+      const cardRect = card.getBoundingClientRect();
+      return cardRect.width + 28; // Card width + gap
+    }
+    return 360;
+  };
+
+  // Handle arrow clicks to slide left or right
+  const handleScroll = (direction) => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+
+    isPausedRef.current = true;
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+
+    const step = getStepWidth();
+    const delta = direction === 'right' ? step : -step;
+
+    slider.scrollBy({
+      left: delta,
+      behavior: 'smooth'
+    });
+
+    // Resume auto-scroll smoothly after settling
+    resumeTimeoutRef.current = setTimeout(() => {
+      if (sliderRef.current) {
+        const s = sliderRef.current;
+        const singleSetWidth = s.scrollWidth / 6;
+        if (singleSetWidth > 0) {
+          let cur = s.scrollLeft;
+          if (cur >= singleSetWidth * 4) {
+            cur -= singleSetWidth * 2;
+            s.scrollLeft = cur;
+          } else if (cur <= singleSetWidth * 1) {
+            cur += singleSetWidth * 2;
+            s.scrollLeft = cur;
+          }
+          scrollPosRef.current = cur;
+        }
+      }
+      isPausedRef.current = false;
+    }, 800);
+  };
+
+  // Mouse drag support for desktop
+  const handleMouseDown = (e) => {
+    if (!sliderRef.current) return;
+    if (e.target.closest('button')) return;
+    isDraggingRef.current = true;
+    isPausedRef.current = true;
+    startXRef.current = e.pageX - sliderRef.current.offsetLeft;
+    startScrollLeftRef.current = sliderRef.current.scrollLeft;
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDraggingRef.current || !sliderRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - sliderRef.current.offsetLeft;
+    const walk = (x - startXRef.current) * 1.5;
+    sliderRef.current.scrollLeft = startScrollLeftRef.current - walk;
+    scrollPosRef.current = sliderRef.current.scrollLeft;
+  };
+
+  const handleMouseUpOrLeave = () => {
+    if (isDraggingRef.current) {
+      isDraggingRef.current = false;
+      if (sliderRef.current) scrollPosRef.current = sliderRef.current.scrollLeft;
+      if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+      isPausedRef.current = false;
+    }
+  };
+
   return (
-    <div className="mt-20 sm:mt-28 pt-16 border-t border-gold/20 relative z-10">
+    <div className="relative z-10">
       <div className="text-center mb-10 pointer-events-none select-none">
         <span className="font-sans uppercase text-gold text-[11px] tracking-[0.25em] font-semibold block mb-3">
           FACULTY & MENTORSHIP
@@ -86,61 +240,106 @@ const MentorsSliderSection = React.memo(() => {
         </p>
       </div>
 
-      {/* Continuous Right-to-Left Marquee Slider */}
-      <div className="relative overflow-hidden w-full py-6">
+      {/* Interactive Slider Track Container - Non-stop movement */}
+      <div 
+        className="relative w-full py-4 group/slider"
+        onTouchStart={() => {
+          isPausedRef.current = true;
+        }}
+        onTouchEnd={() => {
+          if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+          resumeTimeoutRef.current = setTimeout(() => {
+            if (sliderRef.current) scrollPosRef.current = sliderRef.current.scrollLeft;
+            isPausedRef.current = false;
+          }, 800);
+        }}
+      >
         {/* Subtle Gradient Edge Fades */}
-        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-r from-[#0c0103] to-transparent z-20 pointer-events-none"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-l from-[#0c0103] to-transparent z-20 pointer-events-none"></div>
+        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-r from-[#0c0103] via-[#0c0103]/80 to-transparent z-20 pointer-events-none"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-l from-[#0c0103] via-[#0c0103]/80 to-transparent z-20 pointer-events-none"></div>
 
-        {/* Infinite Animated Marquee Strip */}
-        <div className="flex w-max gap-6 sm:gap-8 animate-mentor-slider">
-          {[...MENTORS_DATA, ...MENTORS_DATA, ...MENTORS_DATA, ...MENTORS_DATA].map((mentor, idx) => (
-            <div
-              key={idx}
-              className="w-[280px] sm:w-[320px] md:w-[340px] flex-shrink-0 bg-gradient-to-b from-[#1a0509] to-[#0d0204] border border-gold/25 rounded-2xl overflow-hidden shadow-xl hover:border-gold hover:shadow-[0_0_25px_rgba(201,162,77,0.3)] transition-all duration-300 group/card cursor-pointer mentor-card-gpu"
-            >
-              {/* Mentor Image Container */}
-              <div className="relative h-[320px] sm:h-[360px] overflow-hidden bg-black/60">
-                <img
-                  src={mentor.img}
-                  alt={mentor.name}
-                  decoding="async"
-                  loading="lazy"
-                  className="w-full h-full object-cover object-top group-hover/card:scale-105 transition-transform duration-500 ease-out mentor-card-gpu"
-                />
-                {/* Gradient overlay for text contrast */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0d0204] via-[#0d0204]/30 to-transparent opacity-90 pointer-events-none"></div>
+        {/* Floating Left Navigation Arrow */}
+        <button
+          type="button"
+          onClick={() => handleScroll('left')}
+          aria-label="Previous Mentor"
+          className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-full bg-[#1c0206]/95 border-2 border-gold/70 text-gold flex items-center justify-center shadow-[0_4px_25px_rgba(0,0,0,0.8),0_0_20px_rgba(201,162,77,0.35)] hover:bg-gold hover:text-[#1c0206] hover:border-gold hover:scale-110 hover:shadow-[0_0_30px_rgba(201,162,77,0.7)] active:scale-95 transition-all duration-300 cursor-pointer backdrop-blur-md group/arrow focus:outline-none focus:ring-2 focus:ring-gold"
+        >
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 transition-transform group-hover/arrow:-translate-x-0.5" />
+        </button>
 
-                {/* Top Badge */}
-                <div className="absolute top-4 left-4 z-10 pointer-events-none">
-                  <span className="px-3 py-1 bg-[#240000]/95 border border-gold/40 rounded-full text-[10px] font-sans font-semibold tracking-wider text-gold uppercase shadow-md">
-                    {mentor.badge}
+        {/* Floating Right Navigation Arrow */}
+        <button
+          type="button"
+          onClick={() => handleScroll('right')}
+          aria-label="Next Mentor"
+          className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-full bg-[#1c0206]/95 border-2 border-gold/70 text-gold flex items-center justify-center shadow-[0_4px_25px_rgba(0,0,0,0.8),0_0_20px_rgba(201,162,77,0.35)] hover:bg-gold hover:text-[#1c0206] hover:border-gold hover:scale-110 hover:shadow-[0_0_30px_rgba(201,162,77,0.7)] active:scale-95 transition-all duration-300 cursor-pointer backdrop-blur-md group/arrow focus:outline-none focus:ring-2 focus:ring-gold"
+        >
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 transition-transform group-hover/arrow:translate-x-0.5" />
+        </button>
+
+        {/* Smooth Scrollable Container */}
+        <div
+          ref={sliderRef}
+          onScroll={handleScrollEvent}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUpOrLeave}
+          className="flex overflow-x-auto scrollbar-none py-6 px-4 sm:px-6 select-none cursor-grab active:cursor-grabbing"
+          style={{ scrollBehavior: 'auto' }}
+        >
+          {/* Cards Strip */}
+          <div className="flex w-max gap-6 sm:gap-8">
+            {repeatedMentors.map((mentor, idx) => (
+              <div
+                key={idx}
+                className="mentor-slider-card w-[280px] sm:w-[320px] md:w-[340px] flex-shrink-0 bg-gradient-to-b from-[#1a0509] to-[#0d0204] border border-gold/25 rounded-2xl overflow-hidden shadow-xl hover:border-gold hover:shadow-[0_0_25px_rgba(201,162,77,0.3)] transition-all duration-300 group/card cursor-pointer mentor-card-gpu"
+              >
+                {/* Mentor Image Container */}
+                <div className="relative h-[320px] sm:h-[360px] overflow-hidden bg-black/60">
+                  <img
+                    src={mentor.img}
+                    alt={mentor.name}
+                    decoding="async"
+                    loading="lazy"
+                    className="w-full h-full object-cover object-top group-hover/card:scale-105 transition-transform duration-500 ease-out mentor-card-gpu"
+                  />
+                  {/* Gradient overlay for text contrast */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d0204] via-[#0d0204]/30 to-transparent opacity-90 pointer-events-none"></div>
+
+                  {/* Top Badge */}
+                  <div className="absolute top-4 left-4 z-10 pointer-events-none">
+                    <span className="px-3 py-1 bg-[#240000]/95 border border-gold/40 rounded-full text-[10px] font-sans font-semibold tracking-wider text-gold uppercase shadow-md">
+                      {mentor.badge}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Mentor Info & Label */}
+                <div className="p-6 relative z-10 bg-[#0d0204] border-t border-gold/10">
+                  <h4 className="font-serif text-lg sm:text-xl font-bold text-white tracking-wide uppercase group-hover/card:text-gold transition-colors duration-300 leading-snug min-h-[56px] flex items-center">
+                    {mentor.name}
+                  </h4>
+                  <p className="text-xs font-sans text-gold/90 font-medium tracking-wider mt-1 uppercase">
+                    {mentor.title}
+                  </p>
+                  {mentor.bio && (
+                    <p className="text-[11.5px] text-white/70 font-light leading-relaxed mt-2.5 min-h-[36px] group-hover/card:text-white/90 transition-colors duration-300">
+                      {mentor.bio}
+                    </p>
+                  )}
+                  <div className="w-full h-[1px] bg-gradient-to-r from-gold/30 via-gold/10 to-transparent mt-4 mb-3"></div>
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-sans font-semibold text-white/50 group-hover/card:text-gold transition-colors duration-300">
+                    <span>Beever Academy Faculty</span>
+                    <Sparkles className="w-3 h-3 text-gold/70" />
                   </span>
                 </div>
               </div>
-
-              {/* Mentor Info & Label */}
-              <div className="p-6 relative z-10 bg-[#0d0204] border-t border-gold/10">
-                <h4 className="font-serif text-lg sm:text-xl font-bold text-white tracking-wide uppercase group-hover/card:text-gold transition-colors duration-300 leading-snug min-h-[56px] flex items-center">
-                  {mentor.name}
-                </h4>
-                <p className="text-xs font-sans text-gold/90 font-medium tracking-wider mt-1 uppercase">
-                  {mentor.title}
-                </p>
-                {mentor.bio && (
-                  <p className="text-[11.5px] text-white/70 font-light leading-relaxed mt-2.5 min-h-[36px] group-hover/card:text-white/90 transition-colors duration-300">
-                    {mentor.bio}
-                  </p>
-                )}
-                <div className="w-full h-[1px] bg-gradient-to-r from-gold/30 via-gold/10 to-transparent mt-4 mb-3"></div>
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-sans font-semibold text-white/50 group-hover/card:text-gold transition-colors duration-300">
-                  <span>Beever Academy Faculty</span>
-                  <Sparkles className="w-3 h-3 text-gold/70" />
-                </span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
+
       </div>
     </div>
   );
@@ -2783,6 +2982,99 @@ export default function App() {
     </section>
   );
 
+  // ==========================================
+  // ADVANCED COURSES "LAUNCHING SOON" ANNOUNCEMENT
+  // ==========================================
+  const AdvancedLaunchingSoonAnnouncement = () => {
+    const [isVisible, setIsVisible] = useState(false);
+    const announcementRef = useRef(null);
+
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        },
+        { threshold: 0.2 }
+      );
+
+      if (announcementRef.current) {
+        observer.observe(announcementRef.current);
+      }
+
+      return () => observer.disconnect();
+    }, []);
+
+    return (
+      <div
+        ref={announcementRef}
+        className={`relative overflow-hidden rounded-2xl p-4 sm:p-5 my-4 border transition-all duration-700 ease-out ${
+          isVisible
+            ? 'opacity-100 translate-y-0 border-gold/50 shadow-[0_4px_25px_rgba(201,162,77,0.18),0_0_15px_rgba(201,162,77,0.1)] bg-gradient-to-br from-[#2a040a]/8 via-[#2a040a]/4 to-[#c9a24d]/10'
+            : 'opacity-0 translate-y-3 border-gold/20 shadow-none bg-ivory/40'
+        }`}
+      >
+        {/* Subtle floating gold particle accents */}
+        <span
+          className="absolute top-2.5 left-4 w-1.5 h-1.5 rounded-full bg-gold/70 floating-gold-particle pointer-events-none"
+          style={{ animationDelay: '0s' }}
+        ></span>
+        <span
+          className="absolute top-5 right-5 w-2 h-2 rounded-full bg-gold/60 floating-gold-particle pointer-events-none"
+          style={{ animationDelay: '1.2s' }}
+        ></span>
+        <span
+          className="absolute bottom-2.5 left-1/3 w-1 h-1 rounded-full bg-gold/80 floating-gold-particle pointer-events-none"
+          style={{ animationDelay: '2.4s' }}
+        ></span>
+        <span
+          className="absolute bottom-3 right-6 w-1.5 h-1.5 rounded-full bg-gold/50 floating-gold-particle pointer-events-none"
+          style={{ animationDelay: '0.8s' }}
+        ></span>
+
+        {/* Main Announcement Heading with Reveal & Golden Shimmer */}
+        <div className="relative text-center z-10">
+          <div className="inline-flex items-center justify-center gap-1.5 mb-1">
+            <Sparkles className="w-3 h-3 text-gold-dark opacity-80" />
+            <span className="text-[9.5px] font-sans uppercase font-bold tracking-[0.25em] text-gold-dark">
+              Exclusive Announcement
+            </span>
+            <Sparkles className="w-3 h-3 text-gold-dark opacity-80" />
+          </div>
+
+          <h4
+            className={`font-serif text-lg sm:text-xl font-bold tracking-[0.16em] uppercase transition-all duration-700 ease-out ${
+              isVisible
+                ? 'opacity-100 translate-y-0 text-gold-shimmer'
+                : 'opacity-0 translate-y-2 text-burgundy'
+            }`}
+          >
+            LAUNCHING SOON
+          </h4>
+
+          {/* Thin Gold Line Expanding Outward from Center */}
+          <div className="relative py-1.5 flex justify-center">
+            <div
+              className={`h-[1.5px] bg-gradient-to-r from-transparent via-gold to-transparent transition-transform duration-1000 delay-300 ease-out origin-center ${
+                isVisible ? 'w-44 sm:w-52 scale-x-100 opacity-100' : 'w-44 sm:w-52 scale-x-0 opacity-0'
+              }`}
+            ></div>
+          </div>
+
+          {/* Supporting Line with Delayed Fade-in */}
+          <p
+            className={`font-serif italic text-xs text-charcoal/85 leading-relaxed max-w-[280px] mx-auto transition-all duration-700 delay-500 ease-out ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+            }`}
+          >
+            “Something extraordinary is on its way. Stay tuned.”
+          </p>
+        </div>
+      </div>
+    );
+  };
+
   const renderStrengths = () => {
     const programmes = [
       {
@@ -2857,7 +3149,9 @@ export default function App() {
                 className={`relative flex flex-col justify-between rounded-3xl p-8 sm:p-10 transition-all duration-300 ${
                   prog.highlight
                     ? 'bg-gradient-to-b from-[#220207] to-[#120003] text-white border-2 border-gold shadow-[0_10px_35px_rgba(201,162,77,0.25)] hover:shadow-[0_15px_45px_rgba(201,162,77,0.35)] -translate-y-1'
-                    : 'bg-ivory/60 border border-burgundy/15 text-charcoal shadow-md hover:shadow-xl hover:border-gold/40'
+                    : prog.id === 'prog-03'
+                      ? 'bg-ivory/70 border-2 border-gold/45 text-charcoal shadow-md hover:shadow-2xl hover:border-gold'
+                      : 'bg-ivory/60 border border-burgundy/15 text-charcoal shadow-md hover:shadow-xl hover:border-gold/40'
                 }`}
               >
                 {/* Top Badge */}
@@ -2866,18 +3160,29 @@ export default function App() {
                     <span className={`font-sans text-[11px] font-bold tracking-widest uppercase ${prog.highlight ? 'text-gold' : 'text-gold-dark'}`}>
                       {prog.number}
                     </span>
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-sans font-bold tracking-wider uppercase ${
-                      prog.highlight
-                        ? 'bg-gold text-burgundy-dark'
-                        : 'bg-burgundy/10 text-burgundy'
-                    }`}>
-                      {prog.badge}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {prog.id === 'prog-03' && (
+                        <span className="px-2.5 py-1 rounded-full text-[10px] font-sans font-bold tracking-wider uppercase bg-[#28040a] text-gold border border-gold/40 shadow-sm flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>
+                          LAUNCHING SOON
+                        </span>
+                      )}
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-sans font-bold tracking-wider uppercase ${
+                        prog.highlight
+                          ? 'bg-gold text-burgundy-dark'
+                          : 'bg-burgundy/10 text-burgundy'
+                      }`}>
+                        {prog.badge}
+                      </span>
+                    </div>
                   </div>
 
                   <h3 className={`text-2xl sm:text-3xl font-serif font-bold tracking-wide mb-3 ${prog.highlight ? 'text-white' : 'text-burgundy'}`}>
                     {prog.title}
                   </h3>
+
+                  {/* Elegant Animated "LAUNCHING SOON" Announcement for Advanced Courses */}
+                  {prog.id === 'prog-03' && <AdvancedLaunchingSoonAnnouncement />}
 
                   <p className={`text-xs sm:text-[13px] leading-relaxed mb-6 ${prog.highlight ? 'text-white/80' : 'text-text-secondary'}`}>
                     <strong className={prog.highlight ? 'text-gold' : 'text-burgundy'}>For Whom: </strong>
@@ -2931,7 +3236,7 @@ export default function App() {
                         : 'bg-burgundy text-white hover:bg-burgundy-light hover:-translate-y-0.5'
                     }`}
                   >
-                    Enquire Now
+                    {prog.id === 'prog-03' ? 'Pre-Register Interest' : 'Enquire Now'}
                   </a>
                 </div>
               </div>
@@ -2971,47 +3276,140 @@ export default function App() {
     ];
 
     return (
-      <section id="experience" className="py-20 md:py-28 bg-ivory text-center relative overflow-hidden">
+      <section id="experience" className="py-20 md:py-28 bg-gradient-to-b from-[#37060F] via-[#2B040B] to-[#1C0206] text-center relative overflow-hidden text-white border-y border-gold/20">
+        {/* Subtle decorative glow */}
+        <div className="absolute inset-0 bg-radial-gradient from-burgundy-light/20 via-transparent to-black/40 pointer-events-none"></div>
+
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
           <div className="mb-16">
-            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.2em] font-semibold block mb-3">
+            <span className="font-sans uppercase text-gold text-[11px] tracking-[0.25em] font-semibold block mb-3">
               METHODOLOGY & APPROACH
             </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-3 font-bold">
+            <h2 className="text-4xl md:text-5xl font-serif text-white mb-3 font-bold tracking-wide">
               The Learning Experience.
             </h2>
-            <h3 className="text-lg md:text-xl font-serif text-gold-dark mb-4 font-medium italic">
+            <h3 className="text-lg md:text-xl font-serif text-gold-light mb-4 font-medium italic">
               Learn with Guidance. Develop Through Practice.
             </h3>
-            <div className="w-[80px] h-[2px] bg-gold-gradient mx-auto mb-6"></div>
+            <div className="w-[80px] h-[2px] bg-gold mx-auto mb-6 opacity-80"></div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
             {stages.map((stage, idx) => (
               <div
                 key={idx}
-                className="bg-white p-8 rounded-2xl border border-burgundy/10 shadow-sm hover:shadow-xl hover:border-gold/50 hover:-translate-y-1 transition-all duration-300 relative group flex flex-col justify-between"
+                className="bg-gradient-to-b from-[#240006]/90 to-[#150003]/95 p-8 rounded-2xl border border-gold/25 shadow-lg hover:shadow-[0_0_25px_rgba(201,162,77,0.25)] hover:border-gold hover:-translate-y-1 transition-all duration-300 relative group flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <span className="font-serif text-4xl font-bold text-gold/60 group-hover:text-gold transition-colors duration-300">
+                    <span className="font-serif text-4xl font-bold text-gold/70 group-hover:text-gold transition-colors duration-300">
                       {stage.step}
                     </span>
-                    <div className="w-10 h-10 rounded-xl bg-burgundy/5 group-hover:bg-gold/15 text-gold-dark flex items-center justify-center transition-colors duration-300">
+                    <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/25 group-hover:bg-gold/20 text-gold flex items-center justify-center transition-colors duration-300">
                       {stage.icon}
                     </div>
                   </div>
 
-                  <h4 className="font-serif text-base font-bold text-burgundy mb-3 tracking-wide">
+                  <h4 className="font-serif text-base font-bold text-white mb-3 tracking-wide group-hover:text-gold transition-colors duration-300">
                     {stage.title}
                   </h4>
 
-                  <p className="text-xs sm:text-[13px] text-text-secondary leading-relaxed">
+                  <p className="text-xs sm:text-[13px] text-white/80 leading-relaxed font-light">
                     {stage.desc}
                   </p>
                 </div>
 
-                <div className="w-12 h-[2px] bg-gold/30 group-hover:w-full group-hover:bg-gold transition-all duration-500 mt-6"></div>
+                <div className="w-12 h-[2px] bg-gold/40 group-hover:w-full group-hover:bg-gold transition-all duration-500 mt-6"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  };
+
+  const renderMeetTheBoard = () => {
+    const boardDirectors = [
+      {
+        id: "dir-01",
+        name: "KRISHNAMOORTHI VENKATACHALAM",
+        title: "Chairman",
+        desc: "With over 40 years of financial market experience, he brings a seasoned perspective to Beever Academy. He provides strategic direction, helping shape the academy's priorities and long-term educational vision.",
+        img: mentor1Img
+      },
+      {
+        id: "dir-02",
+        name: "PRAVEEN PATHIYIL",
+        title: "Academic Director",
+        desc: "With over 20 years of financial market experience, his background spans fund management, advisory, research and financial publishing. His expertise in Gann and technical analysis informs Beever's academic direction and approach to explaining complex market concepts.",
+        img: mentor2Img
+      },
+      {
+        id: "dir-03",
+        name: "ABDUL JALEEL",
+        title: "Head of Operations",
+        desc: "Abdul Jaleel brings nearly three decades of experience in the gold industry and a practical understanding of its market dynamics. He oversees operational coordination and supports the smooth delivery of the academy's programmes.",
+        img: mentor5Img
+      },
+      {
+        id: "dir-04",
+        name: "MUHAMMED H",
+        title: "Academic Head",
+        desc: "Muhammed H brings together financial market experience, team leadership and a practical approach to trader education. With a focus on gold, technical analysis and structured strategies, he guides mentor coordination, programme delivery and the student learning experience.",
+        img: mentor3Img
+      }
+    ];
+
+    return (
+      <section id="board" className="py-20 md:py-32 bg-[#FAF7F2] text-center relative border-t border-gold/20">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
+          {/* Section Header */}
+          <div className="mb-12 md:mb-16 text-center">
+            <span className="font-sans uppercase text-gold-dark text-[11px] tracking-[0.25em] font-semibold block mb-2">
+              LEADERSHIP & GOVERNANCE
+            </span>
+            <h2 className="text-4xl md:text-5xl font-serif text-burgundy mb-2 font-bold tracking-wide">
+              Meet the Board
+            </h2>
+            <div className="w-[70px] h-[2px] bg-gold-gradient mx-auto mb-3"></div>
+            <p className="text-sm md:text-base text-text-secondary max-w-[800px] mx-auto leading-relaxed font-light">
+              Meet the visionaries and leaders driving Beever Academy forward through expertise, dedication and a commitment to excellence.
+            </p>
+          </div>
+
+          {/* 2 x 2 Profile Cards Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 text-left">
+            {boardDirectors.map((director) => (
+              <div
+                key={director.id}
+                className="bg-white p-6 sm:p-8 rounded-2xl border border-gold/30 shadow-[0_8px_20px_-4px_rgba(0,0,0,0.08),0_4px_8px_-2px_rgba(0,0,0,0.04)] -translate-y-1 hover:-translate-y-2 hover:shadow-[0_16px_32px_-6px_rgba(0,0,0,0.12),0_8px_16px_-4px_rgba(0,0,0,0.06)] hover:border-gold/60 transition-all duration-300 group flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-7 relative overflow-hidden"
+              >
+                {/* Director Portrait with Elegant Burgundy Border */}
+                <div className="w-[140px] sm:w-[150px] md:w-[160px] h-[180px] sm:h-[195px] md:h-[205px] flex-shrink-0 p-1 rounded-xl border-2 border-burgundy bg-white shadow-md overflow-hidden group-hover:border-burgundy-light transition-colors duration-300">
+                  <img
+                    src={director.img}
+                    alt={director.name}
+                    className="w-full h-full object-cover object-top rounded-lg group-hover:scale-105 transition-transform duration-500 ease-out"
+                    loading="lazy"
+                  />
+                </div>
+
+                {/* Director Information */}
+                <div className="flex-1 flex flex-col justify-center text-center sm:text-left">
+                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-burgundy uppercase tracking-wide leading-tight mb-1 group-hover:text-gold-dark transition-colors duration-300">
+                    {director.name}
+                  </h3>
+                  <span className="font-sans text-xs sm:text-[13px] font-semibold text-gold-dark tracking-wider uppercase mb-2.5 block">
+                    {director.title}
+                  </span>
+                  <div className="w-12 h-[1.5px] bg-gold/50 mx-auto sm:mx-0 mb-3.5"></div>
+                  <p className="text-xs sm:text-sm text-charcoal/85 leading-relaxed font-light text-justify sm:text-left">
+                    {director.desc}
+                  </p>
+                </div>
+
+                {/* Subtle decorative gold line at bottom of card */}
+                <div className="absolute bottom-0 left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-gold/30 to-transparent"></div>
               </div>
             ))}
           </div>
@@ -3692,6 +4090,7 @@ export default function App() {
         {renderGlobalNetwork()}
         {renderStrengths()}
         {renderLearningExperience()}
+        {renderMeetTheBoard()}
         {renderFaculty()}
         {renderInsideGallery()}
         {renderCareers()}

@@ -319,4 +319,74 @@ html.lenis, html.lenis body {
   -webkit-backface-visibility: hidden;
   transform: translateZ(0);
   will-change: transform, border-color, box-shadow;
-}
+}
+
+/* Hide scrollbars cross-browser */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ==========================================
+   ADVANCED COURSES "LAUNCHING SOON" ANIMATION
+   ========================================== */
+@keyframes goldTextShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.text-gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    #4a0e17 0%,
+    #4a0e17 25%,
+    #C9A24D 45%,
+    #FFF5D6 50%,
+    #C9A24D 55%,
+    #4a0e17 75%,
+    #4a0e17 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: goldTextShimmer 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes floatParticle {
+  0%, 100% {
+    transform: translateY(0px) scale(0.9);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-6px) scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+.floating-gold-particle {
+  animation: floatParticle 3.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-gold-shimmer {
+    animation: none;
+    background: none;
+    color: #4a0e17;
+  }
+  .floating-gold-particle {
+    animation: none;
+  }
+}
+
+
+
+
+
